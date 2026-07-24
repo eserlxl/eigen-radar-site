@@ -2,6 +2,7 @@ const CACHE = 'eigen-radar-shell-v3';
 const SHELL = [
   '/index.html',
   '/manifest.webmanifest',
+  '/favicon.ico',
   '/assets/icon.svg',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
