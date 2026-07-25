@@ -1,4 +1,19 @@
 (() => {
+  document.querySelectorAll('[data-writer-history]').forEach(root => {
+    const label = root.querySelector('label[for="writer-history-select"]');
+    const select = root.querySelector('[data-writer-history-select]');
+    const fallback = root.querySelector('[data-writer-history-fallback]');
+    if (!label || !select || select.options.length < 2) return;
+    select.addEventListener('change', () => {
+      if (select.value) window.location.assign(select.value);
+    });
+    label.hidden = false;
+    select.hidden = false;
+    if (fallback) fallback.hidden = true;
+  });
+})();
+
+(() => {
   document.querySelectorAll('[data-brief-listen]').forEach(root => {
     if (!('speechSynthesis' in window)
         || !('SpeechSynthesisUtterance' in window)) return;
