@@ -35,16 +35,17 @@
     if (!parts.length) return;
 
     const synth = window.speechSynthesis;
+    const defaultRate = 1.2;
     const normalize = value => {
       const parsed = Number.parseFloat(value);
       return Number.isFinite(parsed) && parsed >= 0.5 && parsed <= 2
         ? Math.round(parsed * 10) / 10
-        : 1;
+        : defaultRate;
     };
     try {
       rate.value = String(normalize(localStorage.getItem('ttsRate')));
     } catch {
-      rate.value = '1';
+      rate.value = String(defaultRate);
     }
     const showRate = () => {
       output.value = `${rate.value}×`;
