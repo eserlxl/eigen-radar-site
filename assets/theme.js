@@ -3,7 +3,7 @@
   const storageKey = 'theme';
   const colors = {
     dark: '#0b0f1a',
-    light: '#dde2e8',
+    light: '#d3d9e1',
   };
   const copy = {
     tr: {
