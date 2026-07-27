@@ -1,4 +1,4 @@
-const CACHE = 'eigen-radar-shell-v3';
+const CACHE = 'eigen-radar-shell-v4';
 const SHELL = [
   '/index.html',
   '/manifest.webmanifest',
@@ -6,6 +6,7 @@ const SHELL = [
   '/assets/icon.svg',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
+  '/assets/theme.js',
 ];
 
 self.addEventListener('install', event => {

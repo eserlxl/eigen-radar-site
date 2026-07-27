@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b0f1a">
+<meta name="color-scheme" content="dark light">
+<script>
+(()=>{let t='dark';try{t=localStorage.getItem('theme')==='light'?'light':'dark'}catch{}
+document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;
+document.querySelector('meta[name="theme-color"]').content=t==='light'?'#f4f6fb':'#0b0f1a'})();
+</script>
 <title>Hakkında / About — Eigen Radar</title>
 <meta name="description" content="Eigen Radar nedir, içerikler nasıl üretilir ve bize nasıl ulaşırsınız. What Eigen Radar is, how its content is produced, and how to reach us.">
 <link rel="canonical" href="https://eigenradar.com/about">
@@ -18,20 +24,23 @@
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <style>
-  :root{--bg:#0b0f1a;--card:#151c2c;--line:#2d3a56;--text:#e8ecf5;--muted:#aab4c8;--accent:#4fd1c5}
+  :root{--bg:#0b0f1a;--card:#151c2c;--line:#2d3a56;--text:#e8ecf5;--muted:#aab4c8;--accent:#4fd1c5;--scheme:dark;--focus:#fff;--on-accent:#071019;--drawer-shadow:rgba(0,0,0,.35)}
+  :root[data-theme="light"]{--bg:#f4f6fb;--card:#fff;--line:#c7d1df;--text:#111827;--muted:#526078;--accent:#087f78;--scheme:light;--focus:#0f172a;--on-accent:#fff;--drawer-shadow:rgba(15,23,42,.22)}
   *{margin:0;padding:0;box-sizing:border-box}
+  html{color-scheme:var(--scheme)}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.65}
   .wrap{max-width:47.5rem;margin:0 auto;padding:2rem 1.25rem 4rem}
   a{color:var(--accent)}
-  :focus-visible{outline:3px solid #fff;outline-offset:3px}
-  .skip{position:fixed;left:12px;top:-80px;background:var(--accent);color:#071019;padding:10px 14px;border-radius:8px;z-index:2;font-weight:800}.skip:focus{top:12px}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+  .skip{position:fixed;left:12px;top:-80px;background:var(--accent);color:var(--on-accent);padding:10px 14px;border-radius:8px;z-index:2;font-weight:800}.skip:focus{top:12px}
   h1{font-size:1.7rem;margin:18px 0 6px;letter-spacing:-.02em}
   h2{font-size:1.15rem;margin:28px 0 8px;color:var(--accent)}
   p,li{color:var(--text);margin:10px 0}
   ul{padding-left:22px}
   .muted{color:var(--muted);font-size:.9rem}
   .home{display:inline-block;margin-bottom:8px;text-decoration:none;font-weight:600}
-  .languages{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 24px}.languages a{display:inline-flex;align-items:center;min-height:44px;padding:4px 12px;border:1px solid var(--line);border-radius:999px}
+  .page-controls{display:flex;width:max-content;align-items:center;gap:6px;margin:8px 0 24px}.languages{display:flex;gap:8px;flex-wrap:wrap}.languages a{display:inline-flex;align-items:center;min-height:44px;padding:4px 12px;border:1px solid var(--line);border-radius:999px}
+  .theme-switch{appearance:none;position:relative;display:block;width:44px;height:24px;padding:2px;border:1px solid var(--line);border-radius:999px;background:var(--card);cursor:pointer}.theme-switch-thumb{position:absolute;display:grid;place-items:center;inset:2px auto 2px 2px;width:18px;border:1.5px solid var(--accent);border-radius:999px;background:transparent;box-shadow:0 1px 4px var(--drawer-shadow);transition:transform .18s ease}:root[data-theme="light"] .theme-switch-thumb{transform:translateX(20px)}.theme-switch-icon{grid-area:1/1;display:grid;place-items:center;pointer-events:none;opacity:0;transform:scale(.72);transition:opacity .12s ease,transform .18s ease}.theme-switch-icon svg{display:block;width:11px;height:11px}.theme-switch-icon.moon{color:var(--text);opacity:1;transform:scale(1)}.theme-switch-icon.sun{color:var(--text)}:root[data-theme="light"] .theme-switch-icon.moon{opacity:0;transform:scale(.72)}:root[data-theme="light"] .theme-switch-icon.sun{opacity:1;transform:scale(1)}
   section[lang="en"]{border-top:1px solid var(--line);margin-top:40px;padding-top:24px}
   @media(min-width:1440px){html{font-size:106.25%}}
   @media(min-width:1920px){html{font-size:112.5%}}
@@ -39,6 +48,7 @@
   @media(max-width:340px){.wrap{padding-inline:14px}}
   @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style>
+<script src="/assets/theme.js" defer></script>
 <!-- X conversion tracking base code -->
 <script>
 !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
@@ -52,7 +62,15 @@ twq('config','re3b4');
 <a class="skip" href="#content">Ana içeriğe geç / Skip to content</a>
 <main class="wrap" id="content">
 <a class="home" href="/tr/">← Eigen Radar</a>
+<div class="page-controls">
 <nav class="languages" aria-label="Sayfa dili / Page language"><a href="#turkce" lang="tr">Türkçe</a><a href="#english" lang="en">English</a></nav>
+<button class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Açık tema" title="Açık temaya geç" data-theme-switch>
+<span class="theme-switch-thumb" aria-hidden="true">
+<span class="theme-switch-icon moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 15.1A8.5 8.5 0 0 1 8.9 3.6a8.5 8.5 0 1 0 11.5 11.5Z"/></svg></span>
+<span class="theme-switch-icon sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
+</span>
+</button>
+</div>
 
 <section lang="tr" id="turkce">
 <h1>Hakkında</h1>
