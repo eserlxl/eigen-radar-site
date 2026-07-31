@@ -7,3 +7,7 @@
 .remember/**
 **/.remember/**
 **/.DS_Store
+
+# Build-only npm metadata pins Wrangler and must not become public site content.
+package.json
+package-lock.json
