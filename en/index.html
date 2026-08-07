@@ -1159,11 +1159,6 @@ const UI = {
     siteName:"Eigen Radar",
     skip:"Ana içeriğe geç",
     featTitle:"Gündem",
-    briefSlogans:[
-      "Her gün yüzlerce kaynağı eksiksiz analizlere dönüştürüyoruz.",
-      "Tuzak başlık, boş haber yok. Sadece kaliteli içerikler.",
-      "Her içerik çok aşamalı bir denetimden süzülerek hazırlanmaktadır."
-    ],
     newsTitle:"Son Gelişmeler",
     homeViewNav:"İçerik görünümleri",
     filtersLabel:"Haber filtreleri",
@@ -1226,11 +1221,6 @@ const UI = {
     siteName:"Eigen Radar",
     skip:"Skip to main content",
     featTitle:"Briefs",
-    briefSlogans:[
-      "Every day we scan hundreds of trusted sources and turn them into concise analyses.",
-      "No clickbait. No endless feeds. Insight over noise.",
-      "Every article is continuously reviewed for clarity, sources, and consistency."
-    ],
     newsTitle:"Latest Stories",
     homeViewNav:"Content views",
     filtersLabel:"News filters",
@@ -1289,8 +1279,6 @@ const UI = {
     filterAll:"All"
   }
 };
-const BRIEF_SLOGAN_OFFSET = Math.floor(Math.random() * UI.en.briefSlogans.length);
-
 /* =========================================================
    News data (tr + en)
 ========================================================= */
@@ -1737,10 +1725,6 @@ function briefCard(brief, index, eager=true, pageIndex=0){
   const height = Number.isInteger(image.height) && image.height > 0 ? image.height : 720;
   const loading = eager && index===0 ? 'eager' : 'lazy';
   const priority = eager && index===0 ? ' fetchpriority="high"' : '';
-  const u = UI[LANG];
-  const slogan = u.briefSlogans[
-    (BRIEF_SLOGAN_OFFSET + index) % u.briefSlogans.length
-  ];
   const sizes = index===0
     ? '(min-width:2560px) 60rem,(min-width:1920px) 56rem,(min-width:1440px) 50rem,(min-width:1200px) 47rem,(min-width:641px) 66vw,calc(100vw - 2rem)'
     : '(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:641px) 33vw,calc(100vw - 2rem)';
@@ -1751,7 +1735,7 @@ function briefCard(brief, index, eager=true, pageIndex=0){
   const media = src ? `<figure class="brief-media">
     ${mediaOpen}<picture>
       ${srcset ? `<source type="image/webp" srcset="${escapeHTML(srcset)}" sizes="${sizes}">` : ''}
-      <img src="${escapeHTML(src)}"${srcset ? ` srcset="${escapeHTML(srcset)}" sizes="${sizes}"` : ''} width="${width}" height="${height}" loading="${loading}" decoding="async"${priority} alt="${escapeHTML(localized(image.alt))}" title="${escapeHTML(slogan)}">
+      <img src="${escapeHTML(src)}"${srcset ? ` srcset="${escapeHTML(srcset)}" sizes="${sizes}"` : ''} width="${width}" height="${height}" loading="${loading}" decoding="async"${priority} alt="${escapeHTML(localized(image.alt))}">
     </picture>${mediaClose}
   </figure>` : '';
   el.className = 'fcard brief-card';
@@ -2027,17 +2011,12 @@ function renderBriefs(){
   });
   section.hidden = total===0;
   scrollBriefTrack(false);
+  resetBriefReveal();
 }
 
 const BRIEF_REVEAL_MEDIA = matchMedia('(min-width:960px)');
 const BRIEF_REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)');
-let briefRevealTimer = 0;
-function cancelBriefReveal(){
-  clearTimeout(briefRevealTimer);
-  briefRevealTimer = 0;
-}
 function resetBriefReveal(){
-  cancelBriefReveal();
   document.querySelectorAll('.brief-card.is-brief-revealed').forEach(card=>{
     card.classList.remove('is-brief-revealed','is-brief-reveal-transition');
     card.style.removeProperty('--brief-reveal-height');
@@ -2050,6 +2029,7 @@ function resetBriefReveal(){
 function revealBriefCard(card){
   const page = card?.closest('.brief-page');
   if (!card?.isConnected || page?.dataset.editionKey !== selectedBriefDate
+      || card !== page.querySelector('.brief-card')
       || card.classList.contains('is-brief-revealed')
       || !BRIEF_REVEAL_MEDIA.matches || BRIEF_REDUCED_MOTION.matches
       || document.visibilityState !== 'visible' || activeHomeView !== 'briefs') return;
@@ -2070,38 +2050,45 @@ function revealBriefCard(card){
   card.classList.add('is-brief-reveal-transition');
   [media,content].forEach(part=>{ part.style.transform = ''; });
 }
-function scheduleBriefReveal(){
-  cancelBriefReveal();
-  if (!BRIEF_REVEAL_MEDIA.matches || BRIEF_REDUCED_MOTION.matches
-      || document.visibilityState !== 'visible' || activeHomeView !== 'briefs') return;
-  const page = briefTrackPages().find(item=>item.dataset.editionKey===selectedBriefDate);
-  const card = page?.querySelector('.brief-card');
-  if (!card || card.classList.contains('is-brief-revealed')) return;
-  briefRevealTimer = setTimeout(()=>{
-    briefRevealTimer = 0;
-    revealBriefCard(card);
-  }, 5000);
-}
 document.addEventListener('visibilitychange', ()=>{
-  if (document.visibilityState === 'visible') scheduleBriefReveal();
-  else cancelBriefReveal();
-});
-const briefRevealPreferenceChange = ()=>{
   resetBriefReveal();
-  scheduleBriefReveal();
-};
+});
 [BRIEF_REVEAL_MEDIA,BRIEF_REDUCED_MOTION].forEach(query=>{
   if (typeof query.addEventListener === 'function') {
-    query.addEventListener('change', briefRevealPreferenceChange);
+    query.addEventListener('change', resetBriefReveal);
   } else {
-    query.addListener(briefRevealPreferenceChange);
+    query.addListener(resetBriefReveal);
   }
 });
-$('briefsSection').addEventListener('pointerdown', cancelBriefReveal, {passive:true});
-$('briefsSection').addEventListener('pointerup', scheduleBriefReveal, {passive:true});
-$('briefsSection').addEventListener('pointercancel', scheduleBriefReveal, {passive:true});
-$('briefsSection').addEventListener('keydown', cancelBriefReveal);
-$('briefsSection').addEventListener('keyup', scheduleBriefReveal);
+function briefCardFromEvent(target){
+  const card = target instanceof Element && target.closest('.brief-card');
+  const page = card?.closest('.brief-page');
+  return page?.dataset.editionKey === selectedBriefDate
+    && card === page.querySelector('.brief-card') ? card : null;
+}
+const briefSection = $('briefsSection');
+briefSection.addEventListener('pointerover', event=>{
+  if (event.pointerType !== 'mouse') return;
+  const card = briefCardFromEvent(event.target);
+  if (card && !card.contains(event.relatedTarget)) revealBriefCard(card);
+});
+briefSection.addEventListener('pointerout', event=>{
+  if (event.pointerType !== 'mouse') return;
+  const card = briefCardFromEvent(event.target);
+  if (card && !card.contains(event.relatedTarget) && !card.contains(document.activeElement)) {
+    resetBriefReveal();
+  }
+});
+briefSection.addEventListener('focusin', event=>{
+  const card = briefCardFromEvent(event.target);
+  if (card) revealBriefCard(card);
+});
+briefSection.addEventListener('focusout', event=>{
+  const card = briefCardFromEvent(event.target);
+  if (card && !card.contains(event.relatedTarget) && !card.matches(':hover')) {
+    resetBriefReveal();
+  }
+});
 
 function renderNews(){
   const u = UI[LANG];
@@ -2669,7 +2656,7 @@ function adoptBriefEdition(key){
   renderWriters();
   renderNews();
   renderPodcast();
-  scheduleBriefReveal();
+  resetBriefReveal();
 }
 
 function briefArrowStep(dir){
@@ -2813,8 +2800,7 @@ function setHomeView(view){
   });
   Object.entries(panels).forEach(([name, id])=>{ $(id).hidden = name !== view; });
   $('briefsSection').dataset.activeHomeView = view;
-  if (view === 'briefs') scheduleBriefReveal();
-  else cancelBriefReveal();
+  resetBriefReveal();
 }
 $('homeViewNav').addEventListener('click', event=>{
   const button = event.target.closest('[data-home-view]');
@@ -2919,7 +2905,6 @@ window.addEventListener('resize', ()=>{
   scrollBriefTrack(false);
   if (!COMPACT_EDITION_MEDIA.matches) setPodcastPopover(false);
   resetBriefReveal();
-  scheduleBriefReveal();
 }, {passive:true});
 
 /* ---------- boot ---------- */
