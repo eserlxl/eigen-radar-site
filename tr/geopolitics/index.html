@@ -101,9 +101,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
   :root[data-theme="light"]{
     --bg:#d1d9e5;
     --bg-soft:#cfdae9;
-    --card:#d8dfe9;
+    --card:#dce3ed;
     --card-hover:#d6dde8;
-    --line:#a9b5c5;
+    --line:#9eacbf;
     --text:#111827;
     --muted:#46566d;
     --accent:#066b66;
@@ -249,6 +249,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
     background:transparent;color:var(--muted);font-family:inherit;font-size:.68rem;font-weight:600;line-height:1;cursor:pointer;
   }
   .home-view-button[aria-pressed="true"]{border-bottom-color:var(--accent);color:var(--accent)}
+  #newsViewButton::after{
+    content:"▾";display:inline-block;margin-inline-start:.25em;font-size:.8em;
+    transform:translateY(-.04em);
+  }
   .home-view-button:hover{color:var(--text)}
   .home-view{padding-top:10px}
   #briefsSection > .section-title .podcast-bar{margin-left:auto}
@@ -341,7 +345,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
   .home-filter-popover{
     position:absolute;z-index:20;top:calc(100% + 6px);left:0;width:min(22rem,calc(100vw - 32px));
     padding:10px;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg-soft);
-    box-shadow:0 12px 28px var(--drawer-shadow);
+    box-shadow:0 16px 36px var(--drawer-shadow);
   }
   .home-filter-popover[hidden]{display:none}
   .chip{
@@ -1564,8 +1568,8 @@ function briefCard(brief, index, eager=true, pageIndex=0){
   const srcset = variants.map(row => `${row.src} ${row.width}w`).join(', ');
   const width = Number.isInteger(image.width) && image.width > 0 ? image.width : 1280;
   const height = Number.isInteger(image.height) && image.height > 0 ? image.height : 720;
-  const loading = eager && index===0 ? 'eager' : 'lazy';
-  const priority = eager && index===0 ? ' fetchpriority="high"' : '';
+  const loading = eager ? 'eager' : 'lazy';
+  const priority = eager ? ' fetchpriority="high"' : '';
   const sizes = index===0
     ? '(min-width:2560px) 60rem,(min-width:1920px) 56rem,(min-width:1440px) 50rem,(min-width:1200px) 47rem,(min-width:641px) 66vw,calc(100vw - 2rem)'
     : '(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:641px) 33vw,calc(100vw - 2rem)';
