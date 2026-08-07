@@ -2037,12 +2037,17 @@ function renderBriefs(){
   });
   section.hidden = total===0;
   scrollBriefTrack(false);
-  resetBriefReveal();
 }
 
 const BRIEF_REVEAL_MEDIA = matchMedia('(min-width:960px)');
 const BRIEF_REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)');
+let briefRevealTimer = 0;
+function cancelBriefReveal(){
+  clearTimeout(briefRevealTimer);
+  briefRevealTimer = 0;
+}
 function resetBriefReveal(){
+  cancelBriefReveal();
   document.querySelectorAll('.brief-card.is-brief-revealed').forEach(card=>{
     card.classList.remove('is-brief-revealed','is-brief-reveal-transition');
     card.style.removeProperty('--brief-reveal-height');
@@ -2055,7 +2060,6 @@ function resetBriefReveal(){
 function revealBriefCard(card){
   const page = card?.closest('.brief-page');
   if (!card?.isConnected || page?.dataset.editionKey !== selectedBriefDate
-      || card !== page.querySelector('.brief-card')
       || card.classList.contains('is-brief-revealed')
       || !BRIEF_REVEAL_MEDIA.matches || BRIEF_REDUCED_MOTION.matches
       || document.visibilityState !== 'visible' || activeHomeView !== 'briefs') return;
@@ -2076,45 +2080,38 @@ function revealBriefCard(card){
   card.classList.add('is-brief-reveal-transition');
   [media,content].forEach(part=>{ part.style.transform = ''; });
 }
+function scheduleBriefReveal(){
+  cancelBriefReveal();
+  if (!BRIEF_REVEAL_MEDIA.matches || BRIEF_REDUCED_MOTION.matches
+      || document.visibilityState !== 'visible' || activeHomeView !== 'briefs') return;
+  const page = briefTrackPages().find(item=>item.dataset.editionKey===selectedBriefDate);
+  const card = page?.querySelector('.brief-card');
+  if (!card || card.classList.contains('is-brief-revealed')) return;
+  briefRevealTimer = setTimeout(()=>{
+    briefRevealTimer = 0;
+    revealBriefCard(card);
+  }, 5000);
+}
 document.addEventListener('visibilitychange', ()=>{
-  resetBriefReveal();
+  if (document.visibilityState === 'visible') scheduleBriefReveal();
+  else cancelBriefReveal();
 });
+const briefRevealPreferenceChange = ()=>{
+  resetBriefReveal();
+  scheduleBriefReveal();
+};
 [BRIEF_REVEAL_MEDIA,BRIEF_REDUCED_MOTION].forEach(query=>{
   if (typeof query.addEventListener === 'function') {
-    query.addEventListener('change', resetBriefReveal);
+    query.addEventListener('change', briefRevealPreferenceChange);
   } else {
-    query.addListener(resetBriefReveal);
+    query.addListener(briefRevealPreferenceChange);
   }
 });
-function briefCardFromEvent(target){
-  const card = target instanceof Element && target.closest('.brief-card');
-  const page = card?.closest('.brief-page');
-  return page?.dataset.editionKey === selectedBriefDate
-    && card === page.querySelector('.brief-card') ? card : null;
-}
-const briefSection = $('briefsSection');
-briefSection.addEventListener('pointerover', event=>{
-  if (event.pointerType !== 'mouse') return;
-  const card = briefCardFromEvent(event.target);
-  if (card && !card.contains(event.relatedTarget)) revealBriefCard(card);
-});
-briefSection.addEventListener('pointerout', event=>{
-  if (event.pointerType !== 'mouse') return;
-  const card = briefCardFromEvent(event.target);
-  if (card && !card.contains(event.relatedTarget) && !card.contains(document.activeElement)) {
-    resetBriefReveal();
-  }
-});
-briefSection.addEventListener('focusin', event=>{
-  const card = briefCardFromEvent(event.target);
-  if (card) revealBriefCard(card);
-});
-briefSection.addEventListener('focusout', event=>{
-  const card = briefCardFromEvent(event.target);
-  if (card && !card.contains(event.relatedTarget) && !card.matches(':hover')) {
-    resetBriefReveal();
-  }
-});
+$('briefsSection').addEventListener('pointerdown', cancelBriefReveal, {passive:true});
+$('briefsSection').addEventListener('pointerup', scheduleBriefReveal, {passive:true});
+$('briefsSection').addEventListener('pointercancel', scheduleBriefReveal, {passive:true});
+$('briefsSection').addEventListener('keydown', cancelBriefReveal);
+$('briefsSection').addEventListener('keyup', scheduleBriefReveal);
 
 function renderNews(){
   const u = UI[LANG];
@@ -2682,7 +2679,7 @@ function adoptBriefEdition(key){
   renderWriters();
   renderNews();
   renderPodcast();
-  resetBriefReveal();
+  scheduleBriefReveal();
 }
 
 function briefArrowStep(dir){
@@ -2826,7 +2823,8 @@ function setHomeView(view){
   });
   Object.entries(panels).forEach(([name, id])=>{ $(id).hidden = name !== view; });
   $('briefsSection').dataset.activeHomeView = view;
-  resetBriefReveal();
+  if (view === 'briefs') scheduleBriefReveal();
+  else cancelBriefReveal();
 }
 $('homeViewNav').addEventListener('click', event=>{
   const button = event.target.closest('[data-home-view]');
@@ -2931,6 +2929,7 @@ window.addEventListener('resize', ()=>{
   scrollBriefTrack(false);
   if (!COMPACT_EDITION_MEDIA.matches) setPodcastPopover(false);
   resetBriefReveal();
+  scheduleBriefReveal();
 }, {passive:true});
 
 /* ---------- boot ---------- */
