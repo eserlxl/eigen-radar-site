@@ -1191,6 +1191,7 @@ const UI = {
   tr: {
     htmlLang:"tr",
     siteName:"Eigen Radar",
+    nextTopic:"Sonraki konu",
     skip:"Ana içeriğe geç",
     featTitle:"Gündem",
     newsTitle:"Son Gelişmeler",
@@ -1253,6 +1254,7 @@ const UI = {
   en: {
     htmlLang:"en",
     siteName:"Eigen Radar",
+    nextTopic:"Next topic",
     skip:"Skip to main content",
     featTitle:"Briefs",
     newsTitle:"Latest Stories",
@@ -1462,6 +1464,7 @@ function detectTopic(){
 }
 let TOPIC = detectTopic();
 function topicMeta(id){ return TOPICS.find(t=>t.id===id) || TOPICS[0]; }
+function nextTopic(){ return TOPICS[(TOPICS.findIndex(t=>t.id===TOPIC)+1)%TOPICS.length]; }
 // An article's topic comes from its writer; a news item carries its own, defaulting to
 // 'ai' so the pre-topic archive still lands under the AI desk.
 function knownTopic(value){
@@ -1659,8 +1662,9 @@ function renderChrome(){
   $('writersTitle').textContent = u.writersTitle;
   $('footerContent').innerHTML = u.footer;
   (function(){var r=function(s){return s.split('').reverse().join('')};document.querySelectorAll('a[data-mu]').forEach(function(a){var v=r(a.getAttribute('data-mu'))+String.fromCharCode(64)+r(a.getAttribute('data-mh'));a.href='mailto:'+v;var s=a.querySelector('span');if(s){s.textContent=v}a.setAttribute('aria-label',a.getAttribute('data-label')+': '+v);a.removeAttribute('data-mu');a.removeAttribute('data-mh')})})();
-  $('homeLink').href = '/';
-  $('homeLink').setAttribute('aria-label', `${u.siteName} — ${LANG==='tr'?'ana sayfa':'home'}`);
+  const next = nextTopic();
+  $('homeLink').href = topicRoute(next.id, LANG);
+  $('homeLink').setAttribute('aria-label', `${u.nextTopic}: ${next.label[LANG]}`);
   $('archiveLink').href = `/${LANG}/archive/`;
   $('archiveLabel').textContent = u.archive;
   $('btnTr').href = currentArticle ? articleRoute(currentArticle, 'tr')
@@ -2107,7 +2111,7 @@ function scheduleBriefReveal(){
   briefRevealTimer = setTimeout(()=>{
     briefRevealTimer = 0;
     revealBriefCard(card);
-  }, 5000);
+  }, 10000);
 }
 document.addEventListener('visibilitychange', ()=>{
   if (document.visibilityState === 'visible') scheduleBriefReveal();
@@ -2547,12 +2551,11 @@ function syncFromHash(){
   showArticle(a, true);
 }
 $('readerBack').addEventListener('click', closeArticle);
-/* Logo goes home: close any open column in place rather than reloading. The href stays
-   a real link so middle-click / new-tab still work. */
+/* The logo cycles desks. Its href remains the next canonical route for modified clicks. */
 $('homeLink').addEventListener('click', e => {
-  if (!isPlainClick(e)) return;
+  if (!isPlainClick(e) || TOPIC_IDS.has(ROUTE_TOPIC)) return;
   e.preventDefault();
-  closeArticle();
+  setTopic(nextTopic().id);
   window.scrollTo(0, 0);
 });
 /* The hash id was designed to be shared; this is its one-tap affordance. Native share
@@ -2929,6 +2932,18 @@ if(typeof COMPACT_EDITION_MEDIA.addEventListener==='function'){
 }
 $('briefsPrev').addEventListener('click', ()=>briefArrowStep(-1));
 $('briefsNext').addEventListener('click', ()=>briefArrowStep(1));
+let briefWheelGesture = 0;
+$('featured').addEventListener('wheel', event=>{
+  if (!BRIEF_REVEAL_MEDIA.matches || !event.deltaY
+      || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+  const dir = event.deltaY > 0 ? -1 : 1;
+  if (!briefTrackPages()[briefPageIndex() + dir]) return;
+  event.preventDefault();
+  const locked = briefWheelGesture;
+  clearTimeout(briefWheelGesture);
+  briefWheelGesture = setTimeout(()=>{ briefWheelGesture = 0; }, 200);
+  if (!locked) briefArrowStep(dir);
+}, {passive:false});
 enableCarouselMouseDrag($('featured'), ()=>updateBriefArrows());
 let briefScrollSettle = 0;
 $('featured').addEventListener('scroll', ()=>{
