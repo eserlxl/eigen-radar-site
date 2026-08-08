@@ -439,6 +439,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
   }
   .brief-track::-webkit-scrollbar{display:none}
   .brief-track.is-dragging{scroll-snap-type:none;cursor:grabbing}
+  /* Vertical wheel page-turn: clip Y motion and freeze horizontal snap. */
+  .brief-track.is-brief-wheel-animating{
+    overflow:hidden;scroll-snap-type:none;cursor:default;
+  }
   .brief-page{flex:0 0 100%;min-width:100%;scroll-snap-align:start;scroll-snap-stop:always}
   #briefsPrev{left:-18px}
   #briefsNext{right:-18px}
@@ -2574,7 +2578,8 @@ function enableCarouselMouseDrag(track, onSettle){
   let suppressClick = false;
 
   track.addEventListener('pointerdown', event=>{
-    if (event.pointerType !== 'mouse' || event.button !== 0 || pointerId !== null) return;
+    if (track.classList.contains('is-brief-wheel-animating')
+        || event.pointerType !== 'mouse' || event.button !== 0 || pointerId !== null) return;
     if (event.target.closest('input,button,select,textarea,audio')) return;
     pointerId = event.pointerId;
     startX = event.clientX;
@@ -2682,6 +2687,50 @@ function briefArrowStep(dir){
   if (target < 0 || target >= pages.length) return;
   adoptBriefEdition(pages[target].dataset.editionKey);
   scrollBriefTrack(true, target);
+}
+
+/* Desktop wheel: a vertical page-turn, not the horizontal smooth carousel.
+   Wheel down (dir=-1, older): current exits UP, target enters from BELOW.
+   Wheel up   (dir=+1, newer): current exits DOWN, target enters from ABOVE.
+   Midpoint jumps scrollLeft with behavior:auto so no horizontal motion is seen. */
+let briefWheelBusy = false;
+async function briefWheelStep(dir){
+  const pages = briefTrackPages();
+  const from = briefPageIndex();
+  const target = from + dir;
+  if (briefWheelBusy || target < 0 || target >= pages.length) return;
+  const fromPage = pages[from];
+  const toPage = pages[target];
+  const track = $('featured');
+  adoptBriefEdition(toPage.dataset.editionKey);
+  if (BRIEF_REDUCED_MOTION.matches || typeof fromPage.animate !== 'function'){
+    scrollBriefTrack(false, target);
+    return;
+  }
+  briefWheelBusy = true;
+  track.classList.add('is-brief-wheel-animating');
+  const exitY = `${dir > 0 ? 100 : -100}%`;
+  const enterY = `${dir > 0 ? -100 : 100}%`;
+  let animation;
+  try {
+    animation = fromPage.animate(
+      [{transform:'translateY(0)'},{transform:`translateY(${exitY})`}],
+      {duration:180,easing:'ease-in',fill:'forwards'});
+    await animation.finished;
+    // The outgoing page now hides the instant horizontal position change.
+    scrollBriefTrack(false, target);
+    animation.cancel();
+    animation = toPage.animate(
+      [{transform:`translateY(${enterY})`},{transform:'translateY(0)'}],
+      {duration:180,easing:'ease-out',fill:'both'});
+    await animation.finished;
+  } catch {
+    scrollBriefTrack(false, target);
+  } finally {
+    animation?.cancel();
+    track.classList.remove('is-brief-wheel-animating');
+    briefWheelBusy = false;
+  }
 }
 
 function syncBriefEditionFromScroll(){
@@ -2913,10 +2962,10 @@ $('featured').addEventListener('wheel', event=>{
   const dir = event.deltaY > 0 ? -1 : 1;
   if (!briefTrackPages()[briefPageIndex() + dir]) return;
   event.preventDefault();
-  const locked = briefWheelGesture;
+  const locked = briefWheelGesture || briefWheelBusy;
   clearTimeout(briefWheelGesture);
   briefWheelGesture = setTimeout(()=>{ briefWheelGesture = 0; }, 200);
-  if (!locked) briefArrowStep(dir);
+  if (!locked) briefWheelStep(dir);
 }, {passive:false});
 enableCarouselMouseDrag($('featured'), ()=>updateBriefArrows());
 let briefScrollSettle = 0;
