@@ -1509,6 +1509,10 @@ function localized(value){
   }
   return value ?? '';
 }
+function writerFocus(value){
+  const role = String(localized(value));
+  return role.split(' · ', 2)[1] ?? role;
+}
 function referenceDate(value){
   if(typeof value!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
   const parsed = new Date(`${value}T00:00:00Z`);
@@ -2304,7 +2308,7 @@ function renderReader(a){
       <div class="avatar">${avatarOf(w)}</div>
       <div>
         <div class="wname">${escapeHTML(w.name)}<span class="ai-badge">${escapeHTML(badgeOf(w))}</span></div>
-        <div class="wrole">${escapeHTML(localized(w.role))} · ${u.aiPersona} · ${escapeHTML(localized(DATE_LABELS[a.date]))} · ${escapeHTML(editionLabel(a))}</div>
+        <div class="wrole">${escapeHTML(writerFocus(w.role))} · ${u.aiPersona} · ${escapeHTML(localized(DATE_LABELS[a.date]))} · ${escapeHTML(editionLabel(a))}</div>
       </div>
     </div>
     <h1>${escapeHTML(localized(a.title))}</h1>
@@ -2700,7 +2704,7 @@ function renderWriters(){
         <div class="avatar">${avatarOf(w)}</div>
         <div>
           <div class="wname">${escapeHTML(w.name)}<span class="ai-badge">${escapeHTML(badgeOf(w))}</span></div>
-          <div class="wrole">${escapeHTML(localized(w.role))} · ${u.aiPersona}</div>
+          <div class="wrole">${escapeHTML(writerFocus(w.role))} · ${u.aiPersona}</div>
         </div>
       </div>
       ${a ? `<h3 class="wtitle">${escapeHTML(localized(a.title))}</h3>
