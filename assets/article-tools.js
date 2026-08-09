@@ -35,6 +35,20 @@
     if (!parts.length) return;
 
     const synth = window.speechSynthesis;
+    // Prime the voice list once per page: engines populate getVoices()
+    // asynchronously, and without a primed, lang-matched voice the first
+    // utterance can play in a mismatched default voice.
+    let voices = synth.getVoices();
+    if (typeof synth.addEventListener === 'function') {
+      synth.addEventListener('voiceschanged', () => { voices = synth.getVoices(); });
+    }
+    const pickVoice = lang => {
+      if (!voices.length || !lang) return null;
+      const lower = String(lang).toLowerCase();
+      return voices.find(v => v.lang && v.lang.toLowerCase() === lower)
+        || voices.find(v => v.lang && v.lang.toLowerCase().slice(0, 2) === lower.slice(0, 2))
+        || null;
+    };
     const defaultRate = 1.2;
     const normalize = value => {
       const parsed = Number.parseFloat(value);
@@ -87,6 +101,8 @@
         }
         const utterance = new SpeechSynthesisUtterance(parts[activeIndex++]);
         utterance.lang = root.dataset.lang;
+        const voice = pickVoice(root.dataset.lang);
+        if (voice) utterance.voice = voice;
         utterance.rate = normalize(rate.value);
         utterance.onend = next;
         utterance.onerror = () => finish(token);

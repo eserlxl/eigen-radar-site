@@ -17,6 +17,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
 <link rel="alternate" type="application/rss+xml" title="Eigen Radar RSS — Jeopolitik / Geopolitics" href="/feed-geopolitics.xml">
 <link rel="alternate" type="application/rss+xml" title="Eigen Radar RSS — Ekonomi ve Piyasalar / Economics &amp; Markets" href="/feed-economics-markets.xml">
 <link rel="alternate" type="application/rss+xml" title="Eigen Radar RSS — Bilim / Science" href="/feed-science.xml">
+<link rel="search" type="application/opensearchdescription+xml" title="Eigen Radar TR" href="/opensearch-tr.xml">
+<link rel="search" type="application/opensearchdescription+xml" title="Eigen Radar EN" href="/opensearch-en.xml">
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
 <!-- Google tag (gtag.js) -->
@@ -66,7 +68,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
 <meta property="og:image:alt" content="Eigen Radar logosu / Eigen Radar logo">
 <meta name="twitter:image" content="https://eigenradar.com/assets/icon-512.png">
 <meta name="twitter:image:alt" content="Eigen Radar logosu / Eigen Radar logo">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://eigenradar.com/#org", "name": "Eigen Radar", "url": "https://eigenradar.com/", "logo": {"@type": "ImageObject", "url": "https://eigenradar.com/assets/icon-512.png"}}, {"@type": "WebSite", "@id": "https://eigenradar.com/#website", "url": "https://eigenradar.com/", "name": "Eigen Radar", "description": "Her gün güncellenen yapay zekâ, jeopolitik, ekonomi ve piyasalar ile bilim haberleri; Türkçe ve İngilizce. Daily AI, geopolitics, economics \u0026 markets, and science news in Turkish and English.", "inLanguage": ["tr", "en"], "dateModified": "2026-08-09T09:07:40+00:00", "publisher": {"@id": "https://eigenradar.com/#org"}}, {"@type": "CollectionPage", "@id": "https://eigenradar.com/en/science/#edition", "url": "https://eigenradar.com/en/science/", "name": "Eigen Radar — Science", "description": "Space, biology, climate, physics and scientific technology.", "inLanguage": "en", "dateModified": "2026-08-09T09:07:40+00:00", "isPartOf": {"@id": "https://eigenradar.com/#website"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://eigenradar.com/#org", "name": "Eigen Radar", "url": "https://eigenradar.com/", "logo": {"@type": "ImageObject", "url": "https://eigenradar.com/assets/icon-512.png"}}, {"@type": "WebSite", "@id": "https://eigenradar.com/#website", "url": "https://eigenradar.com/", "name": "Eigen Radar", "description": "Her gün güncellenen yapay zekâ, jeopolitik, ekonomi ve piyasalar ile bilim haberleri; Türkçe ve İngilizce. Daily AI, geopolitics, economics \u0026 markets, and science news in Turkish and English.", "inLanguage": ["tr", "en"], "dateModified": "2026-08-09T09:07:40+00:00", "publisher": {"@id": "https://eigenradar.com/#org"}, "potentialAction": {"@type": "SearchAction", "target": {"@type": "EntryPoint", "urlTemplate": "https://eigenradar.com/en/archive/?q={search_term_string}"}, "query-input": "required name=search_term_string"}}, {"@type": "CollectionPage", "@id": "https://eigenradar.com/en/science/#edition", "url": "https://eigenradar.com/en/science/", "name": "Eigen Radar — Science", "description": "Space, biology, climate, physics and scientific technology.", "inLanguage": "en", "dateModified": "2026-08-09T09:07:40+00:00", "isPartOf": {"@id": "https://eigenradar.com/#website"}}]}</script>
 <style>
   :root{
     --bg:#0b0f1a;
@@ -826,6 +828,17 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
     *,::before,::after{transition:none !important;animation:none !important;
                        scroll-behavior:auto !important}
   }
+  @media print{
+    :root{--bg:#fff;--soft:#fff;--card:#fff;--card-hover:#fff;--line:#9ca3af;--text:#000;
+          --muted:#374151;--accent:#066b66;--accent-soft:transparent;--mast-bg:#fff;--scheme:light}
+    .skip,.theme-switch,.topics,.languages,.utility-switches,.reader-nav,.reader-actions,
+    .reader-share,.listen-row,.brief-listen,.brief-share-button,.brief-date-control,
+    .archive-controls,.related,.related-all,.footer-links,
+    footer nav,.news-pager,.lang-btn{display:none!important}
+    body{background:#fff;color:#000}
+    main a{color:inherit}
+    .writer-content{box-shadow:none}
+  }
 </style>
 <script src="/assets/theme.js" defer></script>
 <!-- X conversion tracking base code -->
@@ -1028,7 +1041,7 @@ const UI = {
     listenRate:"Okuma hızı",
     editionsToday:"Bugünkü sürümler",
     editionWord:"Sürüm",
-    editionLabels:{1:"Sabah",2:"Öğle",3:"Akşam"},
+    editionLabels:{1:"Sabah",2:"Öğle",3:"Akşam",4:"Gece"},
     updatedAt:"Güncellendi",
     references:"Kaynakça",
     reference:"Kaynak",
@@ -1091,7 +1104,7 @@ const UI = {
     listenRate:"Reading speed",
     editionsToday:"Today's editions",
     editionWord:"Edition",
-    editionLabels:{1:"Morning",2:"Midday",3:"Evening"},
+    editionLabels:{1:"Morning",2:"Midday",3:"Evening",4:"Night"},
     updatedAt:"Updated",
     references:"References",
     reference:"Reference",
@@ -1201,7 +1214,7 @@ const TOPIC_ICONS = {
   'science': `<svg ${S}><path d="M9.5 3h5M10.5 3v6.2L5.4 18a1.6 1.6 0 0 0 1.4 2.4h10.4a1.6 1.6 0 0 0 1.4-2.4L13.5 9.2V3"/><path d="M8 15h8"/></svg>`,
 };
 const TOPICS = [
-  {id:'ai', symbol:'🧠', label:{tr:'Yapay Zeka', en:'AI'}, pageMeta:{
+  {id:'ai', symbol:'🧠', label:{tr:'Yapay Zekâ', en:'AI'}, pageMeta:{
     tr:{page:'Eigen Radar — Yapay Zekâ',
         title:'Yapay zekadaki son gelişmeler.'},
     en:{page:'Eigen Radar — Artificial Intelligence',
@@ -1326,7 +1339,7 @@ function editionLabel(value){
   const u = UI[LANG];
   return u.editionLabels[n] || String(n);
 }
-const EDITION_SYMBOLS={1:'☕︎',2:'☀️',3:'🌙'};
+const EDITION_SYMBOLS={1:'☕︎',2:'☀️',3:'🕯️',4:'🌘'};
 const COMPACT_EDITION_MEDIA=window.matchMedia(
   '(max-width: 640px), (max-width: 1000px) and (max-height: 500px) and (orientation: landscape)'
 );
@@ -2258,9 +2271,19 @@ function renderReader(a){
       try { localStorage.setItem('ttsRate', rate.value); } catch {}
       if (b.classList.contains('speaking')){ stopReadAloud(); speak(); }
     });
+    function pickReaderVoice(lang){
+      const voices = speechSynthesis.getVoices();
+      if (!voices.length || !lang) return null;
+      const lower = String(lang).toLowerCase();
+      return voices.find(v => v.lang && v.lang.toLowerCase() === lower)
+        || voices.find(v => v.lang && v.lang.toLowerCase().slice(0,2) === lower.slice(0,2))
+        || null;
+    }
     function speak(){
       const msg = new SpeechSynthesisUtterance(articleText(a));
       msg.lang = LANG==='tr' ? 'tr-TR' : 'en-US';
+      const voice = pickReaderVoice(msg.lang);
+      if (voice) msg.voice = voice;
       msg.rate = normalizeRate(rate.value);
       msg.onend = msg.onerror = stopReadAloud;
       b.classList.add('speaking');
