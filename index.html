@@ -427,9 +427,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#d1d9e5'
       background:linear-gradient(180deg,transparent,var(--card-gradient-end) 58%);
       color:var(--muted);font-size:1rem;line-height:1;pointer-events:none
     }
-    .featured-grid .brief-card:first-child.is-brief-reveal-transition .brief-media,
-    .featured-grid .brief-card:first-child.is-brief-reveal-transition .brief-content{
-      transition:transform .25s ease
+    .featured-grid .brief-card:first-child.is-brief-reveal-fading{transition:opacity .28s ease}
+    .featured-grid .brief-card:first-child.is-brief-reveal-fading.is-brief-reveal-dimmed{
+      opacity:.1;transition-duration:.18s
     }
   }
 
@@ -1959,55 +1959,68 @@ function renderBriefs(){
 
 const BRIEF_REVEAL_MEDIA = matchMedia('(min-width:960px)');
 const BRIEF_REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)');
-let briefRevealTimer = 0;
+let briefRevealTimer = 0, briefRevealGeneration = 0;
 function cancelBriefReveal(){
   clearTimeout(briefRevealTimer);
   briefRevealTimer = 0;
+  briefRevealGeneration += 1;
+  document.querySelectorAll('.brief-card.is-brief-reveal-fading').forEach(card=>{
+    card.classList.remove('is-brief-reveal-fading','is-brief-reveal-dimmed');
+  });
 }
 function resetBriefReveal(){
   cancelBriefReveal();
   document.querySelectorAll('.brief-card.is-brief-revealed').forEach(card=>{
-    card.classList.remove('is-brief-revealed','is-brief-reveal-transition');
+    card.classList.remove('is-brief-revealed');
     card.style.removeProperty('--brief-reveal-height');
-    card.querySelectorAll('.brief-media,.brief-content').forEach(part=>{
-      part.style.removeProperty('transform');
-      part.style.removeProperty('transform-origin');
-    });
   });
 }
 function revealBriefCard(card){
   const page = card?.closest('.brief-page');
   if (!card?.isConnected || page?.dataset.editionKey !== selectedBriefDate
       || card.classList.contains('is-brief-revealed')
-      || !BRIEF_REVEAL_MEDIA.matches || BRIEF_REDUCED_MOTION.matches
-      || document.visibilityState !== 'visible' || activeHomeView !== 'briefs') return;
-  const media = card.querySelector('.brief-media');
-  const content = card.querySelector('.brief-content');
-  if (!media || !content) return;
-  const before = [media.getBoundingClientRect(), content.getBoundingClientRect()];
+      || !BRIEF_REVEAL_MEDIA.matches || document.visibilityState !== 'visible'
+      || activeHomeView !== 'briefs') return false;
+  if (!card.querySelector('.brief-media') || !card.querySelector('.brief-content')) return false;
   card.style.setProperty('--brief-reveal-height', `${card.getBoundingClientRect().height}px`);
   card.classList.add('is-brief-revealed');
-  const after = [media.getBoundingClientRect(), content.getBoundingClientRect()];
-  [media,content].forEach((part,index)=>{
-    const from = before[index];
-    const to = after[index];
-    part.style.transformOrigin = 'top left';
-    part.style.transform = `translate(${from.left-to.left}px,${from.top-to.top}px) scale(${from.width/to.width},${from.height/to.height})`;
-  });
-  void card.offsetWidth;
-  card.classList.add('is-brief-reveal-transition');
-  [media,content].forEach(part=>{ part.style.transform = ''; });
+  return true;
 }
 function scheduleBriefReveal(){
   cancelBriefReveal();
-  if (!BRIEF_REVEAL_MEDIA.matches || BRIEF_REDUCED_MOTION.matches
-      || document.visibilityState !== 'visible' || activeHomeView !== 'briefs') return;
+  if (!BRIEF_REVEAL_MEDIA.matches || document.visibilityState !== 'visible'
+      || activeHomeView !== 'briefs') return;
   const page = briefTrackPages().find(item=>item.dataset.editionKey===selectedBriefDate);
   const card = page?.querySelector('.brief-card');
   if (!card || card.classList.contains('is-brief-revealed')) return;
+  const generation = briefRevealGeneration;
   briefRevealTimer = setTimeout(()=>{
     briefRevealTimer = 0;
-    revealBriefCard(card);
+    if (generation !== briefRevealGeneration) return;
+    if (BRIEF_REDUCED_MOTION.matches) {
+      revealBriefCard(card);
+      return;
+    }
+    card.classList.add('is-brief-reveal-fading');
+    requestAnimationFrame(()=>{
+      if (generation !== briefRevealGeneration) return;
+      card.classList.add('is-brief-reveal-dimmed');
+      briefRevealTimer = setTimeout(()=>{
+        briefRevealTimer = 0;
+        if (generation !== briefRevealGeneration) return;
+        if (!revealBriefCard(card)) {
+          card.classList.remove('is-brief-reveal-fading','is-brief-reveal-dimmed');
+          return;
+        }
+        card.classList.remove('is-brief-reveal-dimmed');
+        briefRevealTimer = setTimeout(()=>{
+          briefRevealTimer = 0;
+          if (generation === briefRevealGeneration) {
+            card.classList.remove('is-brief-reveal-fading');
+          }
+        }, 280);
+      }, 180);
+    });
   }, 6000);
 }
 document.addEventListener('visibilitychange', ()=>{
