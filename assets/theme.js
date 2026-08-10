@@ -2,8 +2,8 @@
   const root = document.documentElement;
   const storageKey = 'theme';
   const colors = {
-    dark: '#0b0f1a',
-    light: '#d1d9e5',
+    dark: '#040711',
+    light: '#c7d2e0',
   };
   const copy = {
     tr: {
