@@ -1049,10 +1049,10 @@ const UI = {
     shareCopied:"Bağlantı kopyalandı ✓",
     searchPlaceholder:"Haberlerde ara…",
     noResults:"Aramanızla eşleşen haber yok.",
-    podcastTitle:"Günlük Gündem",
-    podcastAudioLabel:"Günlük sesli gündemi oynat",
-    podcastPlay:"Günlük sesli gündemi oynat",
-    podcastPause:"Günlük sesli gündemi duraklat",
+    podcastTitle:"Günlük Özet",
+    podcastAudioLabel:"Günlük sesli özeti oynat",
+    podcastPlay:"Günlük sesli özeti oynat",
+    podcastPause:"Günlük sesli özeti duraklat",
     podcastSeek:"Podcast konumu",
     podcastMute:"Sesi kapat",
     podcastUnmute:"Sesi aç",
@@ -1464,21 +1464,26 @@ function referenceDate(value){
     year:'numeric',month:'long',day:'numeric',timeZone:'UTC'
   }).format(parsed);
 }
-function radarStampHTML(record){
+function radarStampHTML(record, includeDate=false){
   const updated = typeof record?.radarUpdatedAt==='string' && record.radarUpdatedAt.trim();
   const raw = updated ? record.radarUpdatedAt : record?.radarPublishedAt;
   if(typeof raw!=='string' || !raw.trim()) return '';
   const parsed = new Date(raw);
   if(Number.isNaN(parsed.getTime())) return '';
   const isTurkish = LANG==='tr';
+  const timeZone = isTurkish ? 'Europe/Istanbul' : 'UTC';
+  const date = includeDate ? `${new Intl.DateTimeFormat(
+    isTurkish?'tr-TR':'en-US',
+    {year:'numeric',month:'long',day:'numeric',timeZone}
+  ).format(parsed)} · ` : '';
   const time = new Intl.DateTimeFormat(LANG==='tr'?'tr-TR':'en-US',{
     hour:'2-digit',minute:'2-digit',hourCycle:'h23',
-    timeZone:isTurkish?'Europe/Istanbul':'UTC'
+    timeZone
   }).format(parsed);
   const u = UI[LANG];
   const label = updated ? `${escapeHTML(u.updatedAt)} ` : '';
   const zone = isTurkish ? 'TSİ' : 'UTC';
-  return `<small class="radar-stamp"><time datetime="${escapeHTML(raw)}">${label}${escapeHTML(time)} ${zone}</time></small>`;
+  return `<small class="radar-stamp"><time datetime="${escapeHTML(raw)}">${label}${escapeHTML(date)}${escapeHTML(time)} ${zone}</time></small>`;
 }
 
 function renderChrome(){
@@ -2654,7 +2659,7 @@ function renderWriters(){
       </div>
       ${a ? `<h3 class="wtitle">${escapeHTML(localized(a.title))}</h3>
       <p class="wexcerpt">${escapeHTML(localized(a.excerpt))}</p>
-      ${radarStampHTML(a)}
+      ${radarStampHTML(a,true)}
       <span class="read-more">${u.readMore}</span>` : ''}
     `;
     grid.appendChild(card);
