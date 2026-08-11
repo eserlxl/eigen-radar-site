@@ -9,6 +9,7 @@ const SHELL = [
   '/assets/icon-maskable-192.png',
   '/assets/icon-maskable-512.png',
   '/assets/theme.js',
+  '/assets/site-pages.css',
 ];
 
 self.addEventListener('install', event => {

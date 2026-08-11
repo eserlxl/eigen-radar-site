@@ -47,6 +47,10 @@
   ! Cache-Control
   Cache-Control: public, max-age=86400, must-revalidate
 
+/assets/site-pages.css
+  ! Cache-Control
+  Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=60
+
 /assets/archive-index/*
   ! Cache-Control
   Cache-Control: public, max-age=300, s-maxage=600, stale-while-revalidate=60
