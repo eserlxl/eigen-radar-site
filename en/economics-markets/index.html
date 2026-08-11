@@ -2731,6 +2731,13 @@ $('readerContent').addEventListener('click', event=>{
 /* Single source of truth for the reader: the URL hash. Handles deep links on load and
    the browser back/forward buttons. openArticle sets the hash, which lands back here. */
 function syncFromHash(){
+  // #view=<tab> preserves the active home view across language/desk navigation.
+  const viewMatch = (location.hash || '').match(/^#view=(briefs|news|videos|writers)$/);
+  if (viewMatch){
+    setHomeView(viewMatch[1]);
+    history.replaceState(null, '', location.pathname + location.search);
+    return;
+  }
   const id = hashId();
   const a = id && ARTICLES.find(x => articleId(x) === id);
   if (!a){
@@ -3106,9 +3113,12 @@ function chooseLanguage(e, lang){
   // Click-time desk: recomputed so SPA topic switches (and open articles) win over
   // the build-time static href on language-root shells. Fall back path is still the
   // sibling-language same-desk URL from homeLanguageRoute / articleRoute.
-  const dest = currentArticle
+  let dest = currentArticle
     ? articleRoute(currentArticle, lang)
     : homeLanguageRoute(lang);
+  if (!currentArticle && activeHomeView !== 'briefs'){
+    dest += `#view=${activeHomeView}`;  // keep the open tab across the language switch
+  }
   const btn = lang === 'tr' ? $('btnTr') : $('btnEn');
   if (btn && dest) btn.href = dest;
   if (ROUTE_LANG) {

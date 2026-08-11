@@ -1,4 +1,4 @@
-const CACHE = 'eigen-radar-shell-v16';
+const CACHE = 'eigen-radar-shell-v17';
 const SHELL = [
   '/index.html',
   '/manifest.webmanifest',
