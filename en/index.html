@@ -1581,9 +1581,16 @@ const EDITION_SYMBOLS={1:'I',2:'II',3:'III',4:'IV'};
 const COMPACT_EDITION_MEDIA=window.matchMedia(
   '(max-width: 640px), (max-width: 1000px) and (max-height: 500px) and (orientation: landscape)'
 );
+const EDITION_LABEL_MEDIA=window.matchMedia('(max-width: 640px)');
 function editionSymbol(value){
   const n = editionN(value || {});
   return EDITION_SYMBOLS[n] || String(n);
+}
+function briefDateDesktopLabel(date, brief){
+  return `${date} · ${editionLabel(brief)}`;
+}
+function briefDateCompactLabel(date, brief){
+  return `${date} - ${editionSymbol(brief)}`;
 }
 function briefEditionParts(key){
   const [date='', rawN='1'] = String(key || '').split('|');
@@ -2906,13 +2913,12 @@ function renderBriefDateSelect(){
   if (!keys.includes(selectedBriefDate)) selectedBriefDate = keys[0] || null;
   sel.innerHTML = editions.map(([key,brief])=>{
     const date = localized(DATE_LABELS[brief.editionDate]) || brief.editionDate;
-    const full = `${date} · ${editionLabel(brief)} - ${editionSymbol(brief)}`;
-    const accessible = `${date} · ${editionLabel(brief)}`;
-    const compact = `${date} · - ${editionSymbol(brief)}`;
-    return `<option value="${escapeHTML(key)}" data-full-label="${escapeHTML(full)}" data-compact-label="${escapeHTML(compact)}" aria-label="${escapeHTML(accessible)}"${key===selectedBriefDate?' selected':''}>${escapeHTML(full)}</option>`;
+    const desktop = briefDateDesktopLabel(date, brief);
+    const compact = briefDateCompactLabel(date, brief);
+    return `<option value="${escapeHTML(key)}" data-full-label="${escapeHTML(desktop)}" data-compact-label="${escapeHTML(compact)}" aria-label="${escapeHTML(desktop)}"${key===selectedBriefDate?' selected':''}>${escapeHTML(desktop)}</option>`;
   }).join('');
   [...sel.options].forEach(option=>{
-    option.textContent = COMPACT_EDITION_MEDIA.matches
+    option.textContent = EDITION_LABEL_MEDIA.matches
       ? option.dataset.compactLabel : option.dataset.fullLabel;
   });
   sel.style.display = editions.length ? '' : 'none';
@@ -3318,10 +3324,10 @@ $('briefDateSel').addEventListener('change', e=>{
   scrollBriefTrack(true);
 });
 const refreshCompactEditionLabels=()=>renderBriefDateSelect();
-if(typeof COMPACT_EDITION_MEDIA.addEventListener==='function'){
-  COMPACT_EDITION_MEDIA.addEventListener('change',refreshCompactEditionLabels);
+if(typeof EDITION_LABEL_MEDIA.addEventListener==='function'){
+  EDITION_LABEL_MEDIA.addEventListener('change',refreshCompactEditionLabels);
 }else{
-  COMPACT_EDITION_MEDIA.addListener(refreshCompactEditionLabels);
+  EDITION_LABEL_MEDIA.addListener(refreshCompactEditionLabels);
 }
 $('briefsPrev').addEventListener('click', ()=>briefArrowStep(-1));
 $('briefsNext').addEventListener('click', ()=>briefArrowStep(1));
