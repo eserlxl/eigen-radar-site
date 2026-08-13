@@ -1457,6 +1457,7 @@ function editionLabel(value){
   return u.editionLabels[n] || String(n);
 }
 const EDITION_SYMBOLS={1:'I',2:'II',3:'III',4:'IV'};
+const EDITION_ICONS={1:'☕',2:'☀️',3:'🕯️',4:'🌙'};
 const COMPACT_EDITION_MEDIA=window.matchMedia(
   '(max-width: 640px), (max-width: 1000px) and (max-height: 500px) and (orientation: landscape)'
 );
@@ -1465,11 +1466,15 @@ function editionSymbol(value){
   const n = editionN(value || {});
   return EDITION_SYMBOLS[n] || String(n);
 }
+function editionIcon(value){
+  const n = editionN(value || {});
+  return EDITION_ICONS[n] || String(n);
+}
 function briefDateDesktopLabel(date, brief){
-  return `${date} · ${editionLabel(brief)}`;
+  return `${date} ${editionIcon(brief)}`;
 }
 function briefDateCompactLabel(date, brief){
-  return `${date} - ${editionSymbol(brief)}`;
+  return briefDateDesktopLabel(date, brief);
 }
 function briefEditionParts(key){
   const [date='', rawN='1'] = String(key || '').split('|');
@@ -2794,7 +2799,8 @@ function renderBriefDateSelect(){
     const date = localized(DATE_LABELS[brief.editionDate]) || brief.editionDate;
     const desktop = briefDateDesktopLabel(date, brief);
     const compact = briefDateCompactLabel(date, brief);
-    return `<option value="${escapeHTML(key)}" data-full-label="${escapeHTML(desktop)}" data-compact-label="${escapeHTML(compact)}" aria-label="${escapeHTML(desktop)}"${key===selectedBriefDate?' selected':''}>${escapeHTML(desktop)}</option>`;
+    const accessible = `${date} · ${editionLabel(brief)}`;
+    return `<option value="${escapeHTML(key)}" data-full-label="${escapeHTML(desktop)}" data-compact-label="${escapeHTML(compact)}" aria-label="${escapeHTML(accessible)}"${key===selectedBriefDate?' selected':''}>${escapeHTML(desktop)}</option>`;
   }).join('');
   [...sel.options].forEach(option=>{
     option.textContent = EDITION_LABEL_MEDIA.matches
