@@ -3,24 +3,11 @@
     const label = root.querySelector('label[for="writer-history-select"]');
     const select = root.querySelector('[data-writer-history-select]');
     const fallback = root.querySelector('[data-writer-history-fallback]');
-    const go = root.querySelector('[data-writer-history-go]');
     if (!label || !select || select.options.length < 2) return;
     const navigate = () => {
       if (select.value) window.location.assign(select.value);
     };
-    if (go) {
-      // Navigate on explicit commit only: change-driven navigation yanks
-      // keyboard users arrowing through options (WCAG 3.2.2 on-input).
-      go.addEventListener('click', navigate);
-      select.addEventListener('keydown', event => {
-        if (event.key === 'Enter') navigate();
-      });
-      go.hidden = false;
-    } else {
-      // Older cached pages without the commit button keep the change-driven
-      // behavior until they regenerate.
-      select.addEventListener('change', navigate);
-    }
+    select.addEventListener('change', navigate);
     label.hidden = false;
     select.hidden = false;
     if (fallback) fallback.hidden = true;

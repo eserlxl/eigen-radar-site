@@ -192,8 +192,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .lang-btn:hover{opacity:.8}
   .lang-btn.active{opacity:1;color:var(--text);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
   .utility-switches{display:flex;align-items:center;gap:6px}
-  .text-scale-switch{display:inline-flex;align-items:center;justify-content:center;min-width:2.25rem;min-height:2.25rem;padding:.25rem .4375rem;border:1px solid var(--line);border-radius:999px;background:var(--soft);color:var(--muted);font-size:.78rem;font-weight:800;cursor:pointer}.text-scale-switch:hover{color:var(--text);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
-  :root{--text-zoom:1}:root[data-text-scale="1.125"]{--text-zoom:1.125}:root[data-text-scale="1.25"]{--text-zoom:1.25}html{font-size:calc(100% * var(--text-zoom))}
+  .text-scale-switch{display:inline-flex;align-items:center;justify-content:center;min-width:2.75rem;min-height:2.75rem;padding:.25rem .4375rem;border:1px solid var(--line);border-radius:999px;background:var(--soft);color:var(--muted);font-size:.78rem;font-weight:800;cursor:pointer}.text-scale-switch:hover{color:var(--text);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}.text-scale-switch:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  :root{--text-zoom:1}:root[data-text-scale="1.125"]{--text-zoom:1.125}:root[data-text-scale="1.25"]{--text-zoom:1.25}
   .theme-switch{
     appearance:none;position:relative;display:block;width:44px;height:24px;
     padding:2px;border:1px solid var(--line);border-radius:99px;
@@ -692,12 +692,12 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   body.reading .reader .reader-share{grid-row:1}
   .reader-back:hover{color:var(--text);border-color:var(--accent)}
   #readerContent{min-width:0}
-  .reader h1{max-width:none;font-size:clamp(1.65rem,5vw,2.35rem);letter-spacing:-.03em;line-height:1.2;margin:16px 0 10px}
+  .reader h1{max-width:none;font-size:calc(clamp(1.65rem,5vw,2.35rem) * var(--text-zoom));letter-spacing:-.03em;line-height:1.2;margin:16px 0 10px}
   .reader .wrole{margin-bottom:18px}
-  .reader .body{font-size:1rem;line-height:1.75;color:var(--body-copy);max-width:none}
+  .reader .body{font-size:calc(1rem * var(--text-zoom));line-height:1.75;color:var(--body-copy);max-width:none}
   .reader .article-prose{max-width:72ch;margin-inline:auto}
   .reader .body p{margin-bottom:17px}
-  .reader .body h2{margin:30px 0 10px;font-size:1.15rem;font-weight:750;letter-spacing:-.01em;color:var(--text)}
+  .reader .body h2{margin:30px 0 10px;font-size:calc(1.15rem * var(--text-zoom));font-weight:750;letter-spacing:-.01em;color:var(--text)}
   .citation{margin-inline-start:4px;font-size:.72em;line-height:0;white-space:nowrap;vertical-align:super}
   .citation a{padding:2px;color:var(--accent);font-weight:800;text-decoration:none}
   .citation a[id]{scroll-margin-top:88px}
@@ -783,15 +783,15 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   /* Wide CSS viewports need a larger reading scale, not merely wider empty margins.
      Percent-based root sizing still respects the reader's browser font preference. */
   @media(min-width:1440px){
-    html{font-size:calc(106.25% * var(--text-zoom))}
+    html{font-size:106.25%}
     :root{--page-max:76rem}
   }
   @media(min-width:1920px){
-    html{font-size:calc(112.5% * var(--text-zoom))}
+    html{font-size:112.5%}
     :root{--page-max:84rem}
   }
   @media(min-width:2560px){
-    html{font-size:calc(125% * var(--text-zoom))}
+    html{font-size:125%}
     :root{--page-max:90rem}
   }
   @media(max-width:640px){
@@ -918,7 +918,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
           --muted:#374151;--accent:#066b66;--accent-soft:transparent;--mast-bg:#fff;--scheme:light;
           --body-copy:#374151;--amber:#374151;--amber-line:#9ca3af}
     .skip,.theme-switch,.topics,.languages,.utility-switches,.reader-nav,.reader-actions,
-    .reader-share,.listen-row,.brief-listen,.brief-share-button,.brief-date-control,
+    .reader-share,.listen-row,.text-scale-switch,.brief-listen,.brief-share-button,.brief-date-control,
     .archive-controls,.related,.related-all,.footer-links,
     footer nav,.news-pager,.lang-btn{display:none!important}
     body{background:#fff;color:#000}
@@ -969,9 +969,6 @@ twq('config','re3b4');
             </span>
           </span>
         </button>
-        <button class="text-scale-switch" type="button"
-                aria-label="Text size" title="Text size"
-                data-text-scale-switch>A</button>
       </div>
     </div>
   </div>
@@ -2864,6 +2861,11 @@ function renderReader(a){
   if ('speechSynthesis' in window){
     const row = document.createElement('div');
     row.className = 'listen-row';
+    const scaleBtn = document.createElement('button');
+    scaleBtn.type = 'button';
+    scaleBtn.className = 'text-scale-switch';
+    scaleBtn.setAttribute('data-text-scale-switch', '');
+    row.appendChild(scaleBtn);
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'listen-btn';
@@ -2917,6 +2919,19 @@ function renderReader(a){
     });
     row.append(b, rate, out);
     $('readerContent').querySelector('h1').after(row);
+    // Label after insertion: refresh relabels via document.querySelectorAll,
+    // which cannot see a detached row.
+    if (window.refreshTextScaleSwitch) window.refreshTextScaleSwitch();
+  } else {
+    const row = document.createElement('div');
+    row.className = 'listen-row';
+    const scaleBtn = document.createElement('button');
+    scaleBtn.type = 'button';
+    scaleBtn.className = 'text-scale-switch';
+    scaleBtn.setAttribute('data-text-scale-switch', '');
+    row.appendChild(scaleBtn);
+    $('readerContent').querySelector('h1').after(row);
+    if (window.refreshTextScaleSwitch) window.refreshTextScaleSwitch();
   }
 }
 

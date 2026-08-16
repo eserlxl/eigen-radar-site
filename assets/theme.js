@@ -98,16 +98,17 @@
       } catch {}
     }
   };
-  document.querySelectorAll('[data-text-scale-switch]').forEach(button => {
-    button.addEventListener('click', () => {
-      // Cycle from the applied scale, not storage: with localStorage blocked,
-      // stored() is stuck at '1' and the switch could never reach 1.25.
-      const current = root.dataset.textScale || '1';
-      apply(scales[(scales.indexOf(current) + 1) % scales.length], true);
-    });
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-text-scale-switch]');
+    if (!button) return;
+    // Cycle from the applied scale, not storage: with localStorage blocked,
+    // stored() is stuck at '1' and the switch could never reach 1.25.
+    const current = root.dataset.textScale || '1';
+    apply(scales[(scales.indexOf(current) + 1) % scales.length], true);
   });
   addEventListener('storage', event => {
     if (event.key === storageKey) apply(event.newValue || '1');
   });
+  window.refreshTextScaleSwitch = () => apply(root.dataset.textScale || stored());
   apply(stored());
 })();
