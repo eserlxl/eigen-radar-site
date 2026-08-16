@@ -1,4 +1,4 @@
-const CACHE = 'eigen-radar-shell-v17';
+const CACHE = 'eigen-radar-shell-v18';
 const SHELL = [
   '/index.html',
   '/manifest.webmanifest',
@@ -50,12 +50,30 @@ async function networkFirstNavigation(event) {
 }
 
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
   if (event.request.mode === 'navigate') {
     event.respondWith(networkFirstNavigation(event));
     return;
   }
   const url = new URL(event.request.url);
   if (url.origin === self.location.origin && SHELL.includes(url.pathname)) {
-    event.respondWith(caches.match(event.request).then(hit => hit || fetch(event.request)));
+    event.respondWith(caches.match(event.request).then(hit => {
+      // Stale-while-revalidate: serve the cached shell asset immediately but
+      // refresh the entry in the background, so edits to unhashed shell files
+      // converge on installed clients without a manual version bump.
+      const refresh = fetch(event.request).then(response => {
+        if (response.ok) {
+          return caches.open(CACHE)
+            .then(cache => cache.put(event.request, response.clone()))
+            .then(() => response);
+        }
+        return response;
+      });
+      if (hit) {
+        event.waitUntil(refresh.catch(() => {}));
+        return hit;
+      }
+      return refresh;
+    }));
   }
 });

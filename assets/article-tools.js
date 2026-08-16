@@ -3,13 +3,34 @@
     const label = root.querySelector('label[for="writer-history-select"]');
     const select = root.querySelector('[data-writer-history-select]');
     const fallback = root.querySelector('[data-writer-history-fallback]');
+    const go = root.querySelector('[data-writer-history-go]');
     if (!label || !select || select.options.length < 2) return;
-    select.addEventListener('change', () => {
+    const navigate = () => {
       if (select.value) window.location.assign(select.value);
-    });
+    };
+    if (go) {
+      // Navigate on explicit commit only: change-driven navigation yanks
+      // keyboard users arrowing through options (WCAG 3.2.2 on-input).
+      go.addEventListener('click', navigate);
+      select.addEventListener('keydown', event => {
+        if (event.key === 'Enter') navigate();
+      });
+      go.hidden = false;
+    } else {
+      // Older cached pages without the commit button keep the change-driven
+      // behavior until they regenerate.
+      select.addEventListener('change', navigate);
+    }
     label.hidden = false;
     select.hidden = false;
     if (fallback) fallback.hidden = true;
+  });
+})();
+
+(() => {
+  document.querySelectorAll('[data-article-print]').forEach(button => {
+    button.addEventListener('click', () => window.print());
+    button.hidden = false;
   });
 })();
 
@@ -104,13 +125,35 @@
         const voice = pickVoice(root.dataset.lang);
         if (voice) utterance.voice = voice;
         utterance.rate = normalize(rate.value);
-        utterance.onend = next;
-        utterance.onerror = () => finish(token);
-        try {
-          synth.speak(utterance);
-        } catch {
+        // Watchdog: engines can silently drop an utterance queued right after
+        // cancel(); without onstart the button would stay latched as speaking.
+        let watchdog = 0;
+        utterance.onstart = () => clearTimeout(watchdog);
+        utterance.onend = () => {
+          clearTimeout(watchdog);
+          next();
+        };
+        utterance.onerror = () => {
+          clearTimeout(watchdog);
           finish(token);
-        }
+        };
+        const attempt = canRetry => {
+          try {
+            synth.speak(utterance);
+          } catch {
+            finish(token);
+            return;
+          }
+          watchdog = setTimeout(() => {
+            if (token !== run || synth.speaking || synth.pending) return;
+            if (canRetry) attempt(false);
+            else {
+              synth.cancel();
+              finish(token);
+            }
+          }, 1000);
+        };
+        attempt(true);
       };
       next();
     };
