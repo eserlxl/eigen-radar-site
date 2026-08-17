@@ -439,45 +439,48 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .featured-grid.is-brief-grid-expanded{grid-template-columns:minmax(0,3fr) minmax(11rem,1fr)}
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded{
       --brief-expand-pad:clamp(22px,3vw,32px);
-      grid-row:span 2;height:clamp(30rem,66vh,44rem);padding:var(--brief-expand-pad);
-      display:grid;grid-template-columns:minmax(0,55%) minmax(0,1fr);
-      grid-template-rows:minmax(0,1fr);gap:clamp(12px,1.5vw,16px);box-sizing:border-box
+      --brief-expand-gap:clamp(12px,1.5vw,16px);
+      grid-row:span 2;display:block;box-sizing:border-box;
+      min-height:var(--brief-expand-height);height:auto;padding:var(--brief-expand-pad)
     }
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-media{
-      grid-column:1;grid-row:1;align-self:start;margin:0;overflow:hidden;
-      border:1px solid var(--line);border-radius:var(--radius)
+      float:left;position:relative;z-index:1;
+      width:var(--brief-expand-media-width);
+      margin:0 var(--brief-expand-gap) var(--brief-expand-gap) 0;
+      overflow:hidden;border:1px solid var(--line);border-radius:var(--radius)
     }
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-content{
-      grid-column:2;grid-row:1;display:flex;flex-direction:column;padding:0;
-      min-height:0;overflow:hidden
+      height:auto;max-height:none;overflow:visible;padding:0
     }
-    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .summary,
-    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-preview,
-    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .radar-stamp{
-      display:none
-    }
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-content h3{margin-top:0}
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-preview{display:none}
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-detail-link::after{
       display:none
     }
-    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-content h3{
-      flex:0 0 auto;margin:0 0 .5rem;font-size:clamp(1.1rem,2.2vw,1.5rem);line-height:1.25
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded::after{display:none}
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-reader{
+      clear:both;width:100%;margin:.45rem 0 0;gap:.5rem
     }
-    .brief-reader{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;gap:.5rem}
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-reader-viewport{
+      height:clamp(14rem,32vh,22rem);flex:none
+    }
+    .brief-reader{display:flex;flex-direction:column;min-height:0;gap:.5rem}
     .brief-reader[hidden]{display:none!important}
     .brief-reader-viewport{flex:1 1 auto;overflow:hidden;min-height:0}
     .brief-reader-inner{
-      height:100%;column-width:var(--brief-reader-col-width,100%);column-gap:1.25rem;
+      height:100%;column-width:var(--brief-reader-col-width,100%);
+      column-gap:var(--brief-expand-gap,clamp(12px,1.5vw,16px));
       column-fill:auto;color:var(--muted);font-size:.88rem;line-height:1.45;will-change:transform
     }
     .brief-reader-inner.is-brief-reader-animating{transition:transform .18s ease}
     @media(prefers-reduced-motion:reduce){
       .brief-reader-inner.is-brief-reader-animating{transition:none}
     }
-    .brief-reader-section{break-inside:avoid;padding:2px 0}
+    .brief-reader-section{break-inside:avoid;min-width:0;padding:2px}
     .brief-reader-section h4{
       margin:0 0 .25rem;color:var(--text);font-size:.95rem;font-weight:700;line-height:1.3
     }
-    .brief-reader-section p{margin:0 0 .65rem}
+    .brief-reader-section p{margin:0}
     .brief-reader-fallback{margin:.35rem 0 0;font-size:.85rem}
     .brief-reader-full-link{margin:.65rem 0 0}
     .brief-reader-full-link a{color:var(--accent);font-weight:600;text-decoration:none}
@@ -494,22 +497,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .brief-reader-controls button:disabled{opacity:.35;cursor:default}
     .brief-reader-controls button:not(:disabled):hover{border-color:var(--accent);color:var(--accent)}
     .brief-reader-status{font-size:.82rem;color:var(--muted);min-width:3rem;text-align:center}
-    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded){padding:0}
-    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .brief-media picture{
-      aspect-ratio:4/1
-    }
-    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .brief-content{
-      padding:12px 14px 14px
-    }
-    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) h3{
-      font-size:.88rem;margin:6px 0 4px;line-height:1.3
-    }
-    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .summary{
-      -webkit-line-clamp:1;font-size:.8rem
-    }
-    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .brief-preview,
-    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .radar-stamp{
-      display:none
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded){
+      width:var(--brief-scale-width);transform:scale(var(--brief-scale-k,1));
+      transform-origin:top left;
+      margin-bottom:calc(var(--brief-scale-height) * (var(--brief-scale-k,1) - 1))
     }
   }
 
@@ -2384,6 +2375,63 @@ const briefFullTextCache = new Map();
 let briefExpandState = null;
 let briefReaderWheelGesture = 0;
 
+function measureCssClamp(prop, value){
+  const el = document.createElement('div');
+  el.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;${prop}:${value}`;
+  document.body.appendChild(el);
+  const cs = getComputedStyle(el);
+  const px = parseFloat(prop==='padding' ? cs.paddingTop : cs.gap || cs.columnGap);
+  el.remove();
+  return px;
+}
+function normalBriefLeadSlotWidth(gridWidth){
+  const gap = 16;
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const avail = gridWidth - gap;
+  const right = Math.max(16 * rem, avail / 3);
+  return avail - right;
+}
+function measureBriefExpandMetrics(grid){
+  const leadWidth = normalBriefLeadSlotWidth(grid.getBoundingClientRect().width);
+  const pad = measureCssClamp('padding', 'clamp(22px,3vw,32px)');
+  const gap = measureCssClamp('gap', 'clamp(12px,1.5vw,16px)');
+  const mediaWidth = (leadWidth - 2 * pad) * 0.55 - pad;
+  return {leadWidth, pad, gap, mediaWidth};
+}
+function measureBriefExpandHeight(card){
+  if (card.classList.contains('is-brief-revealed')){
+    const locked = card.style.getPropertyValue('--brief-reveal-height');
+    if (locked) return parseFloat(locked);
+  }
+  return card.getBoundingClientRect().height;
+}
+function captureBriefScaleSnapshots(grid, expandedCard){
+  return [...grid.children]
+    .filter(el => el!==expandedCard && el.classList.contains('brief-card'))
+    .map(card=>({
+      card,
+      width:card.getBoundingClientRect().width,
+      height:card.getBoundingClientRect().height
+    }));
+}
+function applyBriefScaleCards(snapshots){
+  snapshots.forEach(({card, width, height})=>{
+    const newWidth = card.getBoundingClientRect().width;
+    const k = width ? newWidth / width : 1;
+    card.style.setProperty('--brief-scale-width', `${width}px`);
+    card.style.setProperty('--brief-scale-height', `${height}px`);
+    card.style.setProperty('--brief-scale-k', String(k));
+  });
+}
+function clearBriefExpandCardStyles(card){
+  card.style.removeProperty('--brief-expand-height');
+  card.style.removeProperty('--brief-expand-media-width');
+  card.style.removeProperty('--brief-scale-width');
+  card.style.removeProperty('--brief-scale-height');
+  card.style.removeProperty('--brief-scale-k');
+  card.style.removeProperty('margin-bottom');
+}
+
 function findBriefById(id){
   return BRIEFS.find(brief=>brief && brief.id===id);
 }
@@ -2486,19 +2534,23 @@ function createBriefReaderUI(card){
 function ensureBriefReader(card){
   return card.querySelector('.brief-reader') || createBriefReaderUI(card);
 }
+function briefReaderMetrics(viewport, inner){
+  const viewportWidth = viewport.clientWidth;
+  const gap = parseFloat(getComputedStyle(inner).columnGap) || 20;
+  const colWidth = Math.max(0, (viewportWidth - gap) / 2);
+  return {viewportWidth, gap, colWidth};
+}
 function setBriefReaderPage(page, {animate=true}={}){
   const state = briefExpandState;
   if (!state) return;
   const {inner, viewport, pages, status, prevBtn, nextBtn} = state;
   const index = Math.max(0, Math.min(page, pages - 1));
   state.page = index;
-  const colWidth = viewport.clientWidth;
-  const gap = parseFloat(getComputedStyle(inner).columnGap) || 20;
-  const step = colWidth + gap;
+  const {viewportWidth, gap, colWidth} = briefReaderMetrics(viewport, inner);
   inner.style.setProperty('--brief-reader-col-width', `${colWidth}px`);
   inner.classList.toggle('is-brief-reader-animating',
     animate && !BRIEF_REDUCED_MOTION.matches);
-  inner.style.transform = `translateX(-${index * step}px)`;
+  inner.style.transform = `translateX(-${index * (viewportWidth + gap)}px)`;
   const u = UI[LANG];
   status.textContent = u.pageStatus.replace('{current}', String(index + 1))
     .replace('{total}', String(pages));
@@ -2507,13 +2559,11 @@ function setBriefReaderPage(page, {animate=true}={}){
 }
 function measureBriefReaderPages(state){
   const {inner, viewport} = state;
-  const colWidth = viewport.clientWidth;
-  if (!colWidth) return 1;
-  const gap = parseFloat(getComputedStyle(inner).columnGap) || 20;
-  const step = colWidth + gap;
+  const {viewportWidth, gap, colWidth} = briefReaderMetrics(viewport, inner);
+  if (!viewportWidth) return 1;
   inner.style.setProperty('--brief-reader-col-width', `${colWidth}px`);
   inner.style.transform = 'translateX(0)';
-  return Math.max(1, Math.round(inner.scrollWidth / step));
+  return Math.max(1, Math.ceil(inner.scrollWidth / (viewportWidth + gap)));
 }
 function updateBriefReaderLayout({resetPage=false}={}){
   const state = briefExpandState;
@@ -2521,6 +2571,15 @@ function updateBriefReaderLayout({resetPage=false}={}){
   state.pages = measureBriefReaderPages(state);
   if (resetPage) state.page = 0;
   setBriefReaderPage(state.page, {animate:false});
+}
+function updateBriefExpandLayout(){
+  const state = briefExpandState;
+  if (!state) return;
+  const {card, grid, scaleSnapshots} = state;
+  const metrics = measureBriefExpandMetrics(grid);
+  card.style.setProperty('--brief-expand-media-width', `${metrics.mediaWidth}px`);
+  if (scaleSnapshots?.length) applyBriefScaleCards(scaleSnapshots);
+  updateBriefReaderLayout();
 }
 function populateBriefReaderPreview(inner, card){
   const preview = card.querySelector('.brief-preview');
@@ -2617,9 +2676,15 @@ function bindBriefReaderEvents(card, reader){
 }
 function applyBriefExpandDom(card, grid, originalOrder){
   resetBriefReveal();
+  const metrics = measureBriefExpandMetrics(grid);
+  const expandHeight = measureBriefExpandHeight(card);
+  const scaleSnapshots = captureBriefScaleSnapshots(grid, card);
   grid.classList.add('is-brief-grid-expanded');
   if (card!==grid.firstElementChild) grid.insertBefore(card, grid.firstElementChild);
   card.classList.add('is-brief-expanded');
+  card.style.setProperty('--brief-expand-media-width', `${metrics.mediaWidth}px`);
+  card.style.setProperty('--brief-expand-height', `${expandHeight}px`);
+  applyBriefScaleCards(scaleSnapshots);
   const reader = ensureBriefReader(card);
   reader.hidden = false;
   const detailLink = card.querySelector('.brief-detail-link');
@@ -2628,7 +2693,7 @@ function applyBriefExpandDom(card, grid, originalOrder){
   const viewport = reader.querySelector('.brief-reader-viewport');
   const inner = reader.querySelector('.brief-reader-inner');
   briefExpandState = {
-    card, grid, originalOrder, page:0, pages:1, brief,
+    card, grid, originalOrder, scaleSnapshots, page:0, pages:1, brief,
     viewport, inner,
     prevBtn:reader.querySelector('.brief-reader-prev'),
     nextBtn:reader.querySelector('.brief-reader-next'),
@@ -2649,8 +2714,10 @@ function applyBriefExpandDom(card, grid, originalOrder){
 function restoreBriefExpandDom(){
   const state = briefExpandState;
   if (!state) return;
-  const {card, grid, originalOrder, detailLink} = state;
+  const {card, grid, originalOrder, detailLink, scaleSnapshots} = state;
   card.classList.remove('is-brief-expanded');
+  clearBriefExpandCardStyles(card);
+  scaleSnapshots?.forEach(({card:smallCard})=>clearBriefExpandCardStyles(smallCard));
   grid.classList.remove('is-brief-grid-expanded');
   originalOrder.forEach(child=>grid.appendChild(child));
   const reader = card.querySelector('.brief-reader');
@@ -2683,6 +2750,8 @@ function expandBriefCard(card){
   return briefExpandFade(fadeCard, ()=>{
     if (current){
       current.card.classList.remove('is-brief-expanded');
+      clearBriefExpandCardStyles(current.card);
+      current.scaleSnapshots?.forEach(({card:smallCard})=>clearBriefExpandCardStyles(smallCard));
       const reader = current.card.querySelector('.brief-reader');
       if (reader) reader.hidden = true;
       current.detailLink?.setAttribute('aria-expanded', 'false');
@@ -3870,7 +3939,7 @@ window.addEventListener('resize', ()=>{
   scrollBriefTrack(false);
   if (!COMPACT_EDITION_MEDIA.matches) setPodcastPopover(false);
   resetBriefReveal();
-  if (briefExpandState) updateBriefReaderLayout();
+  if (briefExpandState) updateBriefExpandLayout();
   scheduleBriefReveal();
 }, {passive:true});
 
