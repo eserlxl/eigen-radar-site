@@ -483,6 +483,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       box-shadow:inset 0 0 0 1px var(--accent)}
     .brief-reading-control-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
     .brief-reading-control-btn.brief-listen.is-speaking{background:var(--accent);color:var(--card)}
+    .brief-reading-control-btn.is-active{border-color:var(--accent);color:var(--accent)}
+    .brief-reading-rate{width:4.2rem;accent-color:var(--accent);cursor:pointer}
+    .brief-reading-rate-value{
+      font-size:.68rem;color:var(--muted);min-width:1.9rem;font-variant-numeric:tabular-nums
+    }
     .brief-ref-mark{
       display:inline;vertical-align:super;font-size:.75em;line-height:0;border:0;
       background:transparent;color:var(--accent);cursor:pointer;padding:0 .1em;font-weight:600
@@ -1234,6 +1239,8 @@ const UI = {
     briefTextSize:"Yazı boyutu",
     briefListen:"Sesli dinle",
     briefListenStop:"Durdur",
+    briefListenRate:"Okuma hızı",
+    briefPrint:"Yazdır",
     disclaimerHead:"Yasal Uyarı",
     aiPersona:"YZ",
     originalSource:"Asıl kaynağı aç",
@@ -1308,6 +1315,8 @@ const UI = {
     briefTextSize:"Text size",
     briefListen:"Listen",
     briefListenStop:"Stop",
+    briefListenRate:"Reading speed",
+    briefPrint:"Print",
     disclaimerHead:"Legal Notice",
     aiPersona:"AI",
     originalSource:"Open original source",
@@ -2493,11 +2502,39 @@ function installBriefReadingControls(card, state){
     textBtn.className = 'brief-reading-control-btn brief-text-size';
     textBtn.textContent = 'A';
     textBtn.setAttribute('aria-label', u.briefTextSize);
+    const syncTextBtn = ()=>{
+      textBtn.style.fontSize = ['.72rem', '.82rem', '.92rem'][briefReadingTextSizeStep];
+      textBtn.classList.toggle('is-active', briefReadingTextSizeStep > 0);
+    };
+    syncTextBtn();
     textBtn.addEventListener('click', ()=>{
       const preview = card.querySelector('.brief-preview');
       if (!preview) return;
       briefReadingTextSizeStep = (briefReadingTextSizeStep + 1) % BRIEF_READING_TEXT_SIZES.length;
       preview.style.fontSize = BRIEF_READING_TEXT_SIZES[briefReadingTextSizeStep];
+      syncTextBtn();
+    });
+    const printBtn = document.createElement('button');
+    printBtn.type = 'button';
+    printBtn.className = 'brief-reading-control-btn brief-print';
+    printBtn.textContent = '🖨';
+    printBtn.setAttribute('aria-label', u.briefPrint);
+    printBtn.addEventListener('click', ()=>{
+      const href = card.querySelector('.brief-detail-link')?.getAttribute('href');
+      if (!href || !href.startsWith('/')) return;
+      const frame = document.createElement('iframe');
+      frame.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;visibility:hidden';
+      frame.src = href;
+      const cleanup = ()=>frame.remove();
+      frame.addEventListener('load', ()=>{
+        try {
+          frame.contentWindow.addEventListener('afterprint', cleanup);
+          frame.contentWindow.focus();
+          frame.contentWindow.print();
+        } catch { cleanup(); }
+        setTimeout(cleanup, 60000);
+      });
+      document.body.appendChild(frame);
     });
     const listenBtn = document.createElement('button');
     listenBtn.type = 'button';
@@ -2523,7 +2560,21 @@ function installBriefReadingControls(card, state){
       listenBtn.setAttribute('aria-label', u.briefListenStop);
       speechSynthesis.speak(msg);
     });
-    controls.append(textBtn, listenBtn);
+    const rateInput = document.createElement('input');
+    rateInput.type = 'range';
+    rateInput.min = '0.5'; rateInput.max = '2'; rateInput.step = '0.1';
+    rateInput.className = 'brief-reading-rate';
+    rateInput.value = String(briefReadingSpeechRate());
+    rateInput.setAttribute('aria-label', u.briefListenRate);
+    const rateValue = document.createElement('span');
+    rateValue.className = 'brief-reading-rate-value';
+    rateValue.textContent = `${briefReadingSpeechRate()}×`;
+    rateInput.addEventListener('input', ()=>{
+      const value = Math.round(Number.parseFloat(rateInput.value) * 10) / 10;
+      rateValue.textContent = `${value}×`;
+      try { localStorage.setItem('ttsRate', String(value)); } catch {}
+    });
+    controls.append(textBtn, printBtn, listenBtn, rateInput, rateValue);
     row.appendChild(controls);
     state.textSizeBtn = textBtn;
     state.listenBtn = listenBtn;
