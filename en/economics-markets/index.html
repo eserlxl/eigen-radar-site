@@ -488,6 +488,27 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .brief-reading-rate-value{
       font-size:.68rem;color:var(--muted);min-width:1.9rem;font-variant-numeric:tabular-nums
     }
+  }
+  #brief-print-region{display:none}
+  @media print{
+    body.brief-print-mode > :not(#brief-print-region){display:none !important}
+    body.brief-print-mode #brief-print-region{
+      display:block;color:#000;background:#fff;font-size:11pt;line-height:1.5
+    }
+    #brief-print-region h2{font-size:16pt;margin:0 0 .4rem}
+    #brief-print-region .brief-print-summary{font-style:italic;margin:0 0 .8rem}
+    #brief-print-region .brief-preview{display:block;margin:0}
+    #brief-print-region .brief-preview-section{margin:0 0 .8rem;padding:0}
+    #brief-print-region .brief-preview-section h4{margin:0 0 .3rem;color:#000}
+    #brief-print-region .brief-preview-section p{margin:0 0 .6rem}
+    #brief-print-region .brief-ref-mark{
+      border:0;background:none;color:#000;font-size:.75em;vertical-align:super;padding:0 .1em
+    }
+    #brief-print-region .brief-preview-sources h4{margin:.6rem 0 .3rem;color:#000}
+    #brief-print-region .brief-preview-ref-list{margin:0;padding-left:1.2rem;color:#000}
+    #brief-print-region .brief-preview-ref-list a{color:#000;text-decoration:none}
+  }
+  @media(min-width:960px){
     .brief-ref-mark{
       display:inline;vertical-align:super;font-size:.75em;line-height:0;border:0;
       background:transparent;color:var(--accent);cursor:pointer;padding:0 .1em;font-weight:600
@@ -2510,21 +2531,40 @@ function installBriefReadingControls(card, state){
     printBtn.textContent = '🖨';
     printBtn.setAttribute('aria-label', u.briefPrint);
     printBtn.addEventListener('click', ()=>{
-      const href = card.querySelector('.brief-detail-link')?.getAttribute('href');
-      if (!href || !href.startsWith('/')) return;
-      const frame = document.createElement('iframe');
-      frame.style.cssText = 'position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;visibility:hidden';
-      frame.src = href;
-      const cleanup = ()=>frame.remove();
-      frame.addEventListener('load', ()=>{
-        try {
-          frame.contentWindow.addEventListener('afterprint', cleanup);
-          frame.contentWindow.focus();
-          frame.contentWindow.print();
-        } catch { cleanup(); }
-        setTimeout(cleanup, 60000);
-      });
-      document.body.appendChild(frame);
+      /* X-Frame-Options: DENY blocks iframing our own pages, so print the card's
+         already-loaded content in place through a print-only region. */
+      document.getElementById('brief-print-region')?.remove();
+      const region = document.createElement('div');
+      region.id = 'brief-print-region';
+      const title = card.querySelector('.brief-content h3')?.textContent.trim();
+      if (title){
+        const h = document.createElement('h2');
+        h.textContent = title;
+        region.appendChild(h);
+      }
+      const summary = card.querySelector('.brief-content .summary')?.textContent.trim();
+      if (summary){
+        const p = document.createElement('p');
+        p.className = 'brief-print-summary';
+        p.textContent = summary;
+        region.appendChild(p);
+      }
+      const preview = card.querySelector('.brief-preview');
+      if (preview){
+        const clone = preview.cloneNode(true);
+        clone.querySelector('.brief-preview-full-link')?.remove();
+        region.appendChild(clone);
+      }
+      document.body.appendChild(region);
+      document.body.classList.add('brief-print-mode');
+      const done = ()=>{
+        document.body.classList.remove('brief-print-mode');
+        region.remove();
+        window.removeEventListener('afterprint', done);
+      };
+      window.addEventListener('afterprint', done);
+      window.print();
+      setTimeout(done, 1000);
     });
     const listenBtn = document.createElement('button');
     listenBtn.type = 'button';
