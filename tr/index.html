@@ -528,7 +528,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     @media (prefers-reduced-motion:reduce){
       .brief-preview-ref.brief-preview-ref-highlight{transition:none}
     }
-    .brief-preview-fallback{margin:.35rem 0 0;font-size:.85rem}
     .brief-preview-full-link{margin:.65rem 0 0}
     .brief-preview-full-link a{color:var(--accent);font-weight:600;text-decoration:none}
     .brief-preview-full-link a:hover{text-decoration:underline}
@@ -2875,6 +2874,16 @@ function ensureBriefPreview(card){
   }
   return preview;
 }
+function appendBriefFullLink(preview, href, label){
+  if (!href || preview.querySelector('.brief-preview-full-link')) return;
+  const full = document.createElement('p');
+  full.className = 'brief-preview-full-link';
+  const link = document.createElement('a');
+  link.href = href;
+  link.textContent = label;
+  full.appendChild(link);
+  preview.appendChild(full);
+}
 function populateBriefPreview(preview, data, state){
   const u = UI[LANG];
   if (!data) return;
@@ -2889,26 +2898,14 @@ function populateBriefPreview(preview, data, state){
     preview.appendChild(buildBriefPreviewSections(data.sections, refElements));
     if (refsSection) preview.appendChild(refsSection);
     if (state) state.refElements = refElements;
-    const full = document.createElement('p');
-    full.className = 'brief-preview-full-link';
-    const link = document.createElement('a');
-    link.href = data.href;
-    link.textContent = u.briefFullPageShort;
-    full.appendChild(link);
-    preview.appendChild(full);
+    appendBriefFullLink(preview, data.href, u.briefFullPageShort);
     applyBriefReadingTextSize(preview);
     (preview.closest('.brief-card') || preview).scrollTop = 0;
     return;
   }
-  if (data.failed){
-    const fallback = document.createElement('p');
-    fallback.className = 'brief-preview-fallback';
-    const link = document.createElement('a');
-    link.href = data.href;
-    link.textContent = u.briefFullPage;
-    fallback.appendChild(link);
-    preview.appendChild(fallback);
-  }
+  /* Fetch failed or parsed empty: reading mode still keeps one full-page link at
+     the bottom (the entry link from applyBriefReadingDom usually already has). */
+  appendBriefFullLink(preview, data.href, u.briefFullPage);
 }
 function bindBriefReadingEvents(card){
   if (card.dataset.readingBound==='true') return;
@@ -2953,6 +2950,10 @@ function applyBriefReadingDom(card, grid, originalOrder){
   briefReadingState = {card, grid, originalOrder, detailLink, scrollContainer, previewHtml, refElements:{}};
   installBriefReadingControls(card, briefReadingState);
   const brief = findBriefById(card.dataset.briefId);
+  /* The full-page link is unconditional in reading mode: it appears the moment the
+     card opens (after the restore snapshot is taken) and survives fetch failure or an
+     empty parse; a successful populate rebuilds the content and re-appends it. */
+  if (brief) appendBriefFullLink(preview, briefPath(brief), UI[LANG].briefFullPage);
   if (brief){
     fetchBriefFullText(brief).then(data=>{
       if (!briefReadingState || briefReadingState.card!==card) return;
