@@ -436,16 +436,20 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .featured-grid .brief-card.is-brief-reveal-fading.is-brief-reveal-dimmed{
       opacity:.1;transition-duration:.18s
     }
+    /* Reading mode: the CARD is the scroll container, so the wheel works anywhere
+       over it and the text wraps the floated media exactly like the reveal. */
+    .featured-grid .brief-card:first-child.is-brief-revealed.is-brief-reading{
+      overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin
+    }
     .featured-grid .brief-card:first-child.is-brief-revealed.is-brief-reading::after{display:none}
     .featured-grid .brief-card:first-child.is-brief-revealed.is-brief-reading .brief-detail-link::after{
       display:none
     }
     .featured-grid .brief-card:first-child.is-brief-revealed.is-brief-reading .brief-content{
-      display:flex;flex-direction:column;min-height:0;height:100%;overflow:hidden
+      height:auto;overflow:visible
     }
     .featured-grid .brief-card:first-child.is-brief-revealed.is-brief-reading .brief-preview{
-      flex:1 1 auto;min-height:0;display:block;grid-template-columns:none;
-      overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin
+      display:block;grid-template-columns:none
     }
     .brief-preview-fallback{margin:.35rem 0 0;font-size:.85rem}
     .brief-preview-full-link{margin:.65rem 0 0}
@@ -2274,7 +2278,7 @@ function populateBriefPreview(preview, data){
     link.textContent = u.briefFullPage;
     full.appendChild(link);
     preview.appendChild(full);
-    preview.scrollTop = 0;
+    (preview.closest('.brief-card') || preview).scrollTop = 0;
     return;
   }
   if (data.failed){
@@ -2304,6 +2308,7 @@ function teardownBriefReadingCard(state){
   card.style.removeProperty('--brief-reveal-height');
   const preview = card.querySelector('.brief-preview');
   if (preview) preview.innerHTML = previewHtml;
+  card.scrollTop = 0;
   scrollContainer?.removeAttribute('tabindex');
   detailLink?.setAttribute('aria-expanded', 'false');
 }
@@ -2316,7 +2321,7 @@ function applyBriefReadingDom(card, grid, originalOrder){
   }
   card.classList.add('is-brief-reading');
   const preview = ensureBriefPreview(card);
-  const scrollContainer = preview;
+  const scrollContainer = card;
   scrollContainer.tabIndex = -1;
   const detailLink = card.querySelector('.brief-detail-link');
   detailLink?.setAttribute('aria-expanded', 'true');
