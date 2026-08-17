@@ -432,9 +432,84 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       background:linear-gradient(180deg,transparent,var(--card-gradient-end) 58%);
       color:var(--muted);font-size:1rem;line-height:1;pointer-events:none
     }
-    .featured-grid .brief-card:first-child.is-brief-reveal-fading{transition:opacity .28s ease}
-    .featured-grid .brief-card:first-child.is-brief-reveal-fading.is-brief-reveal-dimmed{
+    .featured-grid .brief-card.is-brief-reveal-fading{transition:opacity .28s ease}
+    .featured-grid .brief-card.is-brief-reveal-fading.is-brief-reveal-dimmed{
       opacity:.1;transition-duration:.18s
+    }
+    .featured-grid.is-brief-grid-expanded{grid-template-columns:minmax(0,3fr) minmax(11rem,1fr)}
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded{
+      --brief-expand-pad:clamp(22px,3vw,32px);
+      grid-row:span 2;height:clamp(30rem,66vh,44rem);padding:var(--brief-expand-pad);
+      display:grid;grid-template-columns:minmax(0,55%) minmax(0,1fr);
+      grid-template-rows:minmax(0,1fr);gap:clamp(12px,1.5vw,16px);box-sizing:border-box
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-media{
+      grid-column:1;grid-row:1;align-self:start;margin:0;overflow:hidden;
+      border:1px solid var(--line);border-radius:var(--radius)
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-content{
+      grid-column:2;grid-row:1;display:flex;flex-direction:column;padding:0;
+      min-height:0;overflow:hidden
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .summary,
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-preview,
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .radar-stamp{
+      display:none
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-detail-link::after{
+      display:none
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-content h3{
+      flex:0 0 auto;margin:0 0 .5rem;font-size:clamp(1.1rem,2.2vw,1.5rem);line-height:1.25
+    }
+    .brief-reader{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;gap:.5rem}
+    .brief-reader[hidden]{display:none!important}
+    .brief-reader-viewport{flex:1 1 auto;overflow:hidden;min-height:0}
+    .brief-reader-inner{
+      height:100%;column-width:var(--brief-reader-col-width,100%);column-gap:1.25rem;
+      column-fill:auto;color:var(--muted);font-size:.88rem;line-height:1.45;will-change:transform
+    }
+    .brief-reader-inner.is-brief-reader-animating{transition:transform .18s ease}
+    @media(prefers-reduced-motion:reduce){
+      .brief-reader-inner.is-brief-reader-animating{transition:none}
+    }
+    .brief-reader-section{break-inside:avoid;padding:2px 0}
+    .brief-reader-section h4{
+      margin:0 0 .25rem;color:var(--text);font-size:.95rem;font-weight:700;line-height:1.3
+    }
+    .brief-reader-section p{margin:0 0 .65rem}
+    .brief-reader-fallback{margin:.35rem 0 0;font-size:.85rem}
+    .brief-reader-full-link{margin:.65rem 0 0}
+    .brief-reader-full-link a{color:var(--accent);font-weight:600;text-decoration:none}
+    .brief-reader-full-link a:hover{text-decoration:underline}
+    .brief-reader-controls{
+      flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:.75rem;
+      padding-top:.35rem;border-top:1px solid var(--line)
+    }
+    .brief-reader-controls button{
+      background:var(--card);border:1px solid var(--line);border-radius:99px;
+      width:2.25rem;height:2.25rem;cursor:pointer;font-family:inherit;font-size:1rem;
+      color:var(--text);display:grid;place-items:center
+    }
+    .brief-reader-controls button:disabled{opacity:.35;cursor:default}
+    .brief-reader-controls button:not(:disabled):hover{border-color:var(--accent);color:var(--accent)}
+    .brief-reader-status{font-size:.82rem;color:var(--muted);min-width:3rem;text-align:center}
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded){padding:0}
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .brief-media picture{
+      aspect-ratio:4/1
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .brief-content{
+      padding:12px 14px 14px
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) h3{
+      font-size:.88rem;margin:6px 0 4px;line-height:1.3
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .summary{
+      -webkit-line-clamp:1;font-size:.8rem
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .brief-preview,
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .radar-stamp{
+      display:none
     }
   }
 
@@ -1147,6 +1222,9 @@ const UI = {
     prevNews:"Önceki haber sayfası",
     nextNews:"Sonraki haber sayfası",
     pageStatus:"{current} / {total}",
+    briefPagePrev:"Önceki sayfa",
+    briefPageNext:"Sonraki sayfa",
+    briefFullPage:"Kaynaklar ve tam sayfa →",
     disclaimerHead:"Yasal Uyarı",
     aiPersona:"YZ",
     originalSource:"Asıl kaynağı aç",
@@ -1215,6 +1293,9 @@ const UI = {
     prevNews:"Previous news page",
     nextNews:"Next news page",
     pageStatus:"{current} / {total}",
+    briefPagePrev:"Previous page",
+    briefPageNext:"Next page",
+    briefFullPage:"Sources and full page →",
     disclaimerHead:"Legal Notice",
     aiPersona:"AI",
     originalSource:"Open original source",
@@ -1768,7 +1849,7 @@ function briefCard(brief, index, eager=true, pageIndex=0){
   el.dataset.briefId = briefId;
   el.setAttribute('aria-labelledby', headingId);
   const heading = detailHref
-    ? `<a class="brief-detail-link" href="${escapeHTML(detailHref)}">${escapeHTML(localized(brief.title))}</a>`
+    ? `<a class="brief-detail-link" href="${escapeHTML(detailHref)}" aria-expanded="false">${escapeHTML(localized(brief.title))}</a>`
     : escapeHTML(localized(brief.title));
   const preview = Array.isArray(brief.preview) ? brief.preview.map(section=>{
     const sectionHeading = localized(section?.h);
@@ -2020,6 +2101,7 @@ function pageItems(items, requestedPage, pageSize){
 }
 
 function renderBriefs(){
+  briefExpandState = null;
   const section = $('briefsSection');
   const track = $('featured');
   track.innerHTML = '';
@@ -2077,7 +2159,7 @@ function revealBriefCard(card){
 }
 function scheduleBriefReveal(){
   cancelBriefReveal();
-  if (!BRIEF_REVEAL_MEDIA.matches || document.visibilityState !== 'visible'
+  if (briefExpandState || !BRIEF_REVEAL_MEDIA.matches || document.visibilityState !== 'visible'
       || activeHomeView !== 'briefs') return;
   const page = briefTrackPages().find(item=>item.dataset.editionKey===selectedBriefDate);
   const card = page?.querySelector('.brief-card');
@@ -2117,6 +2199,7 @@ document.addEventListener('visibilitychange', ()=>{
   else cancelBriefReveal();
 });
 const briefRevealPreferenceChange = ()=>{
+  resetBriefExpand();
   resetBriefReveal();
   scheduleBriefReveal();
 };
@@ -2132,6 +2215,332 @@ $('briefsSection').addEventListener('pointerup', scheduleBriefReveal, {passive:t
 $('briefsSection').addEventListener('pointercancel', scheduleBriefReveal, {passive:true});
 $('briefsSection').addEventListener('keydown', cancelBriefReveal);
 $('briefsSection').addEventListener('keyup', scheduleBriefReveal);
+
+const briefFullTextCache = new Map();
+let briefExpandState = null;
+let briefReaderWheelGesture = 0;
+
+function findBriefById(id){
+  return BRIEFS.find(brief=>brief && brief.id===id);
+}
+function parseBriefPageSections(html, href){
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const sections = [];
+  doc.querySelectorAll('.brief-opening-body section, .brief-continuation section').forEach(section=>{
+    const headingEl = section.querySelector('h2');
+    const heading = headingEl ? headingEl.textContent.trim() : '';
+    const paragraphs = [];
+    section.querySelectorAll('p').forEach(node=>{
+      const copy = node.cloneNode(true);
+      copy.querySelectorAll('sup.citation').forEach(marker=>marker.remove());
+      const text = copy.textContent.trim();
+      if (text) paragraphs.push(text);
+    });
+    if (heading || paragraphs.length) sections.push({heading, paragraphs});
+  });
+  return {sections, href};
+}
+function fetchBriefFullText(brief){
+  const id = typeof brief?.id==='string' ? brief.id : '';
+  if (!id) return Promise.resolve(null);
+  if (briefFullTextCache.has(id)) return Promise.resolve(briefFullTextCache.get(id));
+  const href = briefPath(brief);
+  if (!href) return Promise.resolve(null);
+  const pending = fetch(href).then(async resp=>{
+    if (!resp.ok) throw new Error('brief fetch failed');
+    const parsed = parseBriefPageSections(await resp.text(), href);
+    briefFullTextCache.set(id, parsed);
+    return parsed;
+  }).catch(()=>{
+    const fallback = {sections:null, href, failed:true};
+    briefFullTextCache.set(id, fallback);
+    return fallback;
+  });
+  briefFullTextCache.set(id, pending);
+  return pending;
+}
+function buildBriefReaderSections(sections){
+  const frag = document.createDocumentFragment();
+  sections.forEach(section=>{
+    const block = document.createElement('section');
+    block.className = 'brief-reader-section';
+    if (section.heading){
+      const h4 = document.createElement('h4');
+      h4.textContent = section.heading;
+      block.appendChild(h4);
+    }
+    section.paragraphs.forEach(text=>{
+      const p = document.createElement('p');
+      p.textContent = text;
+      block.appendChild(p);
+    });
+    frag.appendChild(block);
+  });
+  return frag;
+}
+function briefExpandFade(card, mutate){
+  if (!card){
+    mutate();
+    return Promise.resolve();
+  }
+  if (BRIEF_REDUCED_MOTION.matches){
+    mutate();
+    return Promise.resolve();
+  }
+  card.classList.add('is-brief-reveal-fading');
+  return new Promise(resolve=>{
+    requestAnimationFrame(()=>{
+      card.classList.add('is-brief-reveal-dimmed');
+      setTimeout(()=>{
+        mutate();
+        card.classList.remove('is-brief-reveal-dimmed');
+        setTimeout(()=>{
+          card.classList.remove('is-brief-reveal-fading');
+          resolve();
+        }, 280);
+      }, 180);
+    });
+  });
+}
+function createBriefReaderUI(card){
+  const u = UI[LANG];
+  const reader = document.createElement('div');
+  reader.className = 'brief-reader';
+  reader.hidden = true;
+  reader.innerHTML = `
+    <div class="brief-reader-viewport">
+      <div class="brief-reader-inner"></div>
+    </div>
+    <div class="brief-reader-controls">
+      <button type="button" class="brief-reader-prev" aria-label="${escapeHTML(u.briefPagePrev)}">‹</button>
+      <span class="brief-reader-status" aria-live="polite"></span>
+      <button type="button" class="brief-reader-next" aria-label="${escapeHTML(u.briefPageNext)}">›</button>
+    </div>`;
+  card.querySelector('.brief-content')?.appendChild(reader);
+  return reader;
+}
+function ensureBriefReader(card){
+  return card.querySelector('.brief-reader') || createBriefReaderUI(card);
+}
+function setBriefReaderPage(page, {animate=true}={}){
+  const state = briefExpandState;
+  if (!state) return;
+  const {inner, viewport, pages, status, prevBtn, nextBtn} = state;
+  const index = Math.max(0, Math.min(page, pages - 1));
+  state.page = index;
+  const colWidth = viewport.clientWidth;
+  const gap = parseFloat(getComputedStyle(inner).columnGap) || 20;
+  const step = colWidth + gap;
+  inner.style.setProperty('--brief-reader-col-width', `${colWidth}px`);
+  inner.classList.toggle('is-brief-reader-animating',
+    animate && !BRIEF_REDUCED_MOTION.matches);
+  inner.style.transform = `translateX(-${index * step}px)`;
+  const u = UI[LANG];
+  status.textContent = u.pageStatus.replace('{current}', String(index + 1))
+    .replace('{total}', String(pages));
+  prevBtn.disabled = index <= 0;
+  nextBtn.disabled = index >= pages - 1;
+}
+function measureBriefReaderPages(state){
+  const {inner, viewport} = state;
+  const colWidth = viewport.clientWidth;
+  if (!colWidth) return 1;
+  const gap = parseFloat(getComputedStyle(inner).columnGap) || 20;
+  const step = colWidth + gap;
+  inner.style.setProperty('--brief-reader-col-width', `${colWidth}px`);
+  inner.style.transform = 'translateX(0)';
+  return Math.max(1, Math.round(inner.scrollWidth / step));
+}
+function updateBriefReaderLayout({resetPage=false}={}){
+  const state = briefExpandState;
+  if (!state) return;
+  state.pages = measureBriefReaderPages(state);
+  if (resetPage) state.page = 0;
+  setBriefReaderPage(state.page, {animate:false});
+}
+function populateBriefReaderPreview(inner, card){
+  const preview = card.querySelector('.brief-preview');
+  const summary = card.querySelector('.summary');
+  if (preview){
+    preview.querySelectorAll('.brief-preview-section').forEach(section=>{
+      const block = document.createElement('section');
+      block.className = 'brief-reader-section';
+      const heading = section.querySelector('h4');
+      if (heading){
+        const h4 = document.createElement('h4');
+        h4.textContent = heading.textContent;
+        block.appendChild(h4);
+      }
+      section.querySelectorAll('p').forEach(node=>{
+        const p = document.createElement('p');
+        p.textContent = node.textContent;
+        block.appendChild(p);
+      });
+      inner.appendChild(block);
+    });
+  } else if (summary){
+    const p = document.createElement('p');
+    p.textContent = summary.textContent;
+    inner.appendChild(p);
+  }
+}
+function populateBriefReader(state, data){
+  const u = UI[LANG];
+  const {inner, card} = state;
+  inner.textContent = '';
+  if (data?.sections?.length){
+    inner.appendChild(buildBriefReaderSections(data.sections));
+    const full = document.createElement('p');
+    full.className = 'brief-reader-full-link';
+    const link = document.createElement('a');
+    link.href = data.href;
+    link.textContent = u.briefFullPage;
+    full.appendChild(link);
+    inner.appendChild(full);
+  } else {
+    populateBriefReaderPreview(inner, card);
+    if (data?.failed){
+      const fallback = document.createElement('p');
+      fallback.className = 'brief-reader-fallback';
+      const link = document.createElement('a');
+      link.href = data.href;
+      link.textContent = u.briefFullPage;
+      fallback.appendChild(link);
+      inner.appendChild(fallback);
+    }
+  }
+  updateBriefReaderLayout({resetPage:true});
+}
+function bindBriefReaderEvents(card, reader){
+  if (reader.dataset.bound==='true') return;
+  reader.dataset.bound = 'true';
+  const prevBtn = reader.querySelector('.brief-reader-prev');
+  const nextBtn = reader.querySelector('.brief-reader-next');
+  prevBtn.addEventListener('click', ()=>setBriefReaderPage(briefExpandState.page - 1));
+  nextBtn.addEventListener('click', ()=>setBriefReaderPage(briefExpandState.page + 1));
+  reader.addEventListener('wheel', event=>{
+    if (!briefExpandState || briefExpandState.card!==card) return;
+    if (!event.deltaY || Math.abs(event.deltaY)<=Math.abs(event.deltaX)) return;
+    const dir = event.deltaY > 0 ? 1 : -1;
+    const next = briefExpandState.page + dir;
+    if (next < 0 || next >= briefExpandState.pages){
+      event.preventDefault();
+      return;
+    }
+    event.preventDefault();
+    const locked = briefReaderWheelGesture;
+    clearTimeout(briefReaderWheelGesture);
+    briefReaderWheelGesture = setTimeout(()=>{ briefReaderWheelGesture = 0; }, 200);
+    if (!locked) setBriefReaderPage(next);
+  }, {passive:false});
+  card.addEventListener('keydown', event=>{
+    if (!briefExpandState || briefExpandState.card!==card) return;
+    if (event.key==='Escape'){
+      event.preventDefault();
+      collapseBriefExpand();
+      return;
+    }
+    if (event.key==='PageDown' || event.key==='ArrowDown'){
+      event.preventDefault();
+      setBriefReaderPage(briefExpandState.page + 1);
+      return;
+    }
+    if (event.key==='PageUp' || event.key==='ArrowUp'){
+      event.preventDefault();
+      setBriefReaderPage(briefExpandState.page - 1);
+    }
+  });
+}
+function applyBriefExpandDom(card, grid, originalOrder){
+  resetBriefReveal();
+  grid.classList.add('is-brief-grid-expanded');
+  if (card!==grid.firstElementChild) grid.insertBefore(card, grid.firstElementChild);
+  card.classList.add('is-brief-expanded');
+  const reader = ensureBriefReader(card);
+  reader.hidden = false;
+  const detailLink = card.querySelector('.brief-detail-link');
+  detailLink?.setAttribute('aria-expanded', 'true');
+  const brief = findBriefById(card.dataset.briefId);
+  const viewport = reader.querySelector('.brief-reader-viewport');
+  const inner = reader.querySelector('.brief-reader-inner');
+  briefExpandState = {
+    card, grid, originalOrder, page:0, pages:1, brief,
+    viewport, inner,
+    prevBtn:reader.querySelector('.brief-reader-prev'),
+    nextBtn:reader.querySelector('.brief-reader-next'),
+    status:reader.querySelector('.brief-reader-status'),
+    detailLink
+  };
+  bindBriefReaderEvents(card, reader);
+  populateBriefReader(briefExpandState, null);
+  if (brief){
+    fetchBriefFullText(brief).then(data=>{
+      if (!briefExpandState || briefExpandState.card!==card) return;
+      populateBriefReader(briefExpandState, data);
+    });
+  }
+  card.tabIndex = -1;
+  card.focus({preventScroll:true});
+}
+function restoreBriefExpandDom(){
+  const state = briefExpandState;
+  if (!state) return;
+  const {card, grid, originalOrder, detailLink} = state;
+  card.classList.remove('is-brief-expanded');
+  grid.classList.remove('is-brief-grid-expanded');
+  originalOrder.forEach(child=>grid.appendChild(child));
+  const reader = card.querySelector('.brief-reader');
+  if (reader) reader.hidden = true;
+  detailLink?.setAttribute('aria-expanded', 'false');
+  card.removeAttribute('tabindex');
+  briefExpandState = null;
+}
+function resetBriefExpand(){
+  if (!briefExpandState) return;
+  restoreBriefExpandDom();
+}
+function collapseBriefExpand(){
+  if (!briefExpandState) return Promise.resolve();
+  const focusLink = briefExpandState.detailLink;
+  return briefExpandFade(briefExpandState.card, restoreBriefExpandDom).then(()=>{
+    focusLink?.focus({preventScroll:true});
+  });
+}
+function expandBriefCard(card){
+  if (!BRIEF_REVEAL_MEDIA.matches || !card) return;
+  cancelBriefReveal();
+  const grid = card.closest('.featured-grid');
+  if (!grid) return;
+  let current = briefExpandState;
+  if (current?.card===card) return;
+  if (current && current.grid!==grid){ resetBriefExpand(); current = null; }
+  const originalOrder = current?.originalOrder || [...grid.children];
+  const fadeCard = current?.card || card;
+  return briefExpandFade(fadeCard, ()=>{
+    if (current){
+      current.card.classList.remove('is-brief-expanded');
+      const reader = current.card.querySelector('.brief-reader');
+      if (reader) reader.hidden = true;
+      current.detailLink?.setAttribute('aria-expanded', 'false');
+      current.originalOrder.forEach(child=>current.grid.appendChild(child));
+      current.grid.classList.remove('is-brief-grid-expanded');
+      briefExpandState = null;
+    }
+    applyBriefExpandDom(card, grid, originalOrder);
+  }).then(()=>{
+    briefExpandState?.detailLink?.focus({preventScroll:true});
+  });
+}
+$('featured').addEventListener('click', event=>{
+  if (!BRIEF_REVEAL_MEDIA.matches || event.button!==0) return;
+  if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  const link = event.target.closest('.brief-detail-link, .brief-media-link');
+  if (!link) return;
+  const card = link.closest('.brief-card');
+  if (!card) return;
+  event.preventDefault();
+  expandBriefCard(card);
+});
 
 function renderNews(){
   const u = UI[LANG];
@@ -2948,6 +3357,7 @@ function scrollBriefTrack(smooth, index=null){
 
 function adoptBriefEdition(key){
   if (!key || key === selectedBriefDate) return;
+  resetBriefExpand();
   selectedBriefDate = key;
   $('briefDateSel').value = key;
   newsPage = 0;
@@ -3267,6 +3677,7 @@ function handleDateWheel(event,targetForDirection,step){
   if (!locked) step(dir,target);
 }
 $('featured').addEventListener('wheel', event=>{
+  if (BRIEF_REVEAL_MEDIA.matches && event.target?.closest?.('.brief-card.is-brief-expanded')) return;
   handleDateWheel(event,
     dir=>briefTrackPages()[briefPageIndex() + dir],
     dir=>briefWheelStep(dir));
@@ -3295,6 +3706,7 @@ window.addEventListener('resize', ()=>{
   scrollBriefTrack(false);
   if (!COMPACT_EDITION_MEDIA.matches) setPodcastPopover(false);
   resetBriefReveal();
+  if (briefExpandState) updateBriefReaderLayout();
   scheduleBriefReveal();
 }, {passive:true});
 
