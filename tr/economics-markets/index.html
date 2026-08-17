@@ -441,7 +441,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       --brief-expand-pad:clamp(22px,3vw,32px);
       --brief-expand-gap:clamp(12px,1.5vw,16px);
       grid-row:span 2;display:block;box-sizing:border-box;
-      min-height:var(--brief-expand-height);height:auto;padding:var(--brief-expand-pad)
+      height:auto;padding:var(--brief-expand-pad);overflow:hidden
     }
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-media{
       float:left;position:relative;z-index:1;
@@ -459,7 +459,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded::after{display:none}
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-reader{
-      clear:both;width:100%;margin:.45rem 0 0;gap:.5rem
+      clear:both;width:100%;margin:.45rem 0 0;gap:.25rem
     }
     .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-reader-viewport{
       height:clamp(14rem,32vh,22rem);flex:none
@@ -486,17 +486,41 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .brief-reader-full-link a{color:var(--accent);font-weight:600;text-decoration:none}
     .brief-reader-full-link a:hover{text-decoration:underline}
     .brief-reader-controls{
-      flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:.75rem;
-      padding-top:.35rem;border-top:1px solid var(--line)
+      flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:.35rem;
+      padding:0;margin:0;border-top:none
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card.is-brief-expanded .brief-reader-controls{
+      min-height:2.75rem;padding-right:calc(2.75rem + .2rem);align-items:flex-end
     }
     .brief-reader-controls button{
       background:var(--card);border:1px solid var(--line);border-radius:99px;
-      width:2.25rem;height:2.25rem;cursor:pointer;font-family:inherit;font-size:1rem;
-      color:var(--text);display:grid;place-items:center
+      width:1.75rem;height:1.75rem;cursor:pointer;font-family:inherit;font-size:.95rem;
+      color:var(--text);display:grid;place-items:center;padding:0
     }
     .brief-reader-controls button:disabled{opacity:.35;cursor:default}
     .brief-reader-controls button:not(:disabled):hover{border-color:var(--accent);color:var(--accent)}
-    .brief-reader-status{font-size:.82rem;color:var(--muted);min-width:3rem;text-align:center}
+    .brief-reader-status{font-size:.78rem;color:var(--muted);min-width:2.5rem;text-align:right}
+    .brief-reader-curl[hidden]{display:none!important}
+    .brief-reader-curl:not([hidden]){
+      position:absolute;bottom:0;right:0;z-index:2;
+      width:2.75rem;height:2.75rem;padding:0;border:none;border-radius:0 0 var(--radius) 0;
+      cursor:pointer;
+      background:linear-gradient(135deg,var(--card) 0%,var(--card) 46%,
+        color-mix(in srgb,var(--card-hover) 72%,var(--line)) 46%,var(--card-gradient-end) 100%);
+      box-shadow:-2px -2px 5px color-mix(in srgb,var(--line) 38%,transparent)
+    }
+    .brief-reader-curl:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+    .brief-reader-curl:disabled{opacity:0;pointer-events:none;visibility:hidden}
+    @media(prefers-reduced-motion:no-preference){
+      .brief-reader-curl:not(:disabled):hover,
+      .brief-reader-curl:not(:disabled):focus-visible{
+        width:2.9rem;height:2.9rem;
+        box-shadow:-3px -3px 8px color-mix(in srgb,var(--line) 48%,transparent)
+      }
+    }
+    .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded) .brief-media picture{
+      aspect-ratio:4/1
+    }
     .featured-grid.is-brief-grid-expanded .brief-card:not(.is-brief-expanded){
       width:var(--brief-scale-width);transform:scale(var(--brief-scale-k,1));
       transform-origin:top left;
@@ -2234,33 +2258,34 @@ function measureBriefExpandMetrics(grid){
   const mediaWidth = (leadWidth - 2 * pad) * 0.55 - pad;
   return {leadWidth, pad, gap, mediaWidth};
 }
-function measureBriefExpandHeight(card){
-  if (card.classList.contains('is-brief-revealed')){
-    const locked = card.style.getPropertyValue('--brief-reveal-height');
-    if (locked) return parseFloat(locked);
-  }
-  return card.getBoundingClientRect().height;
-}
 function captureBriefScaleSnapshots(grid, expandedCard){
   return [...grid.children]
     .filter(el => el!==expandedCard && el.classList.contains('brief-card'))
-    .map(card=>({
-      card,
-      width:card.getBoundingClientRect().width,
-      height:card.getBoundingClientRect().height
-    }));
+    .map(card=>({card}));
 }
-function applyBriefScaleCards(snapshots){
-  snapshots.forEach(({card, width, height})=>{
-    const newWidth = card.getBoundingClientRect().width;
-    const k = width ? newWidth / width : 1;
-    card.style.setProperty('--brief-scale-width', `${width}px`);
-    card.style.setProperty('--brief-scale-height', `${height}px`);
+const BRIEF_SCALE_EXTRA = 0.8;
+/* Both side cards lock to the NORMAL small-card width and share one grid-derived
+   scale, so the demoted ex-lead renders identically to a native small card and
+   repeated resize calls stay idempotent. */
+function briefExpandColumnWidths(grid){
+  const gap = 16;
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const avail = grid.getBoundingClientRect().width - gap;
+  return {
+    normalSmall: Math.max(16 * rem, avail / 3),
+    expandedSmall: Math.max(11 * rem, avail / 4)
+  };
+}
+function applyBriefScaleCards(grid, snapshots){
+  const {normalSmall, expandedSmall} = briefExpandColumnWidths(grid);
+  const k = normalSmall > 0 ? (expandedSmall / normalSmall) * BRIEF_SCALE_EXTRA : BRIEF_SCALE_EXTRA;
+  snapshots.forEach(({card})=>{
+    card.style.setProperty('--brief-scale-width', `${normalSmall}px`);
     card.style.setProperty('--brief-scale-k', String(k));
+    card.style.setProperty('--brief-scale-height', `${card.offsetHeight}px`);
   });
 }
 function clearBriefExpandCardStyles(card){
-  card.style.removeProperty('--brief-expand-height');
   card.style.removeProperty('--brief-expand-media-width');
   card.style.removeProperty('--brief-scale-width');
   card.style.removeProperty('--brief-scale-height');
@@ -2362,13 +2387,29 @@ function createBriefReaderUI(card){
     <div class="brief-reader-controls">
       <button type="button" class="brief-reader-prev" aria-label="${escapeHTML(u.briefPagePrev)}">‹</button>
       <span class="brief-reader-status" aria-live="polite"></span>
-      <button type="button" class="brief-reader-next" aria-label="${escapeHTML(u.briefPageNext)}">›</button>
     </div>`;
+  const curlBtn = document.createElement('button');
+  curlBtn.type = 'button';
+  curlBtn.className = 'brief-reader-curl';
+  curlBtn.hidden = true;
+  curlBtn.setAttribute('aria-label', u.briefPageNext);
+  card.appendChild(curlBtn);
   card.querySelector('.brief-content')?.appendChild(reader);
   return reader;
 }
 function ensureBriefReader(card){
-  return card.querySelector('.brief-reader') || createBriefReaderUI(card);
+  let reader = card.querySelector('.brief-reader');
+  if (!reader) return createBriefReaderUI(card);
+  if (!card.querySelector('.brief-reader-curl')){
+    const u = UI[LANG];
+    const curlBtn = document.createElement('button');
+    curlBtn.type = 'button';
+    curlBtn.className = 'brief-reader-curl';
+    curlBtn.hidden = true;
+    curlBtn.setAttribute('aria-label', u.briefPageNext);
+    card.appendChild(curlBtn);
+  }
+  return reader;
 }
 function briefReaderMetrics(viewport, inner){
   const viewportWidth = viewport.clientWidth;
@@ -2379,7 +2420,7 @@ function briefReaderMetrics(viewport, inner){
 function setBriefReaderPage(page, {animate=true}={}){
   const state = briefExpandState;
   if (!state) return;
-  const {inner, viewport, pages, status, prevBtn, nextBtn} = state;
+  const {inner, viewport, pages, status, prevBtn, curlBtn} = state;
   const index = Math.max(0, Math.min(page, pages - 1));
   state.page = index;
   const {viewportWidth, gap, colWidth} = briefReaderMetrics(viewport, inner);
@@ -2391,7 +2432,7 @@ function setBriefReaderPage(page, {animate=true}={}){
   status.textContent = u.pageStatus.replace('{current}', String(index + 1))
     .replace('{total}', String(pages));
   prevBtn.disabled = index <= 0;
-  nextBtn.disabled = index >= pages - 1;
+  if (curlBtn) curlBtn.disabled = index >= pages - 1;
 }
 function measureBriefReaderPages(state){
   const {inner, viewport} = state;
@@ -2414,7 +2455,7 @@ function updateBriefExpandLayout(){
   const {card, grid, scaleSnapshots} = state;
   const metrics = measureBriefExpandMetrics(grid);
   card.style.setProperty('--brief-expand-media-width', `${metrics.mediaWidth}px`);
-  if (scaleSnapshots?.length) applyBriefScaleCards(scaleSnapshots);
+  if (scaleSnapshots?.length) applyBriefScaleCards(grid, scaleSnapshots);
   updateBriefReaderLayout();
 }
 function populateBriefReaderPreview(inner, card){
@@ -2474,9 +2515,9 @@ function bindBriefReaderEvents(card, reader){
   if (reader.dataset.bound==='true') return;
   reader.dataset.bound = 'true';
   const prevBtn = reader.querySelector('.brief-reader-prev');
-  const nextBtn = reader.querySelector('.brief-reader-next');
+  const curlBtn = card.querySelector('.brief-reader-curl');
   prevBtn.addEventListener('click', ()=>setBriefReaderPage(briefExpandState.page - 1));
-  nextBtn.addEventListener('click', ()=>setBriefReaderPage(briefExpandState.page + 1));
+  curlBtn?.addEventListener('click', ()=>setBriefReaderPage(briefExpandState.page + 1));
   reader.addEventListener('wheel', event=>{
     if (!briefExpandState || briefExpandState.card!==card) return;
     if (!event.deltaY || Math.abs(event.deltaY)<=Math.abs(event.deltaX)) return;
@@ -2513,16 +2554,16 @@ function bindBriefReaderEvents(card, reader){
 function applyBriefExpandDom(card, grid, originalOrder){
   resetBriefReveal();
   const metrics = measureBriefExpandMetrics(grid);
-  const expandHeight = measureBriefExpandHeight(card);
   const scaleSnapshots = captureBriefScaleSnapshots(grid, card);
   grid.classList.add('is-brief-grid-expanded');
   if (card!==grid.firstElementChild) grid.insertBefore(card, grid.firstElementChild);
   card.classList.add('is-brief-expanded');
   card.style.setProperty('--brief-expand-media-width', `${metrics.mediaWidth}px`);
-  card.style.setProperty('--brief-expand-height', `${expandHeight}px`);
-  applyBriefScaleCards(scaleSnapshots);
+  applyBriefScaleCards(grid, scaleSnapshots);
   const reader = ensureBriefReader(card);
   reader.hidden = false;
+  const curlBtn = card.querySelector('.brief-reader-curl');
+  if (curlBtn) curlBtn.hidden = false;
   const detailLink = card.querySelector('.brief-detail-link');
   detailLink?.setAttribute('aria-expanded', 'true');
   const brief = findBriefById(card.dataset.briefId);
@@ -2532,7 +2573,7 @@ function applyBriefExpandDom(card, grid, originalOrder){
     card, grid, originalOrder, scaleSnapshots, page:0, pages:1, brief,
     viewport, inner,
     prevBtn:reader.querySelector('.brief-reader-prev'),
-    nextBtn:reader.querySelector('.brief-reader-next'),
+    curlBtn:card.querySelector('.brief-reader-curl'),
     status:reader.querySelector('.brief-reader-status'),
     detailLink
   };
@@ -2558,6 +2599,8 @@ function restoreBriefExpandDom(){
   originalOrder.forEach(child=>grid.appendChild(child));
   const reader = card.querySelector('.brief-reader');
   if (reader) reader.hidden = true;
+  const curlBtn = card.querySelector('.brief-reader-curl');
+  if (curlBtn) curlBtn.hidden = true;
   detailLink?.setAttribute('aria-expanded', 'false');
   card.removeAttribute('tabindex');
   briefExpandState = null;
@@ -2590,6 +2633,8 @@ function expandBriefCard(card){
       current.scaleSnapshots?.forEach(({card:smallCard})=>clearBriefExpandCardStyles(smallCard));
       const reader = current.card.querySelector('.brief-reader');
       if (reader) reader.hidden = true;
+      const curlBtn = current.card.querySelector('.brief-reader-curl');
+      if (curlBtn) curlBtn.hidden = true;
       current.detailLink?.setAttribute('aria-expanded', 'false');
       current.originalOrder.forEach(child=>current.grid.appendChild(child));
       current.grid.classList.remove('is-brief-grid-expanded');
