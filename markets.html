@@ -51,6 +51,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.02em;color:inherit}
   .logo-mark{width:34px;height:34px;border-radius:9px;display:block;object-fit:contain;flex:0 0 auto}
   .header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .header-links{display:flex;align-items:center;gap:10px}
+  .archive-link{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;
+    padding:7px 0;border:0;background:transparent;color:var(--muted);
+    font-size:.78rem;font-weight:800;text-decoration:none;white-space:nowrap;transition:.15s;
+  }
+  .archive-link svg{width:18px;height:18px;flex:0 0 auto}
+  .archive-link:hover,.archive-link:focus-visible{color:var(--text)}
   .lang-switch{display:flex;gap:4px;background:var(--bg-soft);border:1px solid var(--line);border-radius:99px;padding:3px}
   .lang-btn{display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;color:var(--muted);font-size:.78rem;line-height:1;padding:4px 7px;border-radius:99px;opacity:.7;border:0;background:transparent;cursor:pointer;font-family:inherit}
   .lang-btn.active{opacity:1;color:var(--text);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
@@ -112,10 +120,24 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   }
   @media(max-width:640px){
     .header-inner,.wrap{padding-left:12px;padding-right:12px}
+    .header-inner{gap:8px}
+    .logo{font-size:1.05rem}.logo-mark{width:32px;height:32px}
+    .header-right{gap:7px}
+    .header-links{gap:4px}
+    .archive-link{min-height:36px;padding:4px 2px}
+    .archive-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     .strip-price{font-size:1.05rem}
     .chart-frame{min-height:18rem;height:18rem}
     .chart-col,.stage{min-height:0}
     .filter{width:7.4rem}
+  }
+  @media(max-width:360px){
+    .header-inner{padding-inline:8px;gap:4px}
+    .header-right{gap:3px}
+    .lang-switch{gap:2px;padding:2px}
+    .lang-btn{min-width:28px;min-height:34px;padding:3px 4px}
+    .theme-switch{width:38px}
+    :root[data-theme="light"] .theme-switch-thumb{transform:translateX(14px)}
   }
   @media(max-width:340px){.wrap{padding-inline:10px}.filter{width:6.4rem}}
   @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
@@ -127,11 +149,21 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 <a class="skip" href="#content">Ana içeriğe geç / Skip to content</a>
 <header>
   <div class="header-inner">
-    <a class="logo" href="/tr/" id="homeLink">
+    <a class="logo" href="/" id="homeLink">
       <img class="logo-mark" src="/assets/icon.svg" alt="" width="34" height="34">
       <span>Eigen Radar</span>
     </a>
     <div class="header-right">
+      <nav class="header-links" id="headerLinks" aria-label="Site">
+        <a class="archive-link" id="newsLink" href="/" aria-label="Gündem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.5h12.5A2.5 2.5 0 0 1 19 9v10.5H6.2A2.2 2.2 0 0 1 4 17.3V6.5Z"/><path d="M4 17.3A2.2 2.2 0 0 1 6.2 15H19"/><path d="M7.5 10h6.5M7.5 13h4.5"/></svg>
+          <span class="archive-label" id="newsLabel">Gündem</span>
+        </a>
+        <a class="archive-link" id="archiveLink" href="/tr/archive/" aria-label="Arşiv">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h16v12H4z"/><path d="M3 4.5h18v3H3z"/><path d="M9 11.5h6"/></svg>
+          <span class="archive-label" id="archiveLabel">Arşiv</span>
+        </a>
+      </nav>
       <nav class="lang-switch" aria-label="Sayfa dili / Page language">
         <button class="lang-btn active" type="button" id="btnTr" lang="tr" aria-pressed="true">TR</button>
         <button class="lang-btn" type="button" id="btnEn" lang="en" aria-pressed="false">EN</button>
@@ -210,7 +242,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       title: 'Piyasalar — Eigen Radar',
       heading: 'Piyasalar',
       skip: 'Ana içeriğe geç',
-      home: '/tr/',
+      news: 'Gündem',
+      archive: 'Arşiv',
+      archiveHref: '/tr/archive/',
+      linksLabel: 'Site',
       langLabel: 'Sayfa dili',
       chartLabel: 'Fiyat grafiği',
       chartAria: 'Fiyat ve tahmin grafiği',
@@ -253,7 +288,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       title: 'Markets — Eigen Radar',
       heading: 'Markets',
       skip: 'Skip to content',
-      home: '/en/',
+      news: 'News',
+      archive: 'Archive',
+      archiveHref: '/en/archive/',
+      linksLabel: 'Site',
       langLabel: 'Page language',
       chartLabel: 'Price chart',
       chartAria: 'Price and forecast chart',
@@ -390,7 +428,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     document.title = s.title;
     $('pageTitle').textContent = s.heading;
     document.querySelector('.skip').textContent = s.skip;
-    $('homeLink').href = s.home;
+    $('homeLink').href = '/';
+    $('newsLabel').textContent = s.news;
+    $('newsLink').setAttribute('aria-label', s.news);
+    $('archiveLabel').textContent = s.archive;
+    $('archiveLink').href = s.archiveHref;
+    $('archiveLink').setAttribute('aria-label', s.archive);
+    $('headerLinks').setAttribute('aria-label', s.linksLabel);
     document.querySelector('.lang-switch').setAttribute('aria-label', s.langLabel);
     $('btnTr').classList.toggle('active', lang === 'tr');
     $('btnEn').classList.toggle('active', lang === 'en');

@@ -183,6 +183,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   }
   .archive-link svg{width:18px;height:18px;flex:0 0 auto}
   .archive-link:hover,.archive-link:focus-visible{color:var(--text)}
+  .header-markets{display:none}
   .lang-switch{display:flex;gap:4px;background:var(--bg-soft);border:1px solid var(--line);border-radius:99px;padding:3px}
   .lang-btn{
     display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;
@@ -241,6 +242,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(max-width:640px),
     (min-width:641px) and (max-width:1000px) and (max-height:500px) and (orientation:landscape){
     .markets-nav{display:none}
+    .header-markets{
+      display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:1px;flex:0 0 auto;min-width:0;padding:0 1px;margin:0;border:0;background:transparent;
+      color:var(--muted);text-decoration:none;line-height:1;
+    }
+    .header-markets:hover,.header-markets:focus-visible{color:var(--text)}
+    .header-markets svg{width:16px;height:16px;display:block;flex:0 0 auto}
+    .header-markets-label{
+      font-size:9px;font-weight:800;letter-spacing:-.04em;line-height:1;white-space:nowrap;
+    }
   }
   /* Regulatory notice — must read as a warning, not as decoration. */
   .disclaimer{
@@ -903,7 +914,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(max-width:640px){
     header{position:static;backdrop-filter:none}
     .header-inner{padding:10px 12px;gap:8px}
-    .logo{font-size:1.05rem}.logo-mark{width:32px;height:32px}.proto-badge{display:none}
+    .logo{font-size:1.05rem;gap:8px}.logo-mark{width:32px;height:32px}.proto-badge{display:none}
     .header-right{margin-left:auto;gap:7px}
     .topic-switch{
       order:3;width:100%;margin:0;display:grid;
@@ -1007,6 +1018,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   }
   @media(max-width:360px){
     .header-inner{padding-inline:8px;gap:4px}
+    .logo{gap:6px;font-size:.95rem}
+    .header-markets-label{letter-spacing:-.05em}
     .header-right{gap:3px}
     .utility-switches{gap:3px}
     .lang-switch{gap:2px;padding:2px}
@@ -1052,6 +1065,21 @@ twq('config','re3b4');
       <img class="logo-mark" src="/assets/icon.svg" alt="" width="34" height="34">
       <span id="siteName">Eigen Radar</span>
       <span class="proto-badge" id="protoBadge">Yapay Zeka</span>
+    </a>
+    <a class="header-markets" id="headerMarkets" href="/markets" aria-label="Piyasalar">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill-opacity=".38" d="M2.2 16.2 5.4 14.7v3.8l-3.2 1.5z"/>
+        <path fill-opacity=".22" d="M5.4 14.7 7.6 15.7v3.8l-2.2-1z"/>
+        <path fill-opacity=".72" d="M2.2 16.2 4.4 15.2 7.6 16.2 5.4 17.2z"/>
+        <path fill-opacity=".38" d="M8 13.1 11.2 11.6v6.9l-3.2 1.5z"/>
+        <path fill-opacity=".22" d="M11.2 11.6 13.4 12.6v6.9l-2.2-1z"/>
+        <path fill-opacity=".72" d="M8 13.1 10.2 12.1 13.4 13.1 11.2 14.1z"/>
+        <path fill-opacity=".38" d="M13.8 9.4 17 7.9v10.6l-3.2 1.5z"/>
+        <path fill-opacity=".22" d="M17 7.9 19.2 8.9v10.6l-2.2-1z"/>
+        <path fill-opacity=".72" d="M13.8 9.4 16 8.4 19.2 9.4 17 10.4z"/>
+        <path fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" d="M4.4 14.6 10.6 10.8 16.8 6.6 21 4.4"/>
+      </svg>
+      <span class="header-markets-label" id="headerMarketsLabel">Piyasalar</span>
     </a>
     <nav class="topic-switch" id="topicSwitch" aria-label="Konu masaları"></nav>
     <div class="header-right">
@@ -1480,6 +1508,7 @@ const UI = {
     briefOlder:"Daha eski baskı",
     briefNewer:"Daha yeni baskı",
     archive:"Arşiv",
+    markets:"Piyasalar",
     newsPages:"Haber sayfaları",
     prevNews:"Önceki haber sayfası",
     nextNews:"Sonraki haber sayfası",
@@ -1556,6 +1585,7 @@ const UI = {
     briefOlder:"Older edition",
     briefNewer:"Newer edition",
     archive:"Archive",
+    markets:"Markets",
     newsPages:"News pages",
     prevNews:"Previous news page",
     nextNews:"Next news page",
@@ -1997,6 +2027,8 @@ function renderChrome(){
   $('homeLink').setAttribute('aria-label', `${u.nextTopic}: ${next.label[LANG]}`);
   $('archiveLink').href = `/${LANG}/archive/`;
   $('archiveLabel').textContent = u.archive;
+  $('headerMarkets').setAttribute('aria-label', u.markets);
+  $('headerMarketsLabel').textContent = u.markets;
   $('btnTr').href = currentArticle ? articleRoute(currentArticle, 'tr')
     : homeLanguageRoute('tr');
   $('btnEn').href = currentArticle ? articleRoute(currentArticle, 'en')
