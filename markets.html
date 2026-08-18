@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#040711">
+<meta name="color-scheme" content="dark light">
+<script>
+(()=>{let t='dark';try{t=localStorage.getItem('theme')==='light'?'light':'dark'}catch{}
+document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;
+document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0':'#040711'})();
+</script>
+<title>Piyasalar / Markets — Eigen Radar</title>
+<meta name="description" content="Emtia ve kripto endeks fiyatları ile 24 saatlik model projeksiyonu. Commodity and crypto index prices with a 24-hour model forecast.">
+<link rel="canonical" href="https://eigenradar.com/markets">
+<link rel="alternate" type="application/rss+xml" title="Eigen Radar RSS" href="/feed.xml">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Eigen Radar">
+<meta property="og:url" content="https://eigenradar.com/markets">
+<meta property="og:title" content="Piyasalar / Markets — Eigen Radar">
+<meta property="og:description" content="Emtia ve kripto endeks fiyatları ile 24 saatlik model projeksiyonu. Commodity and crypto index prices with a 24-hour model forecast.">
+<meta property="og:image" content="https://eigenradar.com/assets/icon-512.png">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#040711;--bg-soft:#090f1c;--card:#0b111f;--card-hover:#101827;--line:#4b659f;
+    --text:#d9e9fb;--muted:#b4aca0;--accent:#5ee3d7;--accent-soft:rgba(94,227,215,.08);
+    --amber:#d6c08c;--scheme:dark;--focus:#fff;--on-accent:#040711;
+    --drawer-shadow:rgba(0,0,0,.35);--up:#5ee3d7;--down:#f07178;--band:rgba(94,227,215,.16);
+    --page-max:70rem;--radius:14px;
+  }
+  :root[data-theme="light"]{
+    --bg:#c7d2e0;--bg-soft:#d8e2ed;--card:#dde6ef;--card-hover:#d1dce8;--line:#71859d;
+    --text:#111827;--muted:#405269;--accent:#005f5a;--accent-soft:rgba(0,95,90,.12);
+    --amber:#854100;--scheme:light;--focus:#0f172a;--on-accent:#fff;
+    --drawer-shadow:rgba(15,23,42,.22);--up:#005f5a;--down:#b42318;--band:rgba(0,95,90,.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{color-scheme:var(--scheme)}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.55;min-height:100vh}
+  a{color:var(--accent);text-decoration:none}
+  button,input{font:inherit}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+  .skip{position:fixed;left:12px;top:-80px;background:var(--accent);color:var(--on-accent);padding:10px 14px;border-radius:8px;z-index:2;font-weight:800}
+  .skip:focus{top:12px}
+  .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+  header{border-bottom:1px solid var(--line);background:var(--bg)}
+  .header-inner{max-width:var(--page-max);margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:-.02em;color:inherit}
+  .logo-mark{width:34px;height:34px;border-radius:9px;display:block;object-fit:contain;flex:0 0 auto}
+  .header-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .lang-switch{display:flex;gap:4px;background:var(--bg-soft);border:1px solid var(--line);border-radius:99px;padding:3px}
+  .lang-btn{display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;color:var(--muted);font-size:.78rem;line-height:1;padding:4px 7px;border-radius:99px;opacity:.7;border:0;background:transparent;cursor:pointer;font-family:inherit}
+  .lang-btn.active{opacity:1;color:var(--text);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .theme-switch{appearance:none;position:relative;display:block;width:44px;height:24px;padding:2px;border:1px solid var(--line);border-radius:999px;background:var(--card);cursor:pointer}
+  .theme-switch-thumb{position:absolute;display:grid;place-items:center;inset:2px auto 2px 2px;width:18px;border:1.5px solid var(--accent);border-radius:999px;background:transparent;box-shadow:0 1px 4px var(--drawer-shadow);transition:transform .18s ease}
+  :root[data-theme="light"] .theme-switch-thumb{transform:translateX(20px)}
+  .theme-switch-icon{grid-area:1/1;display:grid;place-items:center;pointer-events:none;opacity:0;transform:scale(.72);transition:opacity .12s ease,transform .18s ease}
+  .theme-switch-icon svg{display:block;width:11px;height:11px}
+  .theme-switch-icon.moon{color:var(--text);opacity:1;transform:scale(1)}
+  .theme-switch-icon.sun{color:var(--text)}
+  :root[data-theme="light"] .theme-switch-icon.moon{opacity:0;transform:scale(.72)}
+  :root[data-theme="light"] .theme-switch-icon.sun{opacity:1;transform:scale(1)}
+  .wrap{max-width:var(--page-max);margin:0 auto;padding:16px 20px 48px;min-width:0}
+  .strip{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 0 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .strip-name{font-weight:700;letter-spacing:-.02em}
+  .strip-price{font-variant-numeric:tabular-nums;font-weight:800;font-size:1.15rem}
+  .strip-change{font-variant-numeric:tabular-nums;font-weight:700;font-size:.92rem}
+  .up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--muted)}
+  .stage{display:grid;grid-template-columns:minmax(0,1fr) 17.5rem;gap:16px;align-items:stretch;min-height:28.5rem;margin-top:14px}
+  .chart-col{min-width:0;display:flex;flex-direction:column;min-height:28.5rem}
+  .ranges{display:flex;gap:6px;margin-bottom:8px}
+  .range-btn{min-height:36px;padding:4px 12px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--muted);cursor:pointer}
+  .range-btn[aria-pressed="true"]{color:var(--accent);background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+  .range-btn:disabled{opacity:.45;cursor:not-allowed}
+  .chart-frame{position:relative;flex:1 1 auto;min-height:24rem;height:24rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);overflow:hidden}
+  #chart{position:absolute;inset:0}
+  .skel{position:absolute;inset:12px;border-radius:10px;background:linear-gradient(90deg,var(--bg-soft),var(--card-hover),var(--bg-soft));background-size:200% 100%;animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%{background-position:0 50%}100%{background-position:100% 50%}}
+  @media (prefers-reduced-motion:reduce){.skel{animation:none}}
+  .error-panel{position:absolute;inset:0;display:none;place-items:center;padding:24px;text-align:center;background:var(--card);z-index:2}
+  .error-panel.is-on{display:grid}
+  .error-panel p{margin-bottom:12px;color:var(--muted)}
+  .retry{min-height:44px;padding:8px 16px;border:1px solid var(--line);border-radius:99px;background:var(--accent-soft);color:var(--accent);cursor:pointer;font-weight:700}
+  .panel{min-width:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);display:flex;flex-direction:column;min-height:28.5rem;max-height:28.5rem}
+  .panel-head{display:flex;align-items:center;gap:8px;padding:10px 10px 8px;border-bottom:1px solid var(--line)}
+  .panel-head h2{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:800}
+  .filter{margin-left:auto;width:8.6rem;min-width:0;min-height:36px;padding:4px 10px;border:1px solid var(--line);border-radius:99px;background:var(--bg-soft);color:var(--text)}
+  .filter::placeholder{color:var(--muted)}
+  .panel-list{overflow:auto;padding:6px 6px 10px;scrollbar-width:thin}
+  .group-label{font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 8px 4px}
+  .row{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:6px 8px;border:0;border-radius:10px;background:transparent;color:var(--text);text-align:left;cursor:pointer}
+  .row:hover{background:var(--card-hover)}
+  .row.is-on{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .row-name{flex:1 1 auto;min-width:0;font-size:.86rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row-px{font-variant-numeric:tabular-nums;font-size:.8rem;color:var(--muted)}
+  .badge{flex:0 0 auto;display:block}
+  .bottom{margin-top:18px;display:grid;gap:8px}
+  .blurb{color:var(--text);max-width:62ch}
+  .meta{color:var(--muted);font-size:.86rem}
+  .model-note{color:var(--muted);font-size:.75rem}
+  .legal{margin-top:16px;padding:12px 16px;background:var(--accent-soft);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;font-size:.8rem;color:var(--muted)}
+  @media(min-width:1440px){html{font-size:106.25%}}
+  @media(min-width:1920px){html{font-size:112.5%}}
+  @media(min-width:2560px){html{font-size:125%}}
+  @media(max-width:900px){
+    .stage{grid-template-columns:1fr}
+    .panel{max-height:none;min-height:0}
+    .panel-list{max-height:18rem}
+  }
+  @media(max-width:640px){
+    .header-inner,.wrap{padding-left:12px;padding-right:12px}
+    .strip-price{font-size:1.05rem}
+    .chart-frame{min-height:18rem;height:18rem}
+    .chart-col,.stage{min-height:0}
+    .filter{width:7.4rem}
+  }
+  @media(max-width:340px){.wrap{padding-inline:10px}.filter{width:6.4rem}}
+  @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+<script src="/assets/theme.js" defer></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+<a class="skip" href="#content">Ana içeriğe geç / Skip to content</a>
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/tr/" id="homeLink">
+      <img class="logo-mark" src="/assets/icon.svg" alt="" width="34" height="34">
+      <span>Eigen Radar</span>
+    </a>
+    <div class="header-right">
+      <nav class="lang-switch" aria-label="Sayfa dili / Page language">
+        <button class="lang-btn active" type="button" id="btnTr" lang="tr" aria-pressed="true">TR</button>
+        <button class="lang-btn" type="button" id="btnEn" lang="en" aria-pressed="false">EN</button>
+      </nav>
+      <button class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Açık tema" title="Açık temaya geç" data-theme-switch>
+        <span class="theme-switch-thumb" aria-hidden="true">
+          <span class="theme-switch-icon moon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 15.1A8.5 8.5 0 0 1 8.9 3.6a8.5 8.5 0 1 0 11.5 11.5Z"/></svg></span>
+          <span class="theme-switch-icon sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+<main class="wrap" id="content">
+  <h1 class="visually-hidden" id="pageTitle">Piyasalar</h1>
+  <div class="strip" id="strip" aria-live="polite">
+    <span class="skel" style="position:static;inset:auto;display:block;height:28px;width:min(100%,22rem)"></span>
+  </div>
+  <div class="stage" id="stage">
+    <section class="chart-col" aria-label="Fiyat grafiği">
+      <div class="ranges" role="group" aria-label="Zaman aralığı">
+        <button class="range-btn" type="button" id="range1h" aria-pressed="true">1H</button>
+        <button class="range-btn" type="button" id="range1a" disabled>1A</button>
+        <button class="range-btn" type="button" id="range1y" disabled>1Y</button>
+      </div>
+      <div class="chart-frame">
+        <div class="skel" id="chartSkel"></div>
+        <div id="chart" role="img" aria-label="Fiyat ve tahmin grafiği"></div>
+        <div class="error-panel" id="errorPanel">
+          <div>
+            <p id="errorText">Veri şu an alınamıyor</p>
+            <button class="retry" type="button" id="retryBtn">Yeniden dene</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <aside class="panel" id="panel">
+      <div class="panel-head">
+        <h2 id="panelTitle">Araçlar</h2>
+        <input class="filter" id="filter" type="search" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="panel-list" id="panelList"></div>
+    </aside>
+  </div>
+  <div class="bottom">
+    <p class="blurb" id="blurb"></p>
+    <p class="meta" id="updated"></p>
+    <p class="model-note" id="modelNote"></p>
+    <p class="legal" id="legal"></p>
+  </div>
+</main>
+<script>
+(() => {
+  const DATA_URL = 'https://media.eigenradar.com/markets/markets.json';
+  const COMMODITIES = ['XAUUSDT', 'XAGUSDT', 'PAXGUSDT', 'XAUTUSDT', 'BZUSDT', 'CLUSDT'];
+  const CRYPTO = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT'];
+  const ORDER = COMMODITIES.concat(CRYPTO);
+  const MARK = {
+    XAUUSDT: 'XAU', XAGUSDT: 'XAG', PAXGUSDT: 'PAXG', XAUTUSDT: 'XAUT',
+    BZUSDT: 'BZ', CLUSDT: 'CL', BTCUSDT: '₿', ETHUSDT: 'Ξ', BNBUSDT: 'BNB',
+    SOLUSDT: 'SOL', XRPUSDT: 'XRP', DOGEUSDT: 'Ð'
+  };
+  const COLOR = {
+    XAUUSDT: '#d6c08c', XAGUSDT: '#c5d0dc', PAXGUSDT: '#e0b050', XAUTUSDT: '#c9a227',
+    BZUSDT: '#6b84bb', CLUSDT: '#4b659f', BTCUSDT: '#f2a900', ETHUSDT: '#7aa2ff',
+    BNBUSDT: '#f0b90b', SOLUSDT: '#14c9a0', XRPUSDT: '#5ee3d7', DOGEUSDT: '#c2a633'
+  };
+  const INK = {
+    XAUUSDT: '#1a1408', XAGUSDT: '#1a1f26', PAXGUSDT: '#1a1408', XAUTUSDT: '#1a1408',
+    BZUSDT: '#040711', CLUSDT: '#f4f7fb', BTCUSDT: '#1a1408', ETHUSDT: '#040711',
+    BNBUSDT: '#1a1408', SOLUSDT: '#041018', XRPUSDT: '#041018', DOGEUSDT: '#1a1408'
+  };
+
+  const STR = {
+    tr: {
+      title: 'Piyasalar — Eigen Radar',
+      heading: 'Piyasalar',
+      skip: 'Ana içeriğe geç',
+      home: '/tr/',
+      langLabel: 'Sayfa dili',
+      chartLabel: 'Fiyat grafiği',
+      chartAria: 'Fiyat ve tahmin grafiği',
+      rangeLabel: 'Zaman aralığı',
+      weekHint: '1 hafta',
+      accumulating: 'veri birikiyor',
+      panel: 'Araçlar',
+      filter: 'Ad veya kod',
+      commodities: 'Emtia',
+      crypto: 'Kripto',
+      forecast: 'tahmin',
+      updated: 'Son güncelleme',
+      model: '24 saatlik model projeksiyonu',
+      backtest: 'Geriye dönük sınama',
+      hours: 'saat',
+      error: 'Veri şu an alınamıyor',
+      retry: 'Yeniden dene',
+      legal: 'Bu sayfadaki fiyat verileri ve model projeksiyonları yalnızca bilgilendirme amaçlıdır; yatırım tavsiyesi değildir. Veriler gecikmeli olabilir.',
+      names: {
+        XAUUSDT: 'Altın', XAGUSDT: 'Gümüş', PAXGUSDT: 'PAX Gold', XAUTUSDT: 'Tether Gold',
+        BZUSDT: 'Brent', CLUSDT: 'WTI', BTCUSDT: 'Bitcoin', ETHUSDT: 'Ethereum',
+        BNBUSDT: 'BNB', SOLUSDT: 'Solana', XRPUSDT: 'XRP', DOGEUSDT: 'Dogecoin'
+      },
+      blurb: {
+        XAUUSDT: 'Ons altının USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki peşin altın kotasyonlarının bileşik bir göstergesini yansıtır.',
+        XAGUSDT: 'Ons gümüşün USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki peşin gümüş kotasyonlarının bileşik bir göstergesini yansıtır.',
+        PAXGUSDT: 'PAX Gold, fiziksel altına bağlı bir belirtecin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, bu belirtecin piyasadaki bileşik peşin değerini yansıtır.',
+        XAUTUSDT: 'Tether Gold, fiziksel altına bağlı bir belirtecin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, bu belirtecin piyasadaki bileşik peşin değerini yansıtır.',
+        BZUSDT: 'Brent ham petrolünün varil başına USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, Kuzey Denizi Brent sözleşmesine dayanan bileşik bir peşin göstergesini yansıtır.',
+        CLUSDT: 'Batı Teksas (WTI) ham petrolünün varil başına USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, ABD WTI sözleşmesine dayanan bileşik bir peşin göstergesini yansıtır.',
+        BTCUSDT: 'Bitcoin’in USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Bitcoin/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
+        ETHUSDT: 'Ethereum’un USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Ethereum/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
+        BNBUSDT: 'BNB’nin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki BNB/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
+        SOLUSDT: 'Solana’nın USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Solana/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
+        XRPUSDT: 'XRP’nin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki XRP/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
+        DOGEUSDT: 'Dogecoin’in USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Dogecoin/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.'
+      }
+    },
+    en: {
+      title: 'Markets — Eigen Radar',
+      heading: 'Markets',
+      skip: 'Skip to content',
+      home: '/en/',
+      langLabel: 'Page language',
+      chartLabel: 'Price chart',
+      chartAria: 'Price and forecast chart',
+      rangeLabel: 'Time range',
+      weekHint: '1 week',
+      accumulating: 'data accumulating',
+      panel: 'Instruments',
+      filter: 'Name or code',
+      commodities: 'Commodities',
+      crypto: 'Crypto',
+      forecast: 'forecast',
+      updated: 'Last updated',
+      model: '24-hour model projection',
+      backtest: 'Holdout backtest',
+      hours: 'hours',
+      error: 'Data is currently unavailable',
+      retry: 'Retry',
+      legal: 'Prices and model projections on this page are for information only and are not investment advice. Data may be delayed.',
+      names: {
+        XAUUSDT: 'Gold', XAGUSDT: 'Silver', PAXGUSDT: 'PAX Gold', XAUTUSDT: 'Tether Gold',
+        BZUSDT: 'Brent', CLUSDT: 'WTI', BTCUSDT: 'Bitcoin', ETHUSDT: 'Ethereum',
+        BNBUSDT: 'BNB', SOLUSDT: 'Solana', XRPUSDT: 'XRP', DOGEUSDT: 'Dogecoin'
+      },
+      blurb: {
+        XAUUSDT: 'This is the USDT-quoted perpetual index price of one troy ounce of gold. The reading reflects a composite of spot gold quotes across venues.',
+        XAGUSDT: 'This is the USDT-quoted perpetual index price of one troy ounce of silver. The reading reflects a composite of spot silver quotes across venues.',
+        PAXGUSDT: 'PAX Gold is a gold-backed token quoted here as a USDT perpetual index price. The reading reflects the token’s composite spot value across venues.',
+        XAUTUSDT: 'Tether Gold is a gold-backed token quoted here as a USDT perpetual index price. The reading reflects the token’s composite spot value across venues.',
+        BZUSDT: 'This is the USDT-quoted perpetual index price of one barrel of Brent crude. The reading reflects a composite spot indicator tied to the North Sea Brent contract.',
+        CLUSDT: 'This is the USDT-quoted perpetual index price of one barrel of West Texas Intermediate crude. The reading reflects a composite spot indicator tied to the US WTI contract.',
+        BTCUSDT: 'This is the USDT-quoted perpetual index price of Bitcoin. The reading reflects a composite of Bitcoin/USDT spot quotes across venues.',
+        ETHUSDT: 'This is the USDT-quoted perpetual index price of Ethereum. The reading reflects a composite of Ethereum/USDT spot quotes across venues.',
+        BNBUSDT: 'This is the USDT-quoted perpetual index price of BNB. The reading reflects a composite of BNB/USDT spot quotes across venues.',
+        SOLUSDT: 'This is the USDT-quoted perpetual index price of Solana. The reading reflects a composite of Solana/USDT spot quotes across venues.',
+        XRPUSDT: 'This is the USDT-quoted perpetual index price of XRP. The reading reflects a composite of XRP/USDT spot quotes across venues.',
+        DOGEUSDT: 'This is the USDT-quoted perpetual index price of Dogecoin. The reading reflects a composite of Dogecoin/USDT spot quotes across venues.'
+      }
+    }
+  };
+
+  const $ = id => document.getElementById(id);
+  const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+
+  function detectLang() {
+    try {
+      const saved = localStorage.getItem('lang');
+      if (saved === 'tr' || saved === 'en') return saved;
+    } catch {}
+    return 'tr';
+  }
+
+  let lang = detectLang();
+  let payload = null;
+  let selected = 'XAUUSDT';
+  let chartReady = false;
+  let chart = null;
+  let filterQuery = '';
+  let resizeTimer = 0;
+
+  function t() { return STR[lang]; }
+
+  function locale() { return lang === 'tr' ? 'tr-TR' : 'en-US'; }
+
+  function badgeSVG(symbol) {
+    const mark = MARK[symbol] || symbol.slice(0, 3);
+    const size = mark.length > 3 ? 7.2 : mark.length === 1 ? 12 : 8;
+    return `<svg class="badge" viewBox="0 0 28 28" width="22" height="22" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="${COLOR[symbol] || '#5ee3d7'}"/><text x="14" y="15.2" text-anchor="middle" dominant-baseline="middle" fill="${INK[symbol] || '#041018'}" font-size="${size}" font-weight="800" font-family="ui-sans-serif,system-ui,sans-serif">${escapeHTML(mark)}</text></svg>`;
+  }
+
+  function formatPrice(n) {
+    if (!Number.isFinite(n)) return '—';
+    const abs = Math.abs(n);
+    let digits = 2;
+    if (abs < 1) digits = 5;
+    else if (abs < 10) digits = 4;
+    else if (abs < 100) digits = 3;
+    return new Intl.NumberFormat(locale(), {
+      minimumFractionDigits: Math.min(2, digits),
+      maximumFractionDigits: digits
+    }).format(n);
+  }
+
+  function formatPct(n) {
+    if (!Number.isFinite(n)) return '—';
+    const sign = n > 0 ? '+' : '';
+    return sign + new Intl.NumberFormat(locale(), {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(n) + '%';
+  }
+
+  function formatNum(n, digits) {
+    if (!Number.isFinite(n)) return '—';
+    return new Intl.NumberFormat(locale(), {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: digits
+    }).format(n);
+  }
+
+  function lastAndChange(history) {
+    if (!Array.isArray(history) || history.length === 0) return { last: NaN, change: NaN };
+    const lastPair = history[history.length - 1];
+    const last = Number(lastPair[1]);
+    const lastMs = Number(lastPair[0]);
+    const target = lastMs - 24 * 3600 * 1000;
+    let prev = history[0];
+    let best = Math.abs(Number(history[0][0]) - target);
+    for (let i = 1; i < history.length; i += 1) {
+      const d = Math.abs(Number(history[i][0]) - target);
+      if (d < best) {
+        best = d;
+        prev = history[i];
+      }
+    }
+    const base = Number(prev[1]);
+    const change = Number.isFinite(base) && base !== 0 ? ((last - base) / base) * 100 : NaN;
+    return { last, change };
+  }
+
+  function bySymbol() {
+    const map = new Map();
+    if (!payload || !Array.isArray(payload.symbols)) return map;
+    payload.symbols.forEach(item => {
+      if (item && typeof item.symbol === 'string') map.set(item.symbol, item);
+    });
+    return map;
+  }
+
+  function applyChrome() {
+    const s = t();
+    document.documentElement.lang = lang;
+    document.title = s.title;
+    $('pageTitle').textContent = s.heading;
+    document.querySelector('.skip').textContent = s.skip;
+    $('homeLink').href = s.home;
+    document.querySelector('.lang-switch').setAttribute('aria-label', s.langLabel);
+    $('btnTr').classList.toggle('active', lang === 'tr');
+    $('btnEn').classList.toggle('active', lang === 'en');
+    $('btnTr').setAttribute('aria-pressed', String(lang === 'tr'));
+    $('btnEn').setAttribute('aria-pressed', String(lang === 'en'));
+    document.querySelector('.chart-col').setAttribute('aria-label', s.chartLabel);
+    $('chart').setAttribute('aria-label', s.chartAria);
+    document.querySelector('.ranges').setAttribute('aria-label', s.rangeLabel);
+    $('range1h').title = s.weekHint;
+    $('range1a').title = s.accumulating;
+    $('range1y').title = s.accumulating;
+    $('panelTitle').textContent = s.panel;
+    $('filter').placeholder = s.filter;
+    $('filter').setAttribute('aria-label', s.filter);
+    $('errorText').textContent = s.error;
+    $('retryBtn').textContent = s.retry;
+    $('legal').textContent = s.legal;
+  }
+
+  function renderStrip() {
+    const s = t();
+    const item = bySymbol().get(selected);
+    const history = item && Array.isArray(item.history) ? item.history : [];
+    const { last, change } = lastAndChange(history);
+    const cls = change > 0 ? 'up' : change < 0 ? 'down' : 'flat';
+    $('strip').innerHTML = `${badgeSVG(selected)}<span class="strip-name">${escapeHTML(s.names[selected] || selected)}</span><span class="strip-price">${escapeHTML(formatPrice(last))} USDT</span><span class="strip-change ${cls}">${escapeHTML(formatPct(change))}</span>`;
+  }
+
+  function matchesFilter(symbol) {
+    const q = filterQuery.trim().toLocaleLowerCase(locale());
+    if (!q) return true;
+    const name = (t().names[symbol] || '').toLocaleLowerCase(locale());
+    const code = (MARK[symbol] || '').toLocaleLowerCase(locale());
+    return symbol.toLowerCase().includes(q) || name.includes(q) || code.includes(q);
+  }
+
+  function renderPanel() {
+    const s = t();
+    const map = bySymbol();
+    const chunks = [];
+    [['commodities', COMMODITIES], ['crypto', CRYPTO]].forEach(([key, list]) => {
+      const rows = list.filter(matchesFilter);
+      if (!rows.length) return;
+      chunks.push(`<div class="group-label">${escapeHTML(s[key])}</div>`);
+      rows.forEach(symbol => {
+        const item = map.get(symbol);
+        const history = item && Array.isArray(item.history) ? item.history : [];
+        const last = history.length ? Number(history[history.length - 1][1]) : NaN;
+        chunks.push(
+          `<button class="row${symbol === selected ? ' is-on' : ''}" type="button" data-symbol="${escapeHTML(symbol)}" aria-pressed="${symbol === selected}">` +
+          `${badgeSVG(symbol)}<span class="row-name">${escapeHTML(s.names[symbol] || symbol)}</span>` +
+          `<span class="row-px">${escapeHTML(formatPrice(last))}</span></button>`
+        );
+      });
+    });
+    $('panelList').innerHTML = chunks.join('');
+  }
+
+  function renderBottom() {
+    const s = t();
+    const item = bySymbol().get(selected);
+    $('blurb').textContent = s.blurb[selected] || '';
+    let updated = '';
+    if (payload && payload.generated_utc) {
+      const when = new Date(payload.generated_utc);
+      if (!Number.isNaN(when.getTime())) {
+        const stamp = new Intl.DateTimeFormat(locale(), {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+          timeZone: lang === 'tr' ? 'Europe/Istanbul' : undefined
+        }).format(when);
+        updated = `${s.updated}: ${stamp}`;
+      }
+    }
+    $('updated').textContent = updated;
+    const fc = item && item.forecast ? item.forecast : {};
+    const bt = fc.backtest || {};
+    const horizon = Number(fc.horizon_hours) || 24;
+    const rmse = Number(bt.rmse);
+    const mape = Number(bt.mape);
+    const hold = Number(bt.holdout_hours) || horizon;
+    $('modelNote').textContent = `${s.model}. ${s.backtest} (${hold} ${s.hours}): RMSE ${formatNum(rmse, 4)} · MAPE ${formatPct(mape)}`;
+  }
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function drawChart() {
+    const frame = document.querySelector('.chart-frame');
+    const host = $('chart');
+    if (!chartReady || !window.google || !google.visualization || !host) return;
+    const item = bySymbol().get(selected);
+    const history = item && Array.isArray(item.history) ? item.history.slice() : [];
+    const forecast = item && item.forecast && Array.isArray(item.forecast.points) ? item.forecast.points : [];
+    if (!history.length) return;
+    try {
+      const data = new google.visualization.DataTable();
+      data.addColumn('datetime', 't');
+      data.addColumn('number', t().heading);
+      data.addColumn('number', t().forecast);
+      data.addColumn({ type: 'number', role: 'interval' });
+      data.addColumn({ type: 'number', role: 'interval' });
+      data.addColumn({ type: 'string', role: 'annotation' });
+      history.forEach((pair, index) => {
+        const ms = Number(pair[0]);
+        const price = Number(pair[1]);
+        const last = index === history.length - 1;
+        data.addRow([
+          new Date(ms),
+          price,
+          last ? price : null,
+          last ? price : null,
+          last ? price : null,
+          last ? t().forecast : null
+        ]);
+      });
+      forecast.forEach(point => {
+        data.addRow([
+          new Date(Number(point[0])),
+          null,
+          Number(point[1]),
+          Number(point[2]),
+          Number(point[3]),
+          null
+        ]);
+      });
+      const accent = cssVar('--accent') || '#5ee3d7';
+      const muted = cssVar('--muted') || '#b4aca0';
+      const line = cssVar('--line') || '#4b659f';
+      const text = cssVar('--text') || '#d9e9fb';
+      const width = Math.max(120, host.clientWidth || frame.clientWidth);
+      const height = Math.max(160, host.clientHeight || frame.clientHeight);
+      const options = {
+        backgroundColor: 'transparent',
+        width,
+        height,
+        chartArea: { left: 56, top: 18, width: '86%', height: '76%' },
+        legend: { position: 'none' },
+        interpolateNulls: false,
+        series: {
+          0: { lineWidth: 2.2, color: accent },
+          1: { lineWidth: 2, color: accent, lineDashStyle: [7, 5] }
+        },
+        intervals: { style: 'area', color: accent },
+        interval: {
+          i0: { style: 'area', color: accent, fillOpacity: 0.16 },
+          i1: { style: 'area', color: accent, fillOpacity: 0.16 }
+        },
+        annotations: {
+          style: 'line',
+          stem: { color: line, length: 220 },
+          textStyle: { color: muted, fontSize: 11, italic: true, auraColor: 'none' },
+          boxStyle: null
+        },
+        hAxis: {
+          textStyle: { color: muted, fontSize: 11 },
+          gridlines: { color: 'transparent' },
+          minorGridlines: { color: 'transparent' },
+          baselineColor: line,
+          format: lang === 'tr' ? 'd MMM HH:mm' : 'MMM d HH:mm'
+        },
+        vAxis: {
+          textStyle: { color: muted, fontSize: 11 },
+          gridlines: { color: line, count: 5 },
+          minorGridlines: { color: 'transparent' },
+          baselineColor: line,
+          format: 'short'
+        },
+        tooltip: { textStyle: { color: text, fontSize: 12 } },
+        crosshair: { trigger: 'both', orientation: 'vertical', color: muted }
+      };
+      if (!chart) chart = new google.visualization.LineChart(host);
+      chart.draw(data, options);
+    } catch (err) {
+      chart = null;
+    }
+  }
+
+  function showError(on) {
+    $('errorPanel').classList.toggle('is-on', on);
+    $('chartSkel').style.display = on ? 'none' : (payload ? 'none' : 'block');
+  }
+
+  function renderAll() {
+    applyChrome();
+    if (!payload) {
+      showError(true);
+      $('blurb').textContent = '';
+      $('updated').textContent = '';
+      $('modelNote').textContent = '';
+      return;
+    }
+    showError(false);
+    $('chartSkel').style.display = 'none';
+    renderStrip();
+    renderPanel();
+    renderBottom();
+    drawChart();
+  }
+
+  function selectSymbol(symbol) {
+    if (!ORDER.includes(symbol)) return;
+    selected = symbol;
+    try {
+      history.replaceState(null, '', '#' + symbol);
+    } catch {}
+    renderAll();
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch(DATA_URL, { cache: 'no-cache' });
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (!json || !Array.isArray(json.symbols)) return null;
+      return json;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function waitForCharts() {
+    return new Promise(resolve => {
+      const started = Date.now();
+      const tick = () => {
+        if (window.google && google.charts) {
+          try {
+            google.charts.load('current', { packages: ['corechart'] });
+            google.charts.setOnLoadCallback(() => resolve(true));
+            return;
+          } catch (err) {
+            resolve(false);
+            return;
+          }
+        }
+        if (Date.now() - started > 8000) {
+          resolve(false);
+          return;
+        }
+        setTimeout(tick, 50);
+      };
+      tick();
+    });
+  }
+
+  function isLoopbackHost() {
+    const host = location.hostname;
+    return host === '127.0.0.1' || host === 'localhost' || host === '[::1]';
+  }
+
+  async function boot() {
+    const fromHash = (location.hash || '').replace(/^#/, '').toUpperCase();
+    if (ORDER.includes(fromHash)) selected = fromHash;
+    applyChrome();
+    // Loopback has no CORS grant on the media host; skip the request so a local
+    // audit does not log a blocked fetch. Production origins still load the feed.
+    const dataPromise = isLoopbackHost() ? Promise.resolve(null) : loadData();
+    const [data, ready] = await Promise.all([dataPromise, waitForCharts()]);
+    payload = data;
+    chartReady = ready === true;
+    if (payload && !bySymbol().has(selected)) selected = ORDER.find(id => bySymbol().has(id)) || selected;
+    renderAll();
+  }
+
+  $('btnTr').addEventListener('click', () => {
+    if (lang === 'tr') return;
+    lang = 'tr';
+    try { localStorage.setItem('lang', 'tr'); } catch {}
+    renderAll();
+  });
+  $('btnEn').addEventListener('click', () => {
+    if (lang === 'en') return;
+    lang = 'en';
+    try { localStorage.setItem('lang', 'en'); } catch {}
+    renderAll();
+  });
+  $('filter').addEventListener('input', event => {
+    filterQuery = event.target.value || '';
+    renderPanel();
+  });
+  $('panelList').addEventListener('click', event => {
+    const row = event.target.closest('[data-symbol]');
+    if (!row) return;
+    selectSymbol(row.getAttribute('data-symbol'));
+  });
+  $('retryBtn').addEventListener('click', () => {
+    showError(false);
+    $('chartSkel').style.display = 'block';
+    boot();
+  });
+  addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(drawChart, 80);
+  });
+  addEventListener('hashchange', () => {
+    const next = (location.hash || '').replace(/^#/, '').toUpperCase();
+    if (ORDER.includes(next) && next !== selected) selectSymbol(next);
+  });
+  new MutationObserver(() => {
+    if (payload) drawChart();
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  boot();
+})();
+</script>
+</body>
+</html>

@@ -231,6 +231,17 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .topic-label{font-size:.76rem;font-weight:700;white-space:nowrap}
   .topic-btn:hover{opacity:.8}
   .topic-btn.active{opacity:1;color:var(--text);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .markets-nav{
+    display:inline-flex;align-items:center;gap:7px;min-height:44px;color:var(--muted);
+    padding:8px 12px;border-radius:99px;opacity:.72;transition:.15s;font-family:inherit;
+    text-decoration:none;box-shadow:inset 1px 0 0 var(--line);margin-left:2px;
+  }
+  .markets-nav svg{width:20px;height:20px;display:block;flex:0 0 auto}
+  .markets-nav:hover{opacity:1;color:var(--text)}
+  @media(max-width:640px),
+    (min-width:641px) and (max-width:1000px) and (max-height:500px) and (orientation:landscape){
+    .markets-nav{display:none}
+  }
   /* Regulatory notice — must read as a warning, not as decoration. */
   .disclaimer{
     max-width:var(--page-max);margin:0 auto 18px;padding:12px 16px;
@@ -3873,6 +3884,15 @@ function renderTopics(){
     b.title = t.label[LANG];
     b.innerHTML = `${TOPIC_ICONS[t.id] || t.symbol}<span class="topic-label">${escapeHTML(t.label[LANG])}</span>`;
     el.appendChild(b);
+    if (t.id === 'economics-markets') {
+      const marketsLabel = LANG === 'tr' ? 'Piyasalar' : 'Markets';
+      const m = document.createElement('a');
+      m.className = 'markets-nav';
+      m.href = '/markets';
+      m.title = marketsLabel;
+      m.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19h18"/><path d="M5 15V11M9 15V8M13 15v-5M17 15V6"/></svg><span class="topic-label">${escapeHTML(marketsLabel)}</span>`;
+      el.appendChild(m);
+    }
   });
 }
 function setTopic(id){
