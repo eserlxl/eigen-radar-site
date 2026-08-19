@@ -29,6 +29,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --text:#d9e9fb;--muted:#b4aca0;--accent:#5ee3d7;--accent-soft:rgba(94,227,215,.08);
     --amber:#d6c08c;--scheme:dark;--focus:#fff;--on-accent:#040711;
     --drawer-shadow:rgba(0,0,0,.35);--up:#5ee3d7;--down:#f07178;--band:rgba(94,227,215,.16);
+    --desk-ai:#2aa79e;--desk-ai-hi:#5ee3d7;--desk-geo:#4b659f;--desk-geo-hi:#8aa0d4;
+    --desk-eco:#b8954a;--desk-eco-hi:#d6c08c;--desk-sci:#5b5fd6;--desk-sci-hi:#a5b4fc;
     --page-max:70rem;--radius:14px;
   }
   :root[data-theme="light"]{
@@ -36,6 +38,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --text:#111827;--muted:#405269;--accent:#005f5a;--accent-soft:rgba(0,95,90,.12);
     --amber:#854100;--scheme:light;--focus:#0f172a;--on-accent:#fff;
     --drawer-shadow:rgba(15,23,42,.22);--up:#005f5a;--down:#b42318;--band:rgba(0,95,90,.14);
+    --desk-ai:#005f5a;--desk-ai-hi:#0f766e;--desk-geo:#3f56ad;--desk-geo-hi:#4f6cc4;
+    --desk-eco:#854100;--desk-eco-hi:#a35200;--desk-sci:#4338ca;--desk-sci-hi:#4f46e5;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{color-scheme:var(--scheme)}
@@ -146,48 +150,54 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(max-width:340px){.wrap{padding-inline:10px}.filter{width:6.4rem}}
   @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
-  .topic-switch{display:flex;gap:4px;background:var(--bg-soft);border:1px solid var(--line);border-radius:99px;padding:3px;margin:0 auto}
-  .topic-btn{
-    display:inline-flex;align-items:center;gap:7px;min-height:44px;color:var(--muted);
-    padding:8px 12px;border-radius:99px;opacity:.72;transition:.15s;font-family:inherit;
+  .topic-switch{display:flex;align-items:start;gap:6px;margin:0 auto;padding:0;border:0;background:transparent}
+  .topic-btn,.markets-nav{
+    display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    gap:4px;min-height:44px;min-width:0;padding:6px 10px 8px;border-radius:0;
+    color:var(--muted);background:transparent;box-shadow:none;opacity:1;
+    position:relative;text-decoration:none;transition:.15s;font-family:inherit;
   }
-  .topic-btn svg{width:20px;height:20px;display:block;flex:0 0 auto}
-  .topic-label{font-size:.76rem;font-weight:700;white-space:nowrap}
-  .topic-btn:hover{opacity:.8}
-  .topic-btn.active{opacity:1;color:var(--text);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
-  .markets-nav{
-    display:inline-flex;align-items:center;gap:7px;min-height:44px;color:var(--muted);
-    padding:8px 12px;border-radius:99px;opacity:.72;transition:.15s;font-family:inherit;
-    text-decoration:none;box-shadow:inset 1px 0 0 var(--line);margin-left:2px;
+  .topic-btn svg,.markets-nav svg{
+    width:30px;height:30px;display:block;flex:0 0 auto;opacity:.88;
+    filter:drop-shadow(0 1px 1.5px var(--drawer-shadow));
   }
-  .markets-nav svg{width:20px;height:20px;display:block;flex:0 0 auto}
-  .markets-nav:hover{opacity:1;color:var(--text)}
-  .markets-nav.active{
-    opacity:1;color:var(--text);background:var(--accent-soft);
-    box-shadow:inset 0 0 0 1px var(--accent);
+  .topic-label{
+    font-size:.72rem;font-weight:700;white-space:nowrap;line-height:1;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;
   }
+  .topic-btn:hover svg,.topic-btn.active svg,.markets-nav:hover svg,.markets-nav.active svg{opacity:1}
+  .topic-btn.active,.markets-nav.active{color:var(--text)}
+  .topic-btn.active::after,.markets-nav.active::after,.markets-nav:hover::after{
+    content:"";position:absolute;left:22%;right:22%;bottom:2px;height:2px;
+    border-radius:1px;background:var(--desk,var(--accent));
+  }
+  .topic-btn[data-topic="ai"]{--desk:var(--desk-ai-hi)}
+  .topic-btn[data-topic="geopolitics"]{--desk:var(--desk-geo-hi)}
+  .topic-btn[data-topic="economics-markets"]{--desk:var(--desk-eco-hi)}
+  .topic-btn[data-topic="science"]{--desk:var(--desk-sci-hi)}
+  .markets-nav{--desk:var(--desk-eco-hi);color:var(--desk-eco-hi);margin-left:0}
   @media(max-width:900px){
     .header-inner { flex-wrap: wrap; }
-    .topic-switch { order: 3; width: 100%; justify-content: center; overflow-x: auto; scrollbar-width: none; }
+    .topic-switch { order: 3; width: 100%; justify-content: center; }
   }
   @media(max-width:640px){
     .topic-switch{
-      order:3;width:100%;margin:0;display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:2px;padding:2px;border-radius:99px;
+      order:3;width:100%;margin:0;display:grid;align-items:start;
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto minmax(0,1fr) minmax(0,1fr);
+      gap:2px;padding:0;border:0;background:transparent;
     }
-    .topic-btn, .markets-nav{
-      min-width:0;min-height:40px;justify-content:center;
-      gap:clamp(2px,.75vw,3px);padding:6px 2px;
-      box-shadow:none;margin:0;border:0;
+    .topic-btn,.markets-nav{
+      min-width:0;min-height:0;justify-content:flex-start;
+      gap:3px;padding:4px 2px 6px;box-shadow:none;margin:0;border:0;
     }
-    .markets-nav.active{box-shadow:inset 0 0 0 1px var(--accent)}
-    .topic-btn svg, .markets-nav svg{
-      width:clamp(12px,3.6vw,15px);height:clamp(12px,3.6vw,15px);
+    .topic-btn svg,.markets-nav svg{
+      width:clamp(22px,6.8vw,26px);height:clamp(22px,6.8vw,26px);
     }
     .topic-label{
-      display:none;
+      font-size:clamp(.6rem,2.65vw,.68rem);line-height:1;letter-spacing:-.015em;
     }
+    .markets-nav{padding:6px 3px 8px}
+    .markets-nav .topic-label{display:none}
   }
 
 
@@ -218,11 +228,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     </a>
     <span class="proto-badge" id="pageBadge">PİYASALAR</span>
     <nav class="topic-switch" aria-label="Konu / Topic" id="topicNav">
-      <a class="topic-btn" href="/tr/geopolitics/" id="navGeo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><ellipse cx="12" cy="12" rx="3.6" ry="8.5"/><path d="M3.9 9.2h16.2M3.9 14.8h16.2"/></svg><span class="topic-label">Jeopolitik</span></a>
-      <a class="topic-btn" href="/tr/economics-markets/" id="navEco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 19h18"/><path d="M4.5 15.5 8 8.5l3.5 4 3-6.5 5 9.5"/><path d="M19.5 15.5h-3.2M19.5 15.5v-3.2"/></svg><span class="topic-label">Ekonomi</span></a>
+      <a class="topic-btn" href="/tr/geopolitics/" id="navGeo" data-topic="geopolitics"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-geo" x1="5" y1="3" x2="19" y2="21" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-geo-hi)"/><stop offset="1" stop-color="var(--desk-geo)"/></linearGradient></defs><circle cx="12" cy="12" r="8.6" fill="url(#er-desk-geo)"/><ellipse cx="12" cy="12" rx="3.6" ry="8.6" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.1"/><path d="M3.5 9.2h17M3.5 14.8h17" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.1"/><ellipse cx="9.2" cy="8.2" rx="4.4" ry="2.6" fill="#fff" fill-opacity=".28"/></svg><span class="topic-label">Jeopolitik</span></a>
+      <a class="topic-btn" href="/tr/economics-markets/" id="navEco" data-topic="economics-markets"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-eco" x1="4" y1="6" x2="20" y2="20" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-eco-hi)"/><stop offset="1" stop-color="var(--desk-eco)"/></linearGradient></defs><path d="M3 19 4.5 15.5 8 8.5l3.5 4 3-6.5 5 9.5L21 19Z" fill="url(#er-desk-eco)"/><path d="M4.5 15.5 8 8.5l3.5 4 3-6.5 5 9.5" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="11" cy="10" rx="4" ry="2.2" fill="#fff" fill-opacity=".22"/></svg><span class="topic-label">Ekonomi</span></a>
       <a class="markets-nav active" id="navMarkets" href="/markets" aria-current="page"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-opacity=".38" d="M2.2 16.2 5.4 14.7v3.8l-3.2 1.5z"/><path fill-opacity=".22" d="M5.4 14.7 7.6 15.7v3.8l-2.2-1z"/><path fill-opacity=".72" d="M2.2 16.2 4.4 15.2 7.6 16.2 5.4 17.2z"/><path fill-opacity=".38" d="M8 13.1 11.2 11.6v6.9l-3.2 1.5z"/><path fill-opacity=".22" d="M11.2 11.6 13.4 12.6v6.9l-2.2-1z"/><path fill-opacity=".72" d="M8 13.1 10.2 12.1 13.4 13.1 11.2 14.1z"/><path fill-opacity=".38" d="M13.8 9.4 17 7.9v10.6l-3.2 1.5z"/><path fill-opacity=".22" d="M17 7.9 19.2 8.9v10.6l-2.2-1z"/><path fill-opacity=".72" d="M13.8 9.4 16 8.4 19.2 9.4 17 10.4z"/><path fill="none" stroke="currentColor" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round" d="M4.4 14.6 10.6 10.8 16.8 6.6 21 4.4"/></svg><span class="topic-label">Piyasalar</span></a>
-      <a class="topic-btn" href="/tr/ai/" id="navAi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.2a2.6 2.6 0 0 0-4.6 1.5 2.4 2.4 0 0 0-.9 4.1V12h11V9.8a2.4 2.4 0 0 0-.9-4.1A2.6 2.6 0 0 0 12 4.2Z"/><path d="M12 4.2V12"/><rect x="7.5" y="12" width="9" height="6.5" rx="1.4"/><path d="M10 18.5v2M14 18.5v2M16.5 14h2M16.5 16.5h2M5.5 14h2M5.5 16.5h2"/></svg><span class="topic-label">Yapay Zekâ</span></a>
-      <a class="topic-btn" href="/tr/science/" id="navSci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3h5M10.5 3v6.2L5.4 18a1.6 1.6 0 0 0 1.4 2.4h10.4a1.6 1.6 0 0 0 1.4-2.4L13.5 9.2V3"/><path d="M8 15h8"/></svg><span class="topic-label">Bilim</span></a>
+      <a class="topic-btn" href="/tr/ai/" id="navAi" data-topic="ai"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-ai" x1="7" y1="3" x2="16" y2="20" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-ai-hi)"/><stop offset="1" stop-color="var(--desk-ai)"/></linearGradient></defs><path d="M12 4.2a2.6 2.6 0 0 0-4.6 1.5 2.4 2.4 0 0 0-.9 4.1V12h11V9.8a2.4 2.4 0 0 0-.9-4.1A2.6 2.6 0 0 0 12 4.2Z" fill="url(#er-desk-ai)"/><rect x="7.5" y="12" width="9" height="6.5" rx="1.4" fill="url(#er-desk-ai)" fill-opacity=".88"/><path d="M10 18.5v2M14 18.5v2M16.5 14h2M16.5 16.5h2M5.5 14h2M5.5 16.5h2" fill="none" stroke="var(--desk-ai)" stroke-width="1.4" stroke-linecap="round"/><ellipse cx="10" cy="7.2" rx="3.6" ry="2.2" fill="#fff" fill-opacity=".3"/></svg><span class="topic-label">Yapay Zekâ</span></a>
+      <a class="topic-btn" href="/tr/science/" id="navSci" data-topic="science"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-sci" x1="8" y1="10" x2="16" y2="21" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-sci-hi)"/><stop offset="1" stop-color="var(--desk-sci)"/></linearGradient></defs><path d="M9.5 3h5M10.5 3v6.2L5.4 18a1.6 1.6 0 0 0 1.4 2.4h10.4a1.6 1.6 0 0 0 1.4-2.4L13.5 9.2V3" fill="none" stroke="var(--desk-sci-hi)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 15 6.8 18a1.6 1.6 0 0 0 1.4 2.4h7.6a1.6 1.6 0 0 0 1.4-2.4L15.95 15Z" fill="url(#er-desk-sci)"/><ellipse cx="10.4" cy="16.6" rx="3.1" ry="1.35" fill="#fff" fill-opacity=".28"/></svg><span class="topic-label">Bilim</span></a>
     </nav>
     <div class="header-right">
       <nav class="header-links" id="headerLinks" aria-label="Site">
