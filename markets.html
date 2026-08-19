@@ -518,12 +518,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }).format(n);
   }
 
-  function lastAndChange(history) {
+  function lastAndChange(history, windowMs) {
     if (!Array.isArray(history) || history.length === 0) return { last: NaN, change: NaN };
     const lastPair = history[history.length - 1];
     const last = Number(lastPair[1]);
     const lastMs = Number(lastPair[0]);
-    const target = lastMs - 24 * 3600 * 1000;
+    if (!Number.isFinite(windowMs) || windowMs <= 0) return { last, change: NaN };
+    const target = lastMs - windowMs;
     let prev = history[0];
     let best = Math.abs(Number(history[0][0]) - target);
     for (let i = 1; i < history.length; i += 1) {
@@ -603,7 +604,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const s = t();
     const item = bySymbol().get(selected);
     const history = item && Array.isArray(item.history) ? item.history : [];
-    const { last, change } = lastAndChange(history);
+    const { last, change } = lastAndChange(history, RANGE_MS[rangeKey]);
     const cls = change > 0 ? 'up' : change < 0 ? 'down' : 'flat';
     $('strip').innerHTML = `${badgeSVG(selected)}<span class="strip-name">${escapeHTML(s.names[selected] || selected)}</span><span class="strip-price">${escapeHTML(formatPrice(last))} USDT</span><span class="strip-change ${cls}">${escapeHTML(formatPct(change))}</span>`;
   }
@@ -734,6 +735,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     if (rangeKey === next) return;
     rangeKey = next;
     applyRangeButtons();
+    renderStrip();
     drawChart();
   }
 
