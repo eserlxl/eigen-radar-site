@@ -808,38 +808,32 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const history = sliceHistory(rawHistory, RANGE_MS[rangeKey]);
     const forecast = item && item.forecast && Array.isArray(item.forecast.points) ? item.forecast.points : [];
     if (!history.length) return;
+    const lastMs = Number(history[history.length - 1][0]);
+    const futurePoints = [];
+    forecast.forEach(point => {
+      const ts = Number(point[0]);
+      if (Number.isFinite(ts) && ts > lastMs) futurePoints.push(point);
+    });
     try {
       const data = new google.visualization.DataTable();
       data.addColumn('datetime', 't');
       data.addColumn('number', t().heading);
-      data.addColumn('number', t().forecast);
-      data.addColumn({ type: 'number', role: 'interval' });
-      data.addColumn({ type: 'number', role: 'interval' });
-      data.addColumn({ type: 'string', role: 'annotation' });
-      history.forEach((pair, index) => {
-        const ms = Number(pair[0]);
-        const price = Number(pair[1]);
-        const last = index === history.length - 1;
+      data.addColumn({ type: 'boolean', role: 'certainty' });
+      history.forEach(pair => {
         data.addRow([
-          new Date(ms),
-          price,
-          last ? price : null,
-          null,
-          null,
-          last ? t().forecast : null
+          new Date(Number(pair[0])),
+          Number(pair[1]),
+          true
         ]);
       });
-      forecast.forEach(point => {
+      futurePoints.forEach(point => {
         data.addRow([
           new Date(Number(point[0])),
-          null,
           Number(point[1]),
-          null,
-          null,
-          null
+          false
         ]);
       });
-      const windowY = priceWindow(history, forecast);
+      const windowY = priceWindow(history, futurePoints);
       if (!windowY) return;
       const accent = cssVar('--accent') || '#5ee3d7';
       const muted = cssVar('--muted') || '#b4aca0';
@@ -855,19 +849,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
         legend: { position: 'none' },
         interpolateNulls: false,
         series: {
-          0: { lineWidth: 2.2, color: accent },
-          1: { lineWidth: 2, color: accent, lineDashStyle: [7, 5] }
-        },
-        intervals: { style: 'area', color: accent },
-        interval: {
-          i0: { style: 'area', color: accent, fillOpacity: 0.25 },
-          i1: { style: 'area', color: accent, fillOpacity: 0.25 }
-        },
-        annotations: {
-          style: 'line',
-          stem: { color: 'transparent', length: 0 },
-          textStyle: { color: 'transparent', fontSize: 0, auraColor: 'none' },
-          boxStyle: null
+          0: { lineWidth: 2.2, color: accent }
         },
         hAxis: {
           textStyle: { color: muted, fontSize: 11 },
@@ -896,12 +878,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
         try {
           const cli = chart.getChartLayoutInterface();
           const bbox = cli.getChartAreaBoundingBox();
-          if (forecast && forecast.length > 0 && history && history.length > 0) {
-            const startMs = Number(history[history.length - 1][0]);
-            const endMs = Number(forecast[forecast.length - 1][0]);
-            const startX = cli.getXLocation(new Date(startMs));
-            let endX = cli.getXLocation(new Date(endMs));
-            // Ensure endX does not exceed chart area width
+          if (futurePoints.length > 0 && history.length > 0) {
+            const joinRow = history.length - 1;
+            const endRow = data.getNumberOfRows() - 1;
+            const startX = cli.getXLocation(data.getValue(joinRow, 0));
+            let endX = cli.getXLocation(data.getValue(endRow, 0));
             if (endX > bbox.left + bbox.width) endX = bbox.left + bbox.width;
             
             const bg = document.getElementById('forecastBg');
