@@ -105,7 +105,34 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .panel-head h2{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:800}
   .filter{margin-left:auto;width:8.6rem;min-width:0;min-height:36px;padding:4px 10px;border:1px solid var(--line);border-radius:99px;background:var(--bg-soft);color:var(--text)}
   .filter::placeholder{color:var(--muted)}
-  .panel-list{overflow:auto;padding:6px 6px 10px;scrollbar-width:thin}
+  .panel-body{position:relative;flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  .panel-list{
+    flex:1 1 auto;min-height:0;overflow:auto;padding:6px 8px 10px 6px;
+    scrollbar-width:auto;scrollbar-color:var(--line) var(--bg-soft);
+  }
+  .panel-fade{
+    position:absolute;left:0;right:0;height:2.6rem;pointer-events:none;opacity:0;z-index:1;
+  }
+  .panel-fade-above{
+    top:0;background:linear-gradient(to bottom,var(--card),transparent);
+  }
+  .panel-fade-below{
+    bottom:0;background:linear-gradient(to top,var(--card) 35%,transparent);
+  }
+  .panel.has-more-above .panel-fade-above,
+  .panel.has-more-below .panel-fade-below{opacity:1}
+  .panel-more{
+    position:absolute;left:50%;bottom:7px;width:9px;height:9px;
+    border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+    transform:translateX(-50%) rotate(45deg);
+  }
+  .panel-list::-webkit-scrollbar{width:14px}
+  .panel-list::-webkit-scrollbar-track{
+    background:var(--bg-soft);border-radius:99px;margin:4px 0;
+  }
+  .panel-list::-webkit-scrollbar-thumb{
+    background:var(--line);border-radius:99px;border:3px solid var(--bg-soft);
+  }
   .group-label{font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 8px 4px}
   .row{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:6px 8px;border:0;border-radius:10px;background:transparent;color:var(--text);text-align:left;cursor:pointer}
   .row:hover{background:var(--card-hover)}
@@ -124,7 +151,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(max-width:900px){
     .stage{grid-template-columns:1fr}
     .panel{max-height:none;min-height:0}
-    .panel-list{max-height:18rem}
+    .panel-body,.panel-list{max-height:18rem}
   }
   @media(max-width:640px){
     .header-inner,.wrap{padding-left:12px;padding-right:12px}
@@ -260,7 +287,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   <div class="stage" id="stage">
     <section class="chart-col" aria-label="Fiyat grafiği">
       <div class="ranges" role="group" aria-label="Zaman aralığı">
-        <button class="range-btn" type="button" id="range1h" aria-pressed="true">1H</button>
+        <button class="range-btn" type="button" id="range24h" aria-pressed="true">24S</button>
+        <button class="range-btn" type="button" id="range1h" aria-pressed="false">1H</button>
         <button class="range-btn" type="button" id="range1a" disabled>1A</button>
         <button class="range-btn" type="button" id="range1y" disabled>1Y</button>
       </div>
@@ -278,10 +306,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     </section>
     <aside class="panel" id="panel">
       <div class="panel-head">
-        <h2 id="panelTitle">Araçlar</h2>
+        <h2 id="panelTitle">Varlıklar</h2>
         <input class="filter" id="filter" type="search" autocomplete="off" spellcheck="false">
       </div>
-      <div class="panel-list" id="panelList"></div>
+      <div class="panel-body">
+        <div class="panel-list" id="panelList"></div>
+        <div class="panel-fade panel-fade-above" id="panelFadeAbove" aria-hidden="true"></div>
+        <div class="panel-fade panel-fade-below" id="panelFadeBelow" aria-hidden="true">
+          <span class="panel-more"></span>
+        </div>
+      </div>
     </aside>
   </div>
   <div class="bottom">
@@ -326,9 +360,12 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       chartLabel: 'Fiyat grafiği',
       chartAria: 'Fiyat ve tahmin grafiği',
       rangeLabel: 'Zaman aralığı',
+      range24: '24S',
+      range24Hint: '24 saat',
+      rangeWeek: '1H',
       weekHint: '1 hafta',
       accumulating: 'veri birikiyor',
-      panel: 'Araçlar',
+      panel: 'Varlıklar',
       filter: 'Ad veya kod',
       commodities: 'Emtia',
       crypto: 'Kripto',
@@ -339,7 +376,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       hours: 'saat',
       error: 'Veri şu an alınamıyor',
       retry: 'Yeniden dene',
-      legal: 'Bu sayfadaki fiyat verileri ve model projeksiyonları yalnızca bilgilendirme amaçlıdır; yatırım tavsiyesi değildir. Veriler gecikmeli olabilir.',
+      legal: 'Bu sayfadaki fiyat verileri ve model projeksiyonları yalnızca bilgilendirme amaçlıdır; yatırım tavsiyesi değildir. Veriler 5 dakikaya kadar gecikmeli olabilir.',
       names: {
         XAUUSDT: 'Altın', XAGUSDT: 'Gümüş', PAXGUSDT: 'PAX Gold', XAUTUSDT: 'Tether Gold',
         BZUSDT: 'Brent', CLUSDT: 'WTI', BTCUSDT: 'Bitcoin', ETHUSDT: 'Ethereum',
@@ -372,9 +409,12 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       chartLabel: 'Price chart',
       chartAria: 'Price and forecast chart',
       rangeLabel: 'Time range',
+      range24: '24H',
+      range24Hint: '24 hours',
+      rangeWeek: '1W',
       weekHint: '1 week',
       accumulating: 'data accumulating',
-      panel: 'Instruments',
+      panel: 'Assets',
       filter: 'Name or code',
       commodities: 'Commodities',
       crypto: 'Crypto',
@@ -385,7 +425,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       hours: 'hours',
       error: 'Data is currently unavailable',
       retry: 'Retry',
-      legal: 'Prices and model projections on this page are for information only and are not investment advice. Data may be delayed.',
+      legal: 'Prices and model projections on this page are for information only and are not investment advice. Data may be delayed by up to 5 minutes.',
       names: {
         XAUUSDT: 'Gold', XAGUSDT: 'Silver', PAXGUSDT: 'PAX Gold', XAUTUSDT: 'Tether Gold',
         BZUSDT: 'Brent', CLUSDT: 'WTI', BTCUSDT: 'Bitcoin', ETHUSDT: 'Ethereum',
@@ -429,7 +469,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   let filterQuery = '';
   let resizeTimer = 0;
   let refreshTimer = 0;
+  let lastFetchMs = 0;
+  let rangeKey = '24h';
   const REFRESH_MS = 5 * 60 * 1000;
+  const REFRESH_LAG_MS = 45 * 1000;
+  const RANGE_MS = {
+    '24h': 24 * 3600 * 1000,
+    '1w': 7 * 24 * 3600 * 1000
+  };
 
   function t() { return STR[lang]; }
 
@@ -541,7 +588,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     document.querySelector('.chart-col').setAttribute('aria-label', s.chartLabel);
     $('chart').setAttribute('aria-label', s.chartAria);
     document.querySelector('.ranges').setAttribute('aria-label', s.rangeLabel);
-    $('range1h').title = s.weekHint;
+    applyRangeButtons();
     $('range1a').title = s.accumulating;
     $('range1y').title = s.accumulating;
     $('panelTitle').textContent = s.panel;
@@ -616,6 +663,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       });
     });
     $('panelList').innerHTML = chunks.join('');
+    requestAnimationFrame(syncPanelOverflow);
+  }
+
+  function syncPanelOverflow() {
+    const list = $('panelList');
+    const panel = $('panel');
+    if (!list || !panel) return;
+    const overflow = list.scrollHeight - list.clientHeight;
+    panel.classList.toggle('has-more-below', overflow > 4 && list.scrollTop < overflow - 4);
+    panel.classList.toggle('has-more-above', list.scrollTop > 4);
   }
 
   function renderBottom() {
@@ -656,6 +713,48 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     $('modelNote').textContent = `${s.model}. ${s.backtest} (${hold} ${s.hours}): RMSE ${formatNum(rmse, 4)} · MAPE ${formatPct(mape)}. ${extraNote}`;
   }
 
+  function applyRangeButtons() {
+    const s = t();
+    const btn24 = $('range24h');
+    const btnWeek = $('range1h');
+    if (btn24) {
+      btn24.textContent = s.range24;
+      btn24.title = s.range24Hint;
+      btn24.setAttribute('aria-pressed', String(rangeKey === '24h'));
+    }
+    if (btnWeek) {
+      btnWeek.textContent = s.rangeWeek;
+      btnWeek.title = s.weekHint;
+      btnWeek.setAttribute('aria-pressed', String(rangeKey === '1w'));
+    }
+  }
+
+  function setRange(next) {
+    if (next !== '24h' && next !== '1w') return;
+    if (rangeKey === next) return;
+    rangeKey = next;
+    applyRangeButtons();
+    drawChart();
+  }
+
+  function sliceHistory(history, rangeMs) {
+    if (!Array.isArray(history) || history.length === 0) return [];
+    const copy = history.slice();
+    if (!rangeMs) return copy;
+    const lastPair = copy[copy.length - 1];
+    const lastMs = Number(lastPair[0]);
+    if (!Number.isFinite(lastMs)) return copy;
+    const start = lastMs - rangeMs;
+    let first = 0;
+    for (let i = 0; i < copy.length; i += 1) {
+      if (Number(copy[i][0]) >= start) {
+        first = i > 0 ? i - 1 : 0;
+        break;
+      }
+    }
+    return copy.slice(first);
+  }
+
   function cssVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
@@ -664,8 +763,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const frame = document.querySelector('.chart-frame');
     const host = $('chart');
     if (!chartReady || !window.google || !google.visualization || !host) return;
+    const overlay = $('forecastBg');
+    if (overlay) overlay.style.display = 'none';
     const item = bySymbol().get(selected);
-    const history = item && Array.isArray(item.history) ? item.history.slice() : [];
+    const rawHistory = item && Array.isArray(item.history) ? item.history : [];
+    const history = sliceHistory(rawHistory, RANGE_MS[rangeKey]);
     const forecast = item && item.forecast && Array.isArray(item.forecast.points) ? item.forecast.points : [];
     if (!history.length) return;
     try {
@@ -732,7 +834,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
           gridlines: { color: 'transparent' },
           minorGridlines: { color: 'transparent' },
           baselineColor: line,
-          format: lang === 'tr' ? 'd MMM HH:mm' : 'MMM d HH:mm'
+          format: rangeKey === '24h'
+            ? 'HH:mm'
+            : (lang === 'tr' ? 'd MMM HH:mm' : 'MMM d HH:mm')
         },
         vAxis: {
           textStyle: { color: muted, fontSize: 11 },
@@ -799,6 +903,19 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     drawChart();
   }
 
+  function renderLive() {
+    if (!payload) {
+      renderAll();
+      return;
+    }
+    showError(false);
+    $('chartSkel').style.display = 'none';
+    renderStrip();
+    renderPanel();
+    renderBottom();
+    drawChart();
+  }
+
   function selectSymbol(symbol) {
     if (!bySymbol().has(symbol) && !ORDER.includes(symbol)) return;
     selected = symbol;
@@ -808,12 +925,17 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     renderAll();
   }
 
+  function dataUrl() {
+    return DATA_URL + '?t=' + Math.floor(Date.now() / REFRESH_MS);
+  }
+
   async function loadData() {
     try {
-      const res = await fetch(DATA_URL, { cache: 'no-cache' });
+      const res = await fetch(dataUrl(), { cache: 'no-store', credentials: 'omit' });
       if (!res.ok) return null;
       const json = await res.json();
       if (!json || !Array.isArray(json.symbols)) return null;
+      lastFetchMs = Date.now();
       return json;
     } catch (err) {
       return null;
@@ -851,10 +973,25 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 
   async function refreshData() {
     if (isLoopbackHost()) return;
+    if (document.visibilityState === 'hidden') return;
     const data = await loadData();
     if (!data) return;
+    if (payload && payload.generated_utc === data.generated_utc) return;
     payload = data;
-    renderAll();
+    renderLive();
+  }
+
+  function armRefresh() {
+    clearTimeout(refreshTimer);
+    refreshTimer = 0;
+    if (isLoopbackHost()) return;
+    const now = Date.now();
+    const nextSlot = Math.floor(now / REFRESH_MS) * REFRESH_MS + REFRESH_MS;
+    const delay = Math.max(4000, nextSlot + REFRESH_LAG_MS - now);
+    refreshTimer = setTimeout(async () => {
+      await refreshData();
+      armRefresh();
+    }, delay);
   }
 
   async function boot() {
@@ -874,10 +1011,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       if (bySymbol().has(fromHash)) selected = fromHash;
     }
     renderAll();
-    if (!isLoopbackHost()) {
-      clearInterval(refreshTimer);
-      refreshTimer = setInterval(refreshData, REFRESH_MS);
-    }
+    armRefresh();
   }
 
   $('btnTr').addEventListener('click', () => {
@@ -892,10 +1026,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     try { localStorage.setItem('lang', 'en'); } catch {}
     renderAll();
   });
+  $('range24h').addEventListener('click', () => setRange('24h'));
+  $('range1h').addEventListener('click', () => setRange('1w'));
   $('filter').addEventListener('input', event => {
     filterQuery = event.target.value || '';
     renderPanel();
   });
+  $('panelList').addEventListener('scroll', syncPanelOverflow, { passive: true });
   $('panelList').addEventListener('click', event => {
     const row = event.target.closest('[data-symbol]');
     if (!row) return;
@@ -908,7 +1045,15 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   });
   addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(drawChart, 80);
+    resizeTimer = setTimeout(() => {
+      drawChart();
+      syncPanelOverflow();
+    }, 80);
+  });
+  addEventListener('visibilitychange', () => {
+    if (document.visibilityState !== 'visible') return;
+    if (isLoopbackHost()) return;
+    if (Date.now() - lastFetchMs >= REFRESH_MS - 5000) refreshData();
   });
   addEventListener('hashchange', () => {
     const next = (location.hash || '').replace(/^#/, '').toUpperCase();
