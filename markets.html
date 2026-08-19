@@ -428,6 +428,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   let chart = null;
   let filterQuery = '';
   let resizeTimer = 0;
+  let refreshTimer = 0;
+  const REFRESH_MS = 5 * 60 * 1000;
 
   function t() { return STR[lang]; }
 
@@ -847,6 +849,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     return host === '127.0.0.1' || host === 'localhost' || host === '[::1]';
   }
 
+  async function refreshData() {
+    if (isLoopbackHost()) return;
+    const data = await loadData();
+    if (!data) return;
+    payload = data;
+    renderAll();
+  }
+
   async function boot() {
     const fromHash = (location.hash || '').replace(/^#/, '').toUpperCase();
     if (ORDER.includes(fromHash)) selected = fromHash; // we'll re-check after payload loads
@@ -864,6 +874,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       if (bySymbol().has(fromHash)) selected = fromHash;
     }
     renderAll();
+    if (!isLoopbackHost()) {
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(refreshData, REFRESH_MS);
+    }
   }
 
   $('btnTr').addEventListener('click', () => {
