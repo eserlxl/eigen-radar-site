@@ -183,7 +183,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(max-width:640px){
     .topic-switch{
       order:3;width:100%;margin:0;display:grid;align-items:start;
-      grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto minmax(0,1fr) minmax(0,1fr);
+      grid-template-columns:repeat(5,minmax(0,1fr));
       gap:2px;padding:0;border:0;background:transparent;
     }
     .topic-btn,.markets-nav{
@@ -196,8 +196,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .topic-label{
       font-size:clamp(.6rem,2.65vw,.68rem);line-height:1;letter-spacing:-.015em;
     }
-    .markets-nav{padding:6px 3px 8px}
-    .markets-nav .topic-label{display:none}
   }
 
 

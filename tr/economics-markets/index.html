@@ -256,11 +256,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .topic-btn[data-topic="economics-markets"]{--desk:var(--desk-eco-hi)}
   .topic-btn[data-topic="science"]{--desk:var(--desk-sci-hi)}
   .markets-nav{--desk:var(--desk-eco-hi);color:var(--desk-eco-hi);margin-left:0}
-  @media(max-width:640px),
-    (min-width:641px) and (max-width:1000px) and (max-height:500px) and (orientation:landscape){
-    .markets-nav{padding:6px 3px 8px}
-    .markets-nav .topic-label{display:none}
-  }
   /* Regulatory notice — must read as a warning, not as decoration. */
   .disclaimer{
     max-width:var(--page-max);margin:0 auto 18px;padding:12px 16px;
@@ -926,7 +921,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .header-right{margin-left:auto;gap:7px}
     .topic-switch{
       order:3;width:100%;margin:0;display:grid;align-items:start;
-      grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto minmax(0,1fr) minmax(0,1fr);
+      grid-template-columns:repeat(5,minmax(0,1fr));
       gap:2px;padding:0;border:0;background:transparent;
     }
     .topic-btn,.markets-nav{
