@@ -90,8 +90,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;min-width:0}
   .ranges{display:flex;gap:6px;flex-wrap:wrap;margin:0}
   .range-btn{min-height:36px;padding:4px 12px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap}
-  .chart-updated{margin-left:auto;text-align:right;flex:0 1 auto}
-  .chart-updated:empty{display:none}
+  .chart-updated{display:none;margin-left:auto;align-items:center;gap:5px;text-align:right;flex:0 0 auto;white-space:nowrap}
+  .chart-updated.is-on{display:inline-flex}
+  .chart-updated-icon{width:14px;height:14px;flex:0 0 auto}
   .range-btn[aria-pressed="true"]{color:var(--accent);background:var(--accent-soft);border-color:var(--accent);font-weight:700}
   .range-btn:disabled{opacity:.45;cursor:not-allowed}
   .chart-frame{position:relative;flex:1 1 auto;min-height:24rem;height:24rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);overflow:hidden}
@@ -311,7 +312,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
           <button class="range-btn" type="button" id="range1a" disabled>Aylık</button>
           <button class="range-btn" type="button" id="range1y" disabled>Yıllık</button>
         </div>
-        <p class="meta chart-updated" id="updated"></p>
+        <p class="meta chart-updated" id="updated">
+          <svg class="chart-updated-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.25-6"/><path d="M21 3v6h-6"/></svg>
+          <span id="updatedTime"></span>
+        </p>
       </div>
       <div class="chart-frame">
         <div class="skel" id="chartSkel"></div>
@@ -421,10 +425,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       updated: 'Son güncelleme',
       model: '24 saatlik model öngörüsü',
       livePending: 'Henüz yeterli gerçekleşme yok',
-      livePath: 'MAPE*',
+      livePath: 'MAPE',
       liveBand: 'Aralık doğruluğu',
       liveSafety: 'Güven',
-      liveMape: '* MAPE: 24 saatlik hareketli verideki ortalama mutlak yüzde hata.',
+      liveMape: 'MAPE: 24 saatlik hareketli verideki ortalama mutlak yüzde hata.',
       liveSafetyNote: 'Güven: Modelin 24 saatlik öngörü doğruluğu oranı.',
       backtest: 'Geriye dönük sınama',
       hours: 'saat',
@@ -437,18 +441,18 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
         BNBUSDT: 'BNB', SOLUSDT: 'Solana', XRPUSDT: 'XRP', DOGEUSDT: 'Dogecoin'
       },
       blurb: {
-        XAUUSDT: 'Ons altının USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki peşin altın kotasyonlarının bileşik bir göstergesini yansıtır.',
-        XAGUSDT: 'Ons gümüşün USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki peşin gümüş kotasyonlarının bileşik bir göstergesini yansıtır.',
+        XAUUSDT: 'Ons altının USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki peşin altın fiyatlamalarının bileşik bir göstergesini yansıtır.',
+        XAGUSDT: 'Ons gümüşün USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki peşin gümüş fiyatlamalarının bileşik bir göstergesini yansıtır.',
         PAXGUSDT: 'PAX Gold, fiziksel altına bağlı bir belirtecin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, bu belirtecin piyasadaki bileşik peşin değerini yansıtır.',
         XAUTUSDT: 'Tether Gold, fiziksel altına bağlı bir belirtecin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, bu belirtecin piyasadaki bileşik peşin değerini yansıtır.',
         BZUSDT: 'Brent ham petrolünün varil başına USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, Kuzey Denizi Brent sözleşmesine dayanan bileşik bir peşin göstergesini yansıtır.',
         CLUSDT: 'Batı Teksas (WTI) ham petrolünün varil başına USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, ABD WTI sözleşmesine dayanan bileşik bir peşin göstergesini yansıtır.',
-        BTCUSDT: 'Bitcoin’in USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Bitcoin/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
-        ETHUSDT: 'Ethereum’un USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Ethereum/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
-        BNBUSDT: 'BNB’nin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki BNB/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
-        SOLUSDT: 'Solana’nın USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Solana/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
-        XRPUSDT: 'XRP’nin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki XRP/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.',
-        DOGEUSDT: 'Dogecoin’in USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Dogecoin/USDT peşin kotasyonlarının bileşik bir göstergesini yansıtır.'
+        BTCUSDT: 'Bitcoin’in USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Bitcoin/USDT peşin fiyatlamalarının bileşik bir göstergesini yansıtır.',
+        ETHUSDT: 'Ethereum’un USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Ethereum/USDT peşin fiyatlamalarının bileşik bir göstergesini yansıtır.',
+        BNBUSDT: 'BNB’nin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki BNB/USDT peşin fiyatlamalarının bileşik bir göstergesini yansıtır.',
+        SOLUSDT: 'Solana’nın USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Solana/USDT peşin fiyatlamalarının bileşik bir göstergesini yansıtır.',
+        XRPUSDT: 'XRP’nin USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki XRP/USDT peşin fiyatlamalarının bileşik bir göstergesini yansıtır.',
+        DOGEUSDT: 'Dogecoin’in USDT cinsinden sürekli vadeli endeks fiyatıdır. Okuma, birkaç piyasadaki Dogecoin/USDT peşin fiyatlamalarının bileşik bir göstergesini yansıtır.'
       }
     },
     en: {
@@ -482,10 +486,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       updated: 'Last updated',
       model: '24-hour model forecast',
       livePending: 'Not enough outcomes yet',
-      livePath: 'MAPE*',
+      livePath: 'MAPE',
       liveBand: 'Range hit',
       liveSafety: 'Safety',
-      liveMape: '* MAPE: mean absolute percentage error on 24-hour rolling data.',
+      liveMape: 'MAPE: mean absolute percentage error on 24-hour rolling data.',
       liveSafetyNote: 'Safety: the model’s 24-hour forecast accuracy rate.',
       backtest: 'Holdout backtest',
       hours: 'hours',
@@ -548,6 +552,33 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 
   function locale() { return lang === 'tr' ? 'tr-TR' : 'en-US'; }
 
+  function formatUpdatedStamp(when) {
+    if (lang === 'tr') {
+      return new Intl.DateTimeFormat('tr-TR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+        timeZone: 'Europe/Istanbul'
+      }).format(when) + ' TSİ';
+    }
+    const parts = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+      timeZone: 'UTC'
+    }).formatToParts(when);
+    let hour = '';
+    let minute = '';
+    let dayPeriod = '';
+    parts.forEach(part => {
+      if (part.type === 'hour') hour = part.value;
+      if (part.type === 'minute') minute = part.value;
+      if (part.type === 'dayPeriod') dayPeriod = part.value;
+    });
+    const meridiem = /p/i.test(dayPeriod) ? 'p.m.' : 'a.m.';
+    return `${hour}:${minute} ${meridiem} UTC`;
+  }
+
   function badgeSVG(symbol) {
     const mark = MARK[symbol] || symbol.replace(/USDT$/, '');
     const size = mark.length > 3 ? 7.2 : mark.length === 1 ? 12 : 8;
@@ -582,6 +613,24 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(n) + '%';
+  }
+
+  function setUpdatedStamp(stamp) {
+    const el = $('updated');
+    const timeEl = $('updatedTime');
+    if (!el || !timeEl) return;
+    if (!stamp) {
+      timeEl.textContent = '';
+      el.classList.remove('is-on');
+      el.removeAttribute('title');
+      el.removeAttribute('aria-label');
+      return;
+    }
+    const label = `${t().updated}: ${stamp}`;
+    timeEl.textContent = stamp;
+    el.classList.add('is-on');
+    el.setAttribute('title', label);
+    el.setAttribute('aria-label', label);
   }
 
   function formatNum(n, digits) {
@@ -763,15 +812,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     if (payload && payload.generated_utc) {
       const when = new Date(payload.generated_utc);
       if (!Number.isNaN(when.getTime())) {
-        const stamp = new Intl.DateTimeFormat(locale(), {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-          timeZone: lang === 'tr' ? 'Europe/Istanbul' : undefined
-        }).format(when);
-        updated = `${s.updated}: ${stamp}`;
+        updated = formatUpdatedStamp(when);
       }
     }
-    $('updated').textContent = updated;
+    setUpdatedStamp(updated);
     const fc = item && item.forecast ? item.forecast : {};
     const bt = fc.backtest || {};
     const horizon = Number(fc.horizon_hours) || 24;
@@ -1009,7 +1053,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     if (!payload) {
       showError(true);
       $('blurb').textContent = '';
-      $('updated').textContent = '';
+      setUpdatedStamp('');
       $('modelNote').textContent = '';
       const live = $('liveScore');
       if (live) live.textContent = '';
