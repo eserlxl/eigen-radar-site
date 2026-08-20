@@ -1742,7 +1742,7 @@ function detectTopic(){
 }
 let TOPIC = detectTopic();
 function topicMeta(id){ return TOPICS.find(t=>t.id===id) || TOPICS[0]; }
-function nextTopic(){ return TOPICS[(TOPICS.findIndex(t=>t.id===TOPIC)+1)%TOPICS.length]; }
+function nextTopic(){ return TOPIC==='economics-markets' ? {id:'markets', label:{tr:UI.tr.markets, en:UI.en.markets}} : TOPICS[(TOPICS.findIndex(t=>t.id===TOPIC)+1)%TOPICS.length]; }
 // An article's topic comes from its writer; a news item carries its own, defaulting to
 // 'ai' so the pre-topic archive still lands under the AI desk.
 function knownTopic(value){
@@ -1979,7 +1979,7 @@ function renderChrome(){
   $('footerContent').innerHTML = u.footer;
   (function(){var r=function(s){return s.split('').reverse().join('')};document.querySelectorAll('a[data-mu]').forEach(function(a){var v=r(a.getAttribute('data-mu'))+String.fromCharCode(64)+r(a.getAttribute('data-mh'));a.href='mailto:'+v;var s=a.querySelector('span');if(s){s.textContent=v}a.setAttribute('aria-label',a.getAttribute('data-label')+': '+v);a.removeAttribute('data-mu');a.removeAttribute('data-mh')})})();
   const next = nextTopic();
-  $('homeLink').href = topicRoute(next.id, LANG);
+  $('homeLink').href = next.id === 'markets' ? '/markets' : topicRoute(next.id, LANG);
   $('homeLink').setAttribute('aria-label', `${u.nextTopic}: ${next.label[LANG]}`);
   $('archiveLink').href = `/${LANG}/archive/`;
   $('archiveLabel').textContent = u.archive;
@@ -3682,11 +3682,14 @@ function syncFromHash(){
   showArticle(a, true);
 }
 $('readerBack').addEventListener('click', closeArticle);
-/* The logo cycles desks. Its href remains the next canonical route for modified clicks. */
+/* The logo cycles the header stops, including Piyasalar. Desk stops stay in-page;
+   the markets stop follows its href. Modified clicks always use that href. */
 $('homeLink').addEventListener('click', e => {
   if (!isPlainClick(e) || TOPIC_IDS.has(ROUTE_TOPIC)) return;
+  const next = nextTopic();
+  if (next.id === 'markets') return;
   e.preventDefault();
-  setTopic(nextTopic().id);
+  setTopic(next.id);
   window.scrollTo(0, 0);
 });
 /* The hash id was designed to be shared; this is its one-tap affordance. Native share
