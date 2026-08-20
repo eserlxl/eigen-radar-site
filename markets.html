@@ -873,8 +873,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const mape = Number(bt.mape);
     const hold = Number(bt.holdout_hours) || horizon;
     
-    const trNote = 'Kesikli çizgi 24 saatlik model öngörüsüdür. Gölge, canlı MAPE kadar tipik hatadır.';
-    const enNote = 'The dashed line is the 24-hour model forecast. The shade is the typical error at the live MAPE.';
+    const trNote = 'Kesikli çizgi 24 saatlik model öngörüsüdür. Gölge, canlı MAPE/2 kadar tipik hatadır.';
+    const enNote = 'The dashed line is the 24-hour model forecast. The shade is the typical error at live MAPE/2.';
     const extraNote = lang === 'tr' ? trNote : enNote;
 
     $('modelNote').textContent = `${s.model}. ${s.backtest} (${hold} ${s.hours}): RMSE ${formatNum(rmse, 4)} · MAPE ${formatPct(mape)}. ${extraNote}`;
@@ -1017,7 +1017,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const y = Number(price);
     const m = Number(mapePct);
     if (!Number.isFinite(y) || y <= 0 || !Number.isFinite(m) || m < 0) return null;
-    const frac = m / 100;
+    const frac = m / 200;
     return { y, lo: y * (1 - frac), hi: y * (1 + frac) };
   }
 
