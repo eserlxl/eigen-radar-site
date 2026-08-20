@@ -11,7 +11,7 @@ document.documentElement.dataset.theme=t;document.documentElement.style.colorSch
 document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0':'#040711'})();
 </script>
 <title>Piyasalar / Markets — Eigen Radar</title>
-<meta name="description" content="Emtia ve kripto endeks fiyatları ile 24 saatlik model projeksiyonu. Commodity and crypto index prices with a 24-hour model forecast.">
+<meta name="description" content="Emtia ve kripto endeks fiyatları ile 24 saatlik model öngörüsü. Commodity and crypto index prices with a 24-hour model forecast.">
 <link rel="canonical" href="https://eigenradar.com/markets">
 <link rel="alternate" type="application/rss+xml" title="Eigen Radar RSS" href="/feed.xml">
 <meta name="robots" content="index,follow,max-image-preview:large">
@@ -19,7 +19,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 <meta property="og:site_name" content="Eigen Radar">
 <meta property="og:url" content="https://eigenradar.com/markets">
 <meta property="og:title" content="Piyasalar / Markets — Eigen Radar">
-<meta property="og:description" content="Emtia ve kripto endeks fiyatları ile 24 saatlik model projeksiyonu. Commodity and crypto index prices with a 24-hour model forecast.">
+<meta property="og:description" content="Emtia ve kripto endeks fiyatları ile 24 saatlik model öngörüsü. Commodity and crypto index prices with a 24-hour model forecast.">
 <meta property="og:image" content="https://eigenradar.com/assets/icon-512.png">
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
@@ -87,8 +87,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--muted)}
   .stage{display:grid;grid-template-columns:minmax(0,1fr) 17.5rem;gap:16px;align-items:stretch;min-height:28.5rem;margin-top:14px}
   .chart-col{min-width:0;display:flex;flex-direction:column;min-height:28.5rem}
-  .ranges{display:flex;gap:6px;margin-bottom:8px}
-  .range-btn{min-height:36px;padding:4px 12px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--muted);cursor:pointer}
+  .chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;min-width:0}
+  .ranges{display:flex;gap:6px;flex-wrap:wrap;margin:0}
+  .range-btn{min-height:36px;padding:4px 12px;border:1px solid var(--line);border-radius:99px;background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap}
+  .chart-updated{margin-left:auto;text-align:right;flex:0 1 auto}
+  .chart-updated:empty{display:none}
   .range-btn[aria-pressed="true"]{color:var(--accent);background:var(--accent-soft);border-color:var(--accent);font-weight:700}
   .range-btn:disabled{opacity:.45;cursor:not-allowed}
   .chart-frame{position:relative;flex:1 1 auto;min-height:24rem;height:24rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);overflow:hidden}
@@ -140,8 +143,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .row-name{flex:1 1 auto;min-width:0;font-size:.86rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .row-px{font-variant-numeric:tabular-nums;font-size:.8rem;color:var(--muted)}
   .badge{flex:0 0 auto;display:block;width:32px;height:32px;object-fit:contain}
-  .bottom{margin-top:18px;display:grid;gap:8px}
-  .blurb{color:var(--text);max-width:62ch}
+  .bottom{margin-top:18px;display:grid;grid-template-columns:minmax(0,1fr) 17.5rem;column-gap:16px;row-gap:8px}
+  .live-score-wrap,.blurb,.model-note{grid-column:1}
+  .legal{grid-column:1 / -1}
+  .blurb{color:var(--text)}
   .meta{color:var(--muted);font-size:.86rem}
   .model-note{color:var(--muted);font-size:.75rem}
   .live-score{color:var(--text);font-size:.82rem;font-variant-numeric:tabular-nums}
@@ -152,7 +157,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(min-width:1920px){html{font-size:112.5%}}
   @media(min-width:2560px){html{font-size:125%}}
   @media(max-width:900px){
-    .stage{grid-template-columns:1fr}
+    .stage,.bottom{grid-template-columns:1fr}
     .panel{max-height:none;min-height:0}
     .panel-body,.panel-list{max-height:18rem}
   }
@@ -169,6 +174,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .strip-price{font-size:1.05rem}
     .chart-frame{min-height:18rem;height:18rem}
     .chart-col,.stage{min-height:0}
+    .range-btn{padding:4px 8px;font-size:.78rem}
     .filter{width:7.4rem}
   }
   @media(max-width:360px){
@@ -298,15 +304,18 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   </div>
   <div class="stage" id="stage">
     <section class="chart-col" aria-label="Fiyat grafiği">
-      <div class="ranges" role="group" aria-label="Zaman aralığı">
-        <button class="range-btn" type="button" id="range24h" aria-pressed="true">24S</button>
-        <button class="range-btn" type="button" id="range1h" aria-pressed="false">1H</button>
-        <button class="range-btn" type="button" id="range1a" disabled>1A</button>
-        <button class="range-btn" type="button" id="range1y" disabled>1Y</button>
+      <div class="chart-toolbar">
+        <div class="ranges" role="group" aria-label="Zaman aralığı">
+          <button class="range-btn" type="button" id="range24h" aria-pressed="true">Günlük</button>
+          <button class="range-btn" type="button" id="range1h" aria-pressed="false">Haftalık</button>
+          <button class="range-btn" type="button" id="range1a" disabled>Aylık</button>
+          <button class="range-btn" type="button" id="range1y" disabled>Yıllık</button>
+        </div>
+        <p class="meta chart-updated" id="updated"></p>
       </div>
       <div class="chart-frame">
         <div class="skel" id="chartSkel"></div>
-        <div id="chart" role="img" aria-label="Fiyat ve tahmin grafiği"></div>
+        <div id="chart" role="img" aria-label="Fiyat ve kestirim grafiği"></div>
         <div class="forecast-bg" id="forecastBg">
           <div class="forecast-label" id="forecastLabel"></div>
           <div class="forecast-future" id="forecastFuture"></div>
@@ -337,9 +346,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     <div class="live-score-wrap">
       <p class="live-score" id="liveScore"></p>
       <p class="live-score-note" id="liveScoreNote"></p>
+      <p class="live-score-note" id="liveSafetyNote"></p>
     </div>
     <p class="blurb" id="blurb"></p>
-    <p class="meta" id="updated"></p>
     <p class="model-note" id="modelNote"></p>
     <p class="legal" id="legal"></p>
   </div>
@@ -391,32 +400,37 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       linksLabel: 'Site',
       langLabel: 'Sayfa dili',
       chartLabel: 'Fiyat grafiği',
-      chartAria: 'Fiyat ve tahmin grafiği',
+      chartAria: 'Fiyat ve kestirim grafiği',
       rangeLabel: 'Zaman aralığı',
-      range24: '24S',
+      range24: 'Günlük',
       range24Hint: '24 saat',
-      rangeWeek: '1H',
+      rangeWeek: 'Haftalık',
       weekHint: '1 hafta',
+      rangeMonth: 'Aylık',
+      monthHint: '1 ay',
+      rangeYear: 'Yıllık',
+      yearHint: '1 yıl',
       accumulating: 'veri birikiyor',
       panel: 'Varlıklar',
       filter: 'Ad veya kod',
       commodities: 'Emtia',
       crypto: 'Kripto',
-      forecast: 'tahmin',
-      forecastZone: '24 saatlik tahmin',
+      forecast: 'kestirim',
+      forecastZone: '24 saatlik kestirim',
       future: 'Gelecek',
       updated: 'Son güncelleme',
-      model: '24 saatlik model projeksiyonu',
+      model: '24 saatlik model öngörüsü',
       livePending: 'Henüz yeterli gerçekleşme yok',
       livePath: 'MAPE*',
-      liveBand: 'Aralık isabeti',
+      liveBand: 'Aralık doğruluğu',
       liveSafety: 'Güven',
-      liveMape: '* MAPE: 24 saatlik hareketli verideki ortalama mutlak yüzde hata. Güven: hata, yüzde değişime eşitlenince veya geçince 0.',
+      liveMape: '* MAPE: 24 saatlik hareketli verideki ortalama mutlak yüzde hata.',
+      liveSafetyNote: 'Güven: Modelin 24 saatlik öngörü doğruluğu oranı.',
       backtest: 'Geriye dönük sınama',
       hours: 'saat',
       error: 'Veri şu an alınamıyor',
       retry: 'Yeniden dene',
-      legal: 'Bu sayfadaki fiyat verileri ve model projeksiyonları yalnızca bilgilendirme amaçlıdır; yatırım tavsiyesi değildir. Veriler 5 dakikaya kadar gecikmeli olabilir.',
+      legal: 'Bu sayfadaki fiyat verileri ve model öngörüleri yalnızca bilgilendirme amaçlıdır; yatırım tavsiyesi değildir. Veriler 5 dakikaya kadar gecikmeli olabilir.',
       names: {
         XAUUSDT: 'Altın', XAGUSDT: 'Gümüş', PAXGUSDT: 'PAX Gold', XAUTUSDT: 'Tether Gold',
         BZUSDT: 'Brent', CLUSDT: 'WTI', BTCUSDT: 'Bitcoin', ETHUSDT: 'Ethereum',
@@ -449,10 +463,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       chartLabel: 'Price chart',
       chartAria: 'Price and forecast chart',
       rangeLabel: 'Time range',
-      range24: '24H',
+      range24: 'Daily',
       range24Hint: '24 hours',
-      rangeWeek: '1W',
+      rangeWeek: 'Weekly',
       weekHint: '1 week',
+      rangeMonth: 'Monthly',
+      monthHint: '1 month',
+      rangeYear: 'Yearly',
+      yearHint: '1 year',
       accumulating: 'data accumulating',
       panel: 'Assets',
       filter: 'Name or code',
@@ -462,17 +480,18 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       forecastZone: '24-hour forecast',
       future: 'Future',
       updated: 'Last updated',
-      model: '24-hour model projection',
+      model: '24-hour model forecast',
       livePending: 'Not enough outcomes yet',
       livePath: 'MAPE*',
       liveBand: 'Range hit',
       liveSafety: 'Safety',
-      liveMape: '* MAPE: mean absolute percentage error on 24-hour rolling data. Safety: 0 when error meets or exceeds the percent move.',
+      liveMape: '* MAPE: mean absolute percentage error on 24-hour rolling data.',
+      liveSafetyNote: 'Safety: the model’s 24-hour forecast accuracy rate.',
       backtest: 'Holdout backtest',
       hours: 'hours',
       error: 'Data is currently unavailable',
       retry: 'Retry',
-      legal: 'Prices and model projections on this page are for information only and are not investment advice. Data may be delayed by up to 5 minutes.',
+      legal: 'Prices and model forecasts on this page are for information only and are not investment advice. Data may be delayed by up to 5 minutes.',
       names: {
         XAUUSDT: 'Gold', XAGUSDT: 'Silver', PAXGUSDT: 'PAX Gold', XAUTUSDT: 'Tether Gold',
         BZUSDT: 'Brent', CLUSDT: 'WTI', BTCUSDT: 'Bitcoin', ETHUSDT: 'Ethereum',
@@ -645,8 +664,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     $('chart').setAttribute('aria-label', s.chartAria);
     document.querySelector('.ranges').setAttribute('aria-label', s.rangeLabel);
     applyRangeButtons();
-    $('range1a').title = s.accumulating;
-    $('range1y').title = s.accumulating;
     $('panelTitle').textContent = s.panel;
     $('filter').placeholder = s.filter;
     $('filter').setAttribute('aria-label', s.filter);
@@ -762,13 +779,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const mape = Number(bt.mape);
     const hold = Number(bt.holdout_hours) || horizon;
     
-    const trNote = 'Kesikli çizgi 24 saatlik model projeksiyonudur.';
-    const enNote = 'The dashed line is the 24-hour model projection.';
+    const trNote = 'Kesikli çizgi 24 saatlik model öngörüsüdür.';
+    const enNote = 'The dashed line is the 24-hour model forecast.';
     const extraNote = lang === 'tr' ? trNote : enNote;
 
     $('modelNote').textContent = `${s.model}. ${s.backtest} (${hold} ${s.hours}): RMSE ${formatNum(rmse, 4)} · MAPE ${formatPct(mape)}. ${extraNote}`;
     const live = $('liveScore');
     const note = $('liveScoreNote');
+    const safetyNote = $('liveSafetyNote');
     if (!live) return;
     try {
       const raw = item && item.score;
@@ -785,9 +803,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       const hasMape = Number.isFinite(mape);
       live.textContent = bits.length ? bits.join(' · ') : s.livePending;
       if (note) note.textContent = bits.length && hasMape ? s.liveMape : '';
+      if (safetyNote) safetyNote.textContent = bits.length && hasMape ? s.liveSafetyNote : '';
     } catch (err) {
       live.textContent = s.livePending;
       if (note) note.textContent = '';
+      if (safetyNote) safetyNote.textContent = '';
     }
   }
 
@@ -795,6 +815,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const s = t();
     const btn24 = $('range24h');
     const btnWeek = $('range1h');
+    const btnMonth = $('range1a');
+    const btnYear = $('range1y');
     if (btn24) {
       btn24.textContent = s.range24;
       btn24.title = s.range24Hint;
@@ -804,6 +826,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       btnWeek.textContent = s.rangeWeek;
       btnWeek.title = s.weekHint;
       btnWeek.setAttribute('aria-pressed', String(rangeKey === '1w'));
+    }
+    if (btnMonth) {
+      btnMonth.textContent = s.rangeMonth;
+      btnMonth.title = s.accumulating;
+    }
+    if (btnYear) {
+      btnYear.textContent = s.rangeYear;
+      btnYear.title = s.accumulating;
     }
   }
 
@@ -985,6 +1015,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       if (live) live.textContent = '';
       const note = $('liveScoreNote');
       if (note) note.textContent = '';
+      const safetyNote = $('liveSafetyNote');
+      if (safetyNote) safetyNote.textContent = '';
       return;
     }
     showError(false);
