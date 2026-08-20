@@ -28,7 +28,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --bg:#040711;--bg-soft:#090f1c;--card:#0b111f;--card-hover:#101827;--line:#4b659f;
     --text:#d9e9fb;--muted:#b4aca0;--accent:#5ee3d7;--accent-soft:rgba(94,227,215,.08);
     --amber:#d6c08c;--scheme:dark;--focus:#fff;--on-accent:#040711;
-    --drawer-shadow:rgba(0,0,0,.35);--up:#5ee3d7;--down:#f07178;--band:rgba(94,227,215,.16);
+    --drawer-shadow:rgba(0,0,0,.35);--up:#5ee3d7;--down:#f07178;--band:rgba(176,184,198,.28);
     --desk-ai:#2aa79e;--desk-ai-hi:#5ee3d7;--desk-geo:#4b659f;--desk-geo-hi:#8aa0d4;
     --desk-eco:#b8954a;--desk-eco-hi:#d6c08c;--desk-sci:#5b5fd6;--desk-sci-hi:#a5b4fc;
     --page-max:70rem;--radius:14px;
@@ -37,7 +37,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --bg:#c7d2e0;--bg-soft:#d8e2ed;--card:#dde6ef;--card-hover:#d1dce8;--line:#71859d;
     --text:#111827;--muted:#405269;--accent:#005f5a;--accent-soft:rgba(0,95,90,.12);
     --amber:#854100;--scheme:light;--focus:#0f172a;--on-accent:#fff;
-    --drawer-shadow:rgba(15,23,42,.22);--up:#005f5a;--down:#b42318;--band:rgba(0,95,90,.14);
+    --drawer-shadow:rgba(15,23,42,.22);--up:#005f5a;--down:#b42318;--band:rgba(55,71,90,.18);
     --desk-ai:#005f5a;--desk-ai-hi:#0f766e;--desk-geo:#3f56ad;--desk-geo-hi:#4f6cc4;
     --desk-eco:#854100;--desk-eco-hi:#a35200;--desk-sci:#4338ca;--desk-sci-hi:#4f46e5;
   }
@@ -108,11 +108,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .range-btn[aria-pressed="true"]{color:var(--accent);background:var(--accent-soft);border-color:var(--accent);font-weight:700}
   .range-btn:disabled{opacity:.45;cursor:not-allowed}
   .chart-frame{position:relative;flex:1 1 auto;min-height:24rem;height:24rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);overflow:hidden}
-  #chart{position:absolute;inset:0}
-  .skel{position:absolute;inset:12px;border-radius:10px;background:linear-gradient(90deg,var(--bg-soft),var(--card-hover),var(--bg-soft));background-size:200% 100%;animation:pulse 1.4s ease-in-out infinite}
+  .forecast-shade{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+  .forecast-shade path{fill:var(--band);stroke:none}
+  #chart{position:absolute;inset:0;z-index:1}
+  .skel{position:absolute;inset:12px;border-radius:10px;background:linear-gradient(90deg,var(--bg-soft),var(--card-hover),var(--bg-soft));background-size:200% 100%;animation:pulse 1.4s ease-in-out infinite;z-index:3}
   @keyframes pulse{0%{background-position:0 50%}100%{background-position:100% 50%}}
   @media (prefers-reduced-motion:reduce){.skel{animation:none}}
-  .error-panel{position:absolute;inset:0;display:none;place-items:center;padding:24px;text-align:center;background:var(--card);z-index:2}
+  .error-panel{position:absolute;inset:0;display:none;place-items:center;padding:24px;text-align:center;background:var(--card);z-index:4}
   .error-panel.is-on{display:grid}
   .error-panel p{margin-bottom:12px;color:var(--muted)}
   .retry{min-height:44px;padding:8px 16px;border:1px solid var(--line);border-radius:99px;background:var(--accent-soft);color:var(--accent);cursor:pointer;font-weight:700}
@@ -272,8 +274,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 
   .forecast-bg {
     position: absolute; display: none;
-    background: var(--accent-soft);
-    pointer-events: none; z-index: 1;
+    background: transparent;
+    pointer-events: none; z-index: 3;
     border-left: 1px dashed var(--accent);
   }
   .forecast-label {
@@ -352,6 +354,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       <div class="chart-frame">
         <div class="skel" id="chartSkel"></div>
         <div id="chart" role="img" aria-label="Fiyat ve kestirim grafiği"></div>
+        <svg class="forecast-shade" id="forecastShade" aria-hidden="true"></svg>
         <div class="forecast-bg" id="forecastBg">
           <div class="forecast-label" id="forecastLabel"></div>
           <div class="forecast-future" id="forecastFuture"></div>
@@ -460,10 +463,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       livePending: 'Henüz yeterli gerçekleşme yok',
       livePath: 'MAPE',
       liveBand: 'Aralık doğruluğu',
-      liveSafety: 'Güven',
+      liveSafety: 'Güvenilirlik',
       liveMape: 'MAPE: 24 saatlik hareketli verideki ortalama mutlak yüzde hata.',
       liveBandNote: 'Aralık doğruluğu: 24 saatlik hareketli veride gerçekleşen fiyatın öngörü bandı içinde kaldığı noktaların oranı.',
-      liveSafetyNote: 'Güven: Modelin 24 saatlik öngörü doğruluğu oranı.',
+      liveSafetyNote: 'Güvenilirlik: Modelin 24 saatlik öngörü doğruluğu oranı.',
       backtest: 'Geriye dönük sınama',
       hours: 'saat',
       error: 'Veri şu an alınamıyor',
@@ -523,10 +526,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       livePending: 'Not enough outcomes yet',
       livePath: 'MAPE',
       liveBand: 'Range hit',
-      liveSafety: 'Safety',
+      liveSafety: 'Reliability',
       liveMape: 'MAPE: mean absolute percentage error on 24-hour rolling data.',
       liveBandNote: 'Range hit: the share of points on 24-hour rolling data where the actual price stayed inside the forecast band.',
-      liveSafetyNote: 'Safety: the model’s 24-hour forecast accuracy rate.',
+      liveSafetyNote: 'Reliability: the model’s 24-hour forecast accuracy rate.',
       backtest: 'Holdout backtest',
       hours: 'hours',
       error: 'Data is currently unavailable',
@@ -870,8 +873,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const mape = Number(bt.mape);
     const hold = Number(bt.holdout_hours) || horizon;
     
-    const trNote = 'Kesikli çizgi 24 saatlik model öngörüsüdür.';
-    const enNote = 'The dashed line is the 24-hour model forecast.';
+    const trNote = 'Kesikli çizgi 24 saatlik model öngörüsüdür. Gölge, her ufuktaki model aralığıdır.';
+    const enNote = 'The dashed line is the 24-hour model forecast. The shade is the model interval at each horizon.';
     const extraNote = lang === 'tr' ? trNote : enNote;
 
     $('modelNote').textContent = `${s.model}. ${s.backtest} (${hold} ${s.hours}): RMSE ${formatNum(rmse, 4)} · MAPE ${formatPct(mape)}. ${extraNote}`;
@@ -973,7 +976,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     history.forEach(pair => include(pair[1]));
     if (Array.isArray(forecast)) {
-      forecast.forEach(point => include(point[1]));
+      forecast.forEach(point => {
+        include(point[1]);
+        include(point[2]);
+        include(point[3]);
+      });
     }
     if (!Number.isFinite(lo) || !Number.isFinite(hi)) return null;
     if (hi <= lo) {
@@ -984,12 +991,74 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     return { min: lo - pad, max: hi + pad };
   }
 
+  function clearForecastShade() {
+    const svg = $('forecastShade');
+    if (!svg) return;
+    while (svg.lastChild) svg.removeChild(svg.lastChild);
+  }
+
+  function forecastEnvelope(point) {
+    if (!Array.isArray(point) || point.length < 4) return null;
+    const y = Number(point[1]);
+    const lo = Number(point[2]);
+    const hi = Number(point[3]);
+    if (!Number.isFinite(y) || !Number.isFinite(lo) || !Number.isFinite(hi)) return null;
+    if (!(lo <= y && y <= hi)) return null;
+    return { y, lo, hi };
+  }
+
+  function shadeVertices(history, futurePoints) {
+    const out = [];
+    if (!history.length) return out;
+    const origin = history[history.length - 1];
+    const originTs = Number(origin[0]);
+    const originPx = Number(origin[1]);
+    if (Number.isFinite(originTs) && Number.isFinite(originPx) && originPx > 0) {
+      out.push({ ts: originTs, lo: originPx, hi: originPx });
+    }
+    futurePoints.forEach(point => {
+      const ts = Number(point[0]);
+      const env = forecastEnvelope(point);
+      if (!Number.isFinite(ts) || !env) return;
+      out.push({ ts, lo: env.lo, hi: env.hi });
+    });
+    return out;
+  }
+
+  function drawForecastShade(cli, bbox, width, height, history, futurePoints) {
+    const svg = $('forecastShade');
+    if (!svg || !cli || !bbox) return;
+    clearForecastShade();
+    const verts = shadeVertices(history, futurePoints);
+    if (verts.length < 2) return;
+    svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    const NS = 'http://www.w3.org/2000/svg';
+    const inner = document.createElementNS(NS, 'svg');
+    inner.setAttribute('x', String(bbox.left));
+    inner.setAttribute('y', String(bbox.top));
+    inner.setAttribute('width', String(bbox.width));
+    inner.setAttribute('height', String(bbox.height));
+    inner.setAttribute('viewBox', bbox.left + ' ' + bbox.top + ' ' + bbox.width + ' ' + bbox.height);
+    const top = [];
+    const bot = [];
+    verts.forEach(pt => {
+      const x = cli.getXLocation(new Date(pt.ts));
+      top.push(x + ',' + cli.getYLocation(pt.hi));
+      bot.push(x + ',' + cli.getYLocation(pt.lo));
+    });
+    const path = document.createElementNS(NS, 'path');
+    path.setAttribute('d', 'M' + top.join('L') + 'L' + bot.reverse().join('L') + 'Z');
+    inner.appendChild(path);
+    svg.appendChild(inner);
+  }
+
   function drawChart() {
     const frame = document.querySelector('.chart-frame');
     const host = $('chart');
     if (!chartReady || !window.google || !google.visualization || !host) return;
     const overlay = $('forecastBg');
     if (overlay) overlay.style.display = 'none';
+    clearForecastShade();
     const item = bySymbol().get(selected);
     const rawHistory = item && Array.isArray(item.history) ? item.history : [];
     const history = sliceHistory(rawHistory, RANGE_MS[rangeKey]);
@@ -1084,6 +1153,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
               lbl.textContent = t().forecastZone;
               future.textContent = t().future;
             }
+            drawForecastShade(cli, bbox, width, height, history, futurePoints);
           }
         } catch (e) {}
       });
