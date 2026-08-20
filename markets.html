@@ -873,8 +873,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     const mape = Number(bt.mape);
     const hold = Number(bt.holdout_hours) || horizon;
     
-    const trNote = 'Kesikli çizgi 24 saatlik model öngörüsüdür. Gölge, her ufuktaki model aralığıdır.';
-    const enNote = 'The dashed line is the 24-hour model forecast. The shade is the model interval at each horizon.';
+    const trNote = 'Kesikli çizgi 24 saatlik model öngörüsüdür. Gölge, canlı MAPE kadar tipik hatadır.';
+    const enNote = 'The dashed line is the 24-hour model forecast. The shade is the typical error at the live MAPE.';
     const extraNote = lang === 'tr' ? trNote : enNote;
 
     $('modelNote').textContent = `${s.model}. ${s.backtest} (${hold} ${s.hours}): RMSE ${formatNum(rmse, 4)} · MAPE ${formatPct(mape)}. ${extraNote}`;
@@ -965,7 +965,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
-  function priceWindow(history, forecast) {
+  function priceWindow(history, forecast, mapePct) {
     let lo = Infinity;
     let hi = -Infinity;
     function include(value) {
@@ -977,9 +977,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     history.forEach(pair => include(pair[1]));
     if (Array.isArray(forecast)) {
       forecast.forEach(point => {
-        include(point[1]);
-        include(point[2]);
-        include(point[3]);
+        const env = mapeEnvelope(point[1], mapePct);
+        if (env) {
+          include(env.lo);
+          include(env.hi);
+        } else {
+          include(point[1]);
+        }
       });
     }
     if (!Number.isFinite(lo) || !Number.isFinite(hi)) return null;
@@ -997,17 +1001,27 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     while (svg.lastChild) svg.removeChild(svg.lastChild);
   }
 
-  function forecastEnvelope(point) {
-    if (!Array.isArray(point) || point.length < 4) return null;
-    const y = Number(point[1]);
-    const lo = Number(point[2]);
-    const hi = Number(point[3]);
-    if (!Number.isFinite(y) || !Number.isFinite(lo) || !Number.isFinite(hi)) return null;
-    if (!(lo <= y && y <= hi)) return null;
-    return { y, lo, hi };
+  function shadeMapePct(item) {
+    const score = item && item.score && typeof item.score === 'object' ? item.score : {};
+    const mapePath = Number(score.mape_path_med_pct);
+    if (Number.isFinite(mapePath) && mapePath >= 0) return mapePath;
+    const mape24 = Number(score.mape24_med_pct);
+    if (Number.isFinite(mape24) && mape24 >= 0) return mape24;
+    const bt = item && item.forecast && item.forecast.backtest ? item.forecast.backtest : {};
+    const holdout = Number(bt.mape);
+    if (Number.isFinite(holdout) && holdout >= 0) return holdout;
+    return NaN;
   }
 
-  function shadeVertices(history, futurePoints) {
+  function mapeEnvelope(price, mapePct) {
+    const y = Number(price);
+    const m = Number(mapePct);
+    if (!Number.isFinite(y) || y <= 0 || !Number.isFinite(m) || m < 0) return null;
+    const frac = m / 100;
+    return { y, lo: y * (1 - frac), hi: y * (1 + frac) };
+  }
+
+  function shadeVertices(history, futurePoints, mapePct) {
     const out = [];
     if (!history.length) return out;
     const origin = history[history.length - 1];
@@ -1018,18 +1032,18 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     futurePoints.forEach(point => {
       const ts = Number(point[0]);
-      const env = forecastEnvelope(point);
+      const env = mapeEnvelope(point[1], mapePct);
       if (!Number.isFinite(ts) || !env) return;
       out.push({ ts, lo: env.lo, hi: env.hi });
     });
     return out;
   }
 
-  function drawForecastShade(cli, bbox, width, height, history, futurePoints) {
+  function drawForecastShade(cli, bbox, width, height, history, futurePoints, mapePct) {
     const svg = $('forecastShade');
     if (!svg || !cli || !bbox) return;
     clearForecastShade();
-    const verts = shadeVertices(history, futurePoints);
+    const verts = shadeVertices(history, futurePoints, mapePct);
     if (verts.length < 2) return;
     svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
     const NS = 'http://www.w3.org/2000/svg';
@@ -1070,6 +1084,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       const ts = Number(point[0]);
       if (Number.isFinite(ts) && ts > lastMs) futurePoints.push(point);
     });
+    const mapePct = shadeMapePct(item);
     try {
       const data = new google.visualization.DataTable();
       data.addColumn('datetime', 't');
@@ -1089,7 +1104,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
           false
         ]);
       });
-      const windowY = priceWindow(history, futurePoints);
+      const windowY = priceWindow(history, futurePoints, mapePct);
       if (!windowY) return;
       const accent = cssVar('--accent') || '#5ee3d7';
       const muted = cssVar('--muted') || '#b4aca0';
@@ -1153,7 +1168,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
               lbl.textContent = t().forecastZone;
               future.textContent = t().future;
             }
-            drawForecastShade(cli, bbox, width, height, history, futurePoints);
+            drawForecastShade(cli, bbox, width, height, history, futurePoints, mapePct);
           }
         } catch (e) {}
       });
