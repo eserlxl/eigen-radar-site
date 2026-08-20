@@ -145,6 +145,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .meta{color:var(--muted);font-size:.86rem}
   .model-note{color:var(--muted);font-size:.75rem}
   .live-score{color:var(--text);font-size:.82rem;font-variant-numeric:tabular-nums}
+  .live-score-wrap{display:grid;gap:2px}
+  .live-score-note{color:var(--muted);font-size:.72rem}
   .legal{margin-top:16px;padding:12px 16px;background:var(--accent-soft);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;font-size:.8rem;color:var(--muted)}
   @media(min-width:1440px){html{font-size:106.25%}}
   @media(min-width:1920px){html{font-size:112.5%}}
@@ -159,6 +161,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .header-inner{gap:8px}
     .logo{font-size:1.05rem}.logo-mark{width:32px;height:32px}
     .header-right{gap:7px}
+    .lang-switch{gap:2px;padding:2px}
+    .lang-btn{min-width:25px;min-height:25px;padding:2px 3px;font-size:.7rem}
     .header-links{gap:4px}
     .archive-link{min-height:36px;padding:4px 2px}
     .archive-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -171,7 +175,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .header-inner{padding-inline:8px;gap:4px}
     .header-right{gap:3px}
     .lang-switch{gap:2px;padding:2px}
-    .lang-btn{min-width:28px;min-height:34px;padding:3px 4px}
+    .lang-btn{min-width:25px;min-height:25px;padding:2px 3px;font-size:.7rem}
     .theme-switch{width:38px}
     :root[data-theme="light"] .theme-switch-thumb{transform:translateX(14px)}
   }
@@ -330,7 +334,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     </aside>
   </div>
   <div class="bottom">
-    <p class="live-score" id="liveScore"></p>
+    <div class="live-score-wrap">
+      <p class="live-score" id="liveScore"></p>
+      <p class="live-score-note" id="liveScoreNote"></p>
+    </div>
     <p class="blurb" id="blurb"></p>
     <p class="meta" id="updated"></p>
     <p class="model-note" id="modelNote"></p>
@@ -400,10 +407,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       future: 'Gelecek',
       updated: 'Son güncelleme',
       model: '24 saatlik model projeksiyonu',
-      liveScore: 'Canlı skor',
-      live24: '24s MAPE',
-      livePath: 'yol MAPE',
-      liveBand: 'bant',
+      livePending: 'Henüz yeterli gerçekleşme yok',
+      livePath: 'MAPE*',
+      liveBand: 'Aralık isabeti',
+      liveSafety: 'Güven',
+      liveMape: '* MAPE: 24 saatlik hareketli verideki ortalama mutlak yüzde hata. Güven: hata, yüzde değişime eşitlenince veya geçince 0.',
       backtest: 'Geriye dönük sınama',
       hours: 'saat',
       error: 'Veri şu an alınamıyor',
@@ -455,10 +463,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       future: 'Future',
       updated: 'Last updated',
       model: '24-hour model projection',
-      liveScore: 'Live score',
-      live24: '24h MAPE',
-      livePath: 'path MAPE',
-      liveBand: 'band',
+      livePending: 'Not enough outcomes yet',
+      livePath: 'MAPE*',
+      liveBand: 'Range hit',
+      liveSafety: 'Safety',
+      liveMape: '* MAPE: mean absolute percentage error on 24-hour rolling data. Safety: 0 when error meets or exceeds the percent move.',
       backtest: 'Holdout backtest',
       hours: 'hours',
       error: 'Data is currently unavailable',
@@ -759,26 +768,26 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 
     $('modelNote').textContent = `${s.model}. ${s.backtest} (${hold} ${s.hours}): RMSE ${formatNum(rmse, 4)} · MAPE ${formatPct(mape)}. ${extraNote}`;
     const live = $('liveScore');
+    const note = $('liveScoreNote');
     if (!live) return;
     try {
       const raw = item && item.score;
       const score = raw && typeof raw === 'object' ? raw : {};
-      const n = Math.max(0, Number(score.n) || 0);
-      const nMax = Math.max(1, Number(score.n_max) || 288);
       const bits = [];
       const mape24 = Number(score.mape24_med_pct);
       const mapePath = Number(score.mape_path_med_pct);
       const bandHit = Number(score.band_hit_pct);
-      if (Number.isFinite(mape24)) bits.push(`${s.live24} ${formatNum(mape24, 2)}%`);
-      if (Number.isFinite(mapePath)) bits.push(`${s.livePath} ${formatNum(mapePath, 2)}%`);
+      const safety = Number(score.safety);
+      const mape = Number.isFinite(mapePath) ? mapePath : mape24;
+      if (Number.isFinite(mape)) bits.push(`${s.livePath} ${formatNum(mape, 2)}%`);
       if (Number.isFinite(bandHit)) bits.push(`${s.liveBand} ${formatNum(bandHit, 1)}%`);
-      if (bits.length === 0) {
-        live.textContent = `${s.liveScore}: ${s.accumulating} (${n}/${nMax})`;
-      } else {
-        live.textContent = `${s.liveScore} (${n}/${nMax}): ${bits.join(' · ')}`;
-      }
+      if (Number.isFinite(safety)) bits.push(`${s.liveSafety} ${formatNum(safety * 100, 0)}%`);
+      const hasMape = Number.isFinite(mape);
+      live.textContent = bits.length ? bits.join(' · ') : s.livePending;
+      if (note) note.textContent = bits.length && hasMape ? s.liveMape : '';
     } catch (err) {
-      live.textContent = `${s.liveScore}: ${s.accumulating} (0/288)`;
+      live.textContent = s.livePending;
+      if (note) note.textContent = '';
     }
   }
 
@@ -974,6 +983,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       $('modelNote').textContent = '';
       const live = $('liveScore');
       if (live) live.textContent = '';
+      const note = $('liveScoreNote');
+      if (note) note.textContent = '';
       return;
     }
     showError(false);
