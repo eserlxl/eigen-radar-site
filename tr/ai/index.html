@@ -508,6 +508,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       box-shadow:inset 0 0 0 1px var(--accent)}
     .brief-reading-control-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
     .brief-reading-control-btn.brief-listen.is-speaking{background:var(--accent);color:var(--card)}
+    .brief-reading-control-btn.brief-share{width:auto;border-radius:999px;padding:0 .45rem}
     .brief-reading-control-btn.is-active{border-color:var(--accent);color:var(--accent)}
     .brief-reading-rate{width:4.2rem;accent-color:var(--accent);cursor:pointer}
     .brief-reading-rate-value{
@@ -2654,7 +2655,28 @@ function installBriefReadingControls(card, state){
       rateValue.textContent = `${value}×`;
       try { localStorage.setItem('ttsRate', String(value)); } catch {}
     });
-    controls.append(textBtn, printBtn, listenBtn, rateInput, rateValue);
+    const shareBtn = document.createElement('button');
+    shareBtn.type = 'button';
+    shareBtn.className = 'brief-reading-control-btn brief-share';
+    shareBtn.textContent = u.shareBtn;
+    shareBtn.setAttribute('aria-label', u.shareBtn);
+    shareBtn.addEventListener('click', async ()=>{
+      const payload = {
+        title: card.querySelector('.brief-content h3')?.textContent.trim() || document.title,
+        url: state.detailLink?.href || location.href,
+      };
+      if (typeof navigator.share === 'function'){
+        try { await navigator.share(payload); return; }
+        catch (error) { if (error?.name === 'AbortError') return; }
+      }
+      if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') return;
+      try {
+        await navigator.clipboard.writeText(payload.url);
+        shareBtn.textContent = u.shareCopied;
+        setTimeout(()=>{ shareBtn.textContent = UI[LANG].shareBtn; }, 2000);
+      } catch {}
+    });
+    controls.append(textBtn, printBtn, listenBtn, rateInput, rateValue, shareBtn);
     row.appendChild(controls);
     state.textSizeBtn = textBtn;
     state.listenBtn = listenBtn;
