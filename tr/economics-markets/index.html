@@ -396,16 +396,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 
   /* ---------- featured ---------- */
   .featured-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(16rem,1fr);gap:16px}
-  .brief-rail{display:grid;gap:12px;max-height:clamp(32rem,calc(100vh - 14rem),48rem);
-    overflow-y:auto;overscroll-behavior:contain;padding:2px}
-  .brief-rail-card{display:grid;grid-template-columns:7rem minmax(0,1fr);min-height:7rem}
-  .brief-rail-card .brief-media,.brief-rail-card .brief-media picture{height:100%}
-  .brief-rail-card .brief-media picture{aspect-ratio:auto}
-  .brief-rail-card .brief-content{padding:12px 14px}
-  .brief-rail-card h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
-    overflow:hidden;margin:0 0 6px;font-size:.95rem;line-height:1.35}
-  .brief-rail-card .summary{display:-webkit-box;-webkit-box-orient:vertical;
-    -webkit-line-clamp:3;overflow:hidden;margin:0;font-size:.8rem}
+  .brief-rail{display:grid;gap:16px;max-height:clamp(32rem,calc(100vh - 14rem),48rem);
+    overflow-y:auto;overscroll-behavior:contain}
   .fcard{
     background:linear-gradient(160deg,var(--card) 0%,var(--card-gradient-end) 100%);
     border:1px solid var(--line);border-radius:var(--radius);
