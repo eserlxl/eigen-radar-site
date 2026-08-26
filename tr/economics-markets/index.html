@@ -395,9 +395,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .section-title .hint{font-size:.78rem;color:var(--muted)}
 
   /* ---------- featured ---------- */
-  .featured-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(16rem,1fr);
+  .featured-grid{position:relative;display:grid;grid-template-columns:minmax(0,2fr) minmax(16rem,1fr);
     gap:16px;align-items:start}
   .brief-rail{display:grid;gap:16px;overflow-y:auto;overscroll-behavior:contain}
+  .brief-rail-cue{
+    position:absolute;right:18px;bottom:10px;z-index:4;display:grid;place-items:center;
+    width:30px;height:30px;border:1px solid var(--line);border-radius:50%;
+    background:var(--card);color:var(--accent);box-shadow:0 4px 14px var(--drawer-shadow);
+    font-size:1rem;line-height:1;pointer-events:none
+  }
+  .brief-rail-cue[hidden]{display:none}
   .fcard{
     background:linear-gradient(160deg,var(--card) 0%,var(--card-gradient-end) 100%);
     border:1px solid var(--line);border-radius:var(--radius);
@@ -2182,6 +2189,12 @@ function pageItems(items, requestedPage, pageSize){
 const BRIEF_STACK_MEDIA = matchMedia('(max-width:640px)');
 const briefFeatureHeights = new Map();
 const briefRailCardHeights = new Map();
+function syncBriefRailCue(rail){
+  const cue = rail.parentElement?.querySelector(':scope > .brief-rail-cue');
+  if (!cue) return;
+  cue.hidden = BRIEF_STACK_MEDIA.matches || rail.scrollHeight <= rail.clientHeight + 1
+    || rail.scrollTop + rail.clientHeight >= rail.scrollHeight - 1;
+}
 function syncBriefRailHeights(){
   document.querySelectorAll('.featured-grid').forEach(grid=>{
     const feature = grid.querySelector(':scope > .brief-feature');
@@ -2192,6 +2205,7 @@ function syncBriefRailHeights(){
       feature.style.minHeight = '';
       railCards.forEach(card=>card.style.height = '');
       rail.style.maxHeight = '';
+      syncBriefRailCue(rail);
       return;
     }
     feature.style.minHeight = '';
@@ -2220,6 +2234,7 @@ function syncBriefRailHeights(){
     const featureHeight = Math.ceil(feature.getBoundingClientRect().height);
     railCards.forEach(card=>card.style.height = `${railCardHeight}px`);
     rail.style.maxHeight = `${featureHeight}px`;
+    syncBriefRailCue(rail);
   });
 }
 
@@ -2250,6 +2265,7 @@ function renderBriefs(){
     rail.className = 'brief-rail';
     rail.setAttribute('aria-label', UI[LANG].featTitle);
     rail.addEventListener('wheel', event=>event.stopPropagation(), {passive:true});
+    rail.addEventListener('scroll', ()=>syncBriefRailCue(rail), {passive:true});
     items.filter(brief=>brief!==selected).forEach((brief,index)=>{
       const card = briefCard(brief, index + 1, key===selectedBriefDate, pageIndex);
       card.classList.add('brief-rail-card');
@@ -2257,6 +2273,11 @@ function renderBriefs(){
       rail.appendChild(card);
     });
     grid.appendChild(rail);
+    const railCue = document.createElement('span');
+    railCue.className = 'brief-rail-cue';
+    railCue.textContent = '↓';
+    railCue.setAttribute('aria-hidden', 'true');
+    grid.appendChild(railCue);
     page.appendChild(grid);
     track.appendChild(page);
   });
