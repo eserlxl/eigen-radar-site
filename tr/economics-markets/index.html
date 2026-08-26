@@ -445,12 +445,15 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     .featured-grid > .brief-feature.is-brief-revealed .brief-content h3{margin-top:0}
     .featured-grid > .brief-feature.is-brief-revealed .brief-preview{
-      clear:both;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--brief-reveal-gap);
-      width:100%;margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45
+      clear:both;display:block;column-count:2;column-gap:calc(var(--brief-reveal-gap) * 1.5);
+      column-rule:1px solid var(--line);width:100%;margin:.45rem 0 0;
+      color:var(--muted);font-size:.88rem;line-height:1.5
     }
-    .featured-grid > .brief-feature.is-brief-revealed .brief-preview-section{min-width:0;padding:2px}
+    .featured-grid > .brief-feature.is-brief-revealed .brief-preview-section{min-width:0;padding:0}
     .featured-grid > .brief-feature.is-brief-revealed .brief-preview h4{margin:0 0 .25rem;color:var(--text);font-size:.95rem;font-weight:700;line-height:1.3}
-    .featured-grid > .brief-feature.is-brief-revealed .brief-preview p{margin:0}
+    .featured-grid > .brief-feature.is-brief-revealed .brief-preview p{margin:0 0 .7rem}
+    .featured-grid > .brief-feature.is-brief-revealed:not(.is-brief-reading) .brief-preview-sources,
+    .featured-grid > .brief-feature.is-brief-revealed:not(.is-brief-reading) .brief-preview-full-link{display:none}
     .featured-grid > .brief-feature.is-brief-revealed::after{
       content:"…";position:absolute;z-index:3;inset:auto 0 0 0;
       display:flex;align-items:flex-end;justify-content:flex-end;
@@ -476,7 +479,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       height:auto;overflow:visible
     }
     .featured-grid > .brief-feature.is-brief-revealed.is-brief-reading .brief-preview{
-      display:block;grid-template-columns:none;margin-top:1rem;line-height:1.6
+      display:block;column-count:1;column-rule:0;margin-top:1rem;line-height:1.6
     }
     .featured-grid > .brief-feature.is-brief-revealed.is-brief-reading .brief-preview-section{
       padding:0;margin:0 0 1.1rem
@@ -2177,13 +2180,24 @@ function pageItems(items, requestedPage, pageSize){
 }
 
 const BRIEF_STACK_MEDIA = matchMedia('(max-width:640px)');
+const briefFeatureHeights = new Map();
 function syncBriefRailHeights(){
   document.querySelectorAll('.featured-grid').forEach(grid=>{
     const feature = grid.querySelector(':scope > .brief-feature');
     const rail = grid.querySelector(':scope > .brief-rail');
     if (!feature || !rail) return;
-    rail.style.maxHeight = BRIEF_STACK_MEDIA.matches
-      ? '' : `${Math.ceil(feature.getBoundingClientRect().height)}px`;
+    if (BRIEF_STACK_MEDIA.matches){
+      feature.style.minHeight = '';
+      rail.style.maxHeight = '';
+      return;
+    }
+    const rect = feature.getBoundingClientRect();
+    const edition = grid.closest('.brief-page')?.dataset.editionKey || '';
+    const key = `${TOPIC}|${edition}|${Math.round(rect.width)}`;
+    const height = Math.max(briefFeatureHeights.get(key) || 0, Math.ceil(rect.height));
+    briefFeatureHeights.set(key, height);
+    feature.style.minHeight = `${height}px`;
+    rail.style.maxHeight = `${Math.ceil(feature.getBoundingClientRect().height)}px`;
   });
 }
 
@@ -2257,6 +2271,14 @@ function revealBriefCard(card){
   if (!card.querySelector('.brief-media') || !card.querySelector('.brief-content')) return false;
   card.style.setProperty('--brief-reveal-height', `${card.getBoundingClientRect().height}px`);
   card.classList.add('is-brief-revealed');
+  const brief = findBriefById(card.dataset.briefId);
+  if (brief){
+    fetchBriefFullText(brief).then(data=>{
+      if (!card.isConnected || !card.classList.contains('is-brief-revealed')
+          || card.classList.contains('is-brief-reading')) return;
+      populateBriefPreview(ensureBriefPreview(card), data, null);
+    });
+  }
   return true;
 }
 function scheduleBriefReveal(){
@@ -2266,6 +2288,8 @@ function scheduleBriefReveal(){
   const page = briefTrackPages().find(item=>item.dataset.editionKey===selectedBriefDate);
   const card = page?.querySelector('.brief-card');
   if (!card || card.classList.contains('is-brief-revealed')) return;
+  const brief = findBriefById(card.dataset.briefId);
+  if (brief) fetchBriefFullText(brief);
   const generation = briefRevealGeneration;
   briefRevealTimer = setTimeout(()=>{
     briefRevealTimer = 0;
