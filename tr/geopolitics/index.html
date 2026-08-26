@@ -457,7 +457,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .featured-grid > .brief-feature.is-brief-revealed::after{
       content:"…";position:absolute;z-index:3;inset:auto 0 0 0;
       display:flex;align-items:flex-end;justify-content:flex-end;
-      box-sizing:border-box;height:calc(var(--brief-reveal-pad) + 6.6rem);
+      box-sizing:border-box;height:calc(var(--brief-reveal-pad) + 13.2rem);
       padding:0 var(--brief-reveal-pad) var(--brief-reveal-pad);
       background:linear-gradient(180deg,transparent,var(--card-gradient-end) 58%);
       color:var(--muted);font-size:1rem;line-height:1;pointer-events:none
@@ -2228,24 +2228,35 @@ function pageItems(items, requestedPage, pageSize){
 
 const BRIEF_STACK_MEDIA = matchMedia('(max-width:640px)');
 const briefFeatureHeights = new Map();
+const briefRailCardHeights = new Map();
 function syncBriefRailHeights(){
   document.querySelectorAll('.featured-grid').forEach(grid=>{
     const feature = grid.querySelector(':scope > .brief-feature');
     const rail = grid.querySelector(':scope > .brief-rail');
     if (!feature || !rail) return;
+    const railCards = [...rail.querySelectorAll(':scope > .brief-rail-card')];
     if (BRIEF_STACK_MEDIA.matches){
       feature.style.minHeight = '';
+      railCards.forEach(card=>card.style.height = '');
       rail.style.maxHeight = '';
       return;
     }
     feature.style.minHeight = '';
+    railCards.forEach(card=>card.style.height = '');
     const rect = feature.getBoundingClientRect();
-    const railCards = [...rail.querySelectorAll(':scope > .brief-rail-card')].slice(0, 2);
     const railGap = parseFloat(getComputedStyle(rail).rowGap) || 0;
-    const railStackHeight = railCards.reduce((sum, card)=>sum + card.getBoundingClientRect().height, 0)
-      + railGap * Math.max(0, railCards.length - 1);
+    const visibleRailCards = Math.min(2, railCards.length);
+    const naturalRailCardHeight = Math.max(0,
+      ...railCards.map(card=>card.getBoundingClientRect().height));
     const edition = grid.closest('.brief-page')?.dataset.editionKey || '';
     const key = `${TOPIC}|${edition}|${Math.round(rect.width)}`;
+    const railCardHeight = Math.max(
+      briefRailCardHeights.get(key) || 0,
+      Math.ceil(naturalRailCardHeight)
+    );
+    briefRailCardHeights.set(key, railCardHeight);
+    const railStackHeight = railCardHeight * visibleRailCards
+      + railGap * Math.max(0, visibleRailCards - 1);
     const height = Math.max(
       briefFeatureHeights.get(key) || 0,
       Math.ceil(rect.height),
@@ -2253,7 +2264,9 @@ function syncBriefRailHeights(){
     );
     briefFeatureHeights.set(key, height);
     feature.style.minHeight = `${height}px`;
-    rail.style.maxHeight = `${Math.ceil(feature.getBoundingClientRect().height)}px`;
+    const featureHeight = Math.ceil(feature.getBoundingClientRect().height);
+    railCards.forEach(card=>card.style.height = `${railCardHeight}px`);
+    rail.style.maxHeight = `${featureHeight}px`;
   });
 }
 
