@@ -2202,13 +2202,13 @@ function syncBriefRailHeights(){
     if (!feature || !rail) return;
     const railCards = [...rail.querySelectorAll(':scope > .brief-rail-card')];
     if (BRIEF_STACK_MEDIA.matches){
-      feature.style.minHeight = '';
+      feature.style.height = '';
       railCards.forEach(card=>card.style.height = '');
       rail.style.maxHeight = '';
       syncBriefRailCue(rail);
       return;
     }
-    feature.style.minHeight = '';
+    feature.style.height = '';
     railCards.forEach(card=>card.style.height = '');
     const rect = feature.getBoundingClientRect();
     const railGap = parseFloat(getComputedStyle(rail).rowGap) || 0;
@@ -2217,20 +2217,15 @@ function syncBriefRailHeights(){
       ...railCards.map(card=>card.getBoundingClientRect().height));
     const edition = grid.closest('.brief-page')?.dataset.editionKey || '';
     const key = `${TOPIC}|${edition}|${Math.round(rect.width)}`;
-    const railCardHeight = Math.max(
-      briefRailCardHeights.get(key) || 0,
-      Math.ceil(naturalRailCardHeight)
-    );
+    const railCardHeight = briefRailCardHeights.get(key)
+      || Math.ceil(naturalRailCardHeight);
     briefRailCardHeights.set(key, railCardHeight);
     const railStackHeight = railCardHeight * visibleRailCards
       + railGap * Math.max(0, visibleRailCards - 1);
-    const height = Math.max(
-      briefFeatureHeights.get(key) || 0,
-      Math.ceil(rect.height),
-      Math.ceil(railStackHeight)
-    );
+    const height = briefFeatureHeights.get(key)
+      || Math.max(Math.ceil(rect.height), Math.ceil(railStackHeight));
     briefFeatureHeights.set(key, height);
-    feature.style.minHeight = `${height}px`;
+    feature.style.height = `${height}px`;
     const featureHeight = Math.ceil(feature.getBoundingClientRect().height);
     railCards.forEach(card=>card.style.height = `${railCardHeight}px`);
     rail.style.maxHeight = `${featureHeight}px`;
