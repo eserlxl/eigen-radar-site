@@ -396,8 +396,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 
   /* ---------- featured ---------- */
   .featured-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(16rem,1fr);gap:16px}
-  .brief-rail{display:grid;gap:16px;max-height:clamp(32rem,calc(100vh - 14rem),48rem);
-    overflow-y:auto;overscroll-behavior:contain}
+  .brief-rail{display:grid;gap:16px}
   .fcard{
     background:linear-gradient(160deg,var(--card) 0%,var(--card-gradient-end) 100%);
     border:1px solid var(--line);border-radius:var(--radius);
@@ -942,7 +941,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     section{padding-left:16px;padding-right:16px}
     .featured-grid{grid-template-columns:1fr}.featured-grid > .brief-feature{grid-row:auto}
-    .brief-rail{max-height:none;overflow:visible}
+    .featured-grid > .brief-feature h3{font-size:1.05rem;line-height:1.4}
+    .featured-grid > .brief-feature .brief-content{padding:18px 22px 22px}
     #briefsSection > .section-title{
       display:flex;align-items:center;justify-content:space-between;gap:0;flex-wrap:wrap;
     }
