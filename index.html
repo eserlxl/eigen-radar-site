@@ -2500,10 +2500,19 @@ function syncBriefRailHeights(){
       rail.style.maxHeight = '';
       return;
     }
+    feature.style.minHeight = '';
     const rect = feature.getBoundingClientRect();
+    const railCards = [...rail.querySelectorAll(':scope > .brief-rail-card')].slice(0, 2);
+    const railGap = parseFloat(getComputedStyle(rail).rowGap) || 0;
+    const railStackHeight = railCards.reduce((sum, card)=>sum + card.getBoundingClientRect().height, 0)
+      + railGap * Math.max(0, railCards.length - 1);
     const edition = grid.closest('.brief-page')?.dataset.editionKey || '';
     const key = `${TOPIC}|${edition}|${Math.round(rect.width)}`;
-    const height = Math.max(briefFeatureHeights.get(key) || 0, Math.ceil(rect.height));
+    const height = Math.max(
+      briefFeatureHeights.get(key) || 0,
+      Math.ceil(rect.height),
+      Math.ceil(railStackHeight)
+    );
     briefFeatureHeights.set(key, height);
     feature.style.minHeight = `${height}px`;
     rail.style.maxHeight = `${Math.ceil(feature.getBoundingClientRect().height)}px`;
