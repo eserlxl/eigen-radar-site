@@ -1,4 +1,4 @@
-const CACHE = 'eigen-radar-shell-v19';
+const CACHE = 'eigen-radar-shell-v21';
 const SHELL = [
   '/index.html',
   '/manifest.webmanifest',
@@ -56,6 +56,21 @@ self.addEventListener('fetch', event => {
     return;
   }
   const url = new URL(event.request.url);
+  if (url.origin === self.location.origin && url.pathname.startsWith('/assets/data/') && url.pathname.endsWith('.json')) {
+    event.respondWith(
+      caches.match(event.request).then(hit => {
+        if (hit) return hit;
+        return fetch(event.request).then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            return caches.open(CACHE).then(cache => cache.put(event.request, clone)).then(() => response);
+          }
+          return response;
+        });
+      })
+    );
+    return;
+  }
   if (url.origin === self.location.origin && SHELL.includes(url.pathname)) {
     event.respondWith(caches.match(event.request).then(hit => {
       // Stale-while-revalidate: serve the cached shell asset immediately but
