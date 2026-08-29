@@ -11,7 +11,9 @@
 # dynamic rules and counted the previous 1,078 exact-path rules against that cap, so the
 # per-URL list was undeployable (deploy error 100324). Editions never exceed n=4, and a
 # Brief id must contain a letter, so the literal /2/ /3/ /4/ tails cannot collide with any
-# live route. A future distinctColumn /2/ page must add a pass-through above these rules.
+# live route. A published distinctColumn /N/ page is served past these rules by the
+# generated pass-through block above, which build.py maintains from the routes the site
+# generator actually wrote.
 /tr/:topic/:writer/:date/2/ /tr/:topic/:writer/:date/ 301
 /tr/:topic/:writer/:date/3/ /tr/:topic/:writer/:date/ 301
 /tr/:topic/:writer/:date/4/ /tr/:topic/:writer/:date/ 301
