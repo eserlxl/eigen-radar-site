@@ -3,6 +3,9 @@
 /assets/briefs/* https://media.eigenradar.com/assets/briefs/:splat 301
 /assets/videos/* https://media.eigenradar.com/assets/videos/:splat 301
 
+# BEGIN distinct-column pass-throughs (build.py owns this block; do not edit)
+# END distinct-column pass-throughs
+
 # Legacy edition-suffix column URLs consolidated to the writer's daily page (2026-08-29).
 # Collapsed to placeholder rules: Cloudflare Workers static assets cap _redirects at 100
 # dynamic rules and counted the previous 1,078 exact-path rules against that cap, so the
