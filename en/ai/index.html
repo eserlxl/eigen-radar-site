@@ -1718,7 +1718,7 @@ function homeLanguageRoute(lang){
 }
 function articleRoute(article, lang){
   if (!article) return topicRoute(TOPIC, lang);
-  const path = articleId(article).split('/').map(encodeURIComponent).join('/');
+  const path = articlePath(article).split('/').map(encodeURIComponent).join('/');
   return `${topicRoute(topicOf(article), lang)}${path}/`;
 }
 function isPlainClick(event){
@@ -3350,6 +3350,13 @@ function editionN(a){
 function articleId(a){
   const n = editionN(a);
   return n > 1 ? `${a.writer}/${a.date}/${n}` : `${a.writer}/${a.date}`;
+}
+/* Server URL path for a column. Since the 2026-08-29 permalink cutover a writer has ONE
+   page per day at the base URL (the highest revision wins; old /N/ forms 301 there), so
+   every href uses the base path. articleId above stays revision-specific: it keys the
+   in-shell edition controls and the SPA hash, which need no server route. */
+function articlePath(a){
+  return `${a.writer}/${a.date}`;
 }
 /* One article per writer: their latest same-day edition (highest n). A writer who files
    twice over a day's news pool shows only their newest column in every roster; the earlier
