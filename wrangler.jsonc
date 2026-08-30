@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eigen-radar-site",
+  "main": "worker/index.mjs",
+  "compatibility_date": "2026-07-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+
+  // Existing files bypass the Worker; only dynamic route fall-through reaches SSR.
+  "assets": { "directory": ".", "binding": "ASSETS" },
+  "r2_buckets": [
+    { "binding": "CONTENT", "bucket_name": "eigenradar-media" }
+  ]
+}
