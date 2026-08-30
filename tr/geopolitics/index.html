@@ -231,13 +231,19 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   /* Auto margins on both sides centre the switch between the logo badge and the
      Archive/utility group; header-right deliberately has no margin-left:auto. */
   .topic-switch{display:flex;align-items:start;gap:6px;margin:0 auto;padding:0;border:0;background:transparent}
-  .topic-btn,.markets-nav{
+  .topic-btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:32px;min-width:0;padding:4px 10px 6px;border-radius:0;
+    color:var(--muted);background:transparent;box-shadow:none;opacity:1;
+    position:relative;text-decoration:none;transition:.15s;font-family:inherit;
+  }
+  .markets-nav{
     display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-start;
     gap:4px;min-height:44px;min-width:0;padding:6px 10px 8px;border-radius:0;
     color:var(--muted);background:transparent;box-shadow:none;opacity:1;
     position:relative;text-decoration:none;transition:.15s;font-family:inherit;
   }
-  .topic-btn svg,.markets-nav svg{
+  .markets-nav svg{
     width:30px;height:30px;display:block;flex:0 0 auto;opacity:.88;
     filter:drop-shadow(0 1px 1.5px var(--drawer-shadow));
   }
@@ -245,7 +251,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     font-size:.72rem;font-weight:700;white-space:nowrap;line-height:1;
     max-width:100%;overflow:hidden;text-overflow:ellipsis;
   }
-  .topic-btn:hover svg,.topic-btn.active svg,.markets-nav:hover svg{opacity:1}
+  .markets-nav:hover svg{opacity:1}
   .topic-btn.active{color:var(--text)}
   .topic-btn.active::after,.markets-nav:hover::after{
     content:"";position:absolute;left:22%;right:22%;bottom:2px;height:2px;
@@ -940,15 +946,20 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       grid-template-columns:repeat(5,minmax(0,1fr));
       gap:2px;padding:0;border:0;background:transparent;
     }
-    .topic-btn,.markets-nav{
+    .topic-btn{
+      min-width:0;min-height:0;justify-content:center;
+      padding:3px 2px 5px;
+    }
+    .markets-nav{
       min-width:0;min-height:0;justify-content:flex-start;
       gap:3px;padding:4px 2px 6px;
     }
-    .topic-btn svg,.markets-nav svg{
+    .markets-nav svg{
       width:clamp(22px,6.8vw,26px);height:clamp(22px,6.8vw,26px);
     }
     .topic-label{
-      font-size:clamp(.6rem,2.65vw,.68rem);line-height:1;letter-spacing:-.015em;
+      /* one step larger than the .74rem home-view row below (operator ask) */
+      font-size:clamp(.76rem,3.2vw,.84rem);line-height:1;letter-spacing:-.015em;
     }
     section{padding-left:16px;padding-right:16px}
     .featured-grid{grid-template-columns:1fr}
@@ -983,12 +994,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       flex:1 1 auto;min-width:0;margin:0;gap:4px;padding:0;
       border:0;background:transparent;align-items:start;
     }
-    .topic-btn,.markets-nav{
+    .topic-btn{
+      flex:1 1 auto;min-width:0;min-height:0;justify-content:center;
+      padding:2px clamp(4px,1vw,8px) 4px;
+    }
+    .markets-nav{
       flex:1 1 auto;min-width:0;min-height:0;justify-content:flex-start;
       gap:2px;padding:3px clamp(4px,1vw,8px) 5px;
     }
-    .topic-btn svg,.markets-nav svg{width:22px;height:22px}
-    .topic-label{font-size:.65rem;line-height:1;letter-spacing:-.015em}
+    .markets-nav svg{width:22px;height:22px}
+    .topic-label{font-size:.78rem;line-height:1;letter-spacing:-.015em}
     .header-right{flex:0 0 auto;margin-left:0;gap:5px}
     .utility-switches{gap:3px}
     .lang-switch{gap:2px;padding:2px}
@@ -1066,6 +1081,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     main a{color:inherit}
     .writer-content{box-shadow:none}
   }
+  /* Pre-hydration: JS browsers get the html.js class before first paint (inline
+     script at body start), so the crawlable static fallback's intro/disclosure
+     paragraphs never flash at the top on slow loads. visibility (not display)
+     keeps their box, so the rail cannot collapse and pull the footer up; the
+     per-desk static preview sections stay visible as the loading state. */
+  html.js .static-edition > p{visibility:hidden}
+  @media (prefers-reduced-motion: no-preference){
+    html.js .brief-track .brief-card{animation:brief-card-in .35s ease both}
+  }
+  @keyframes brief-card-in{from{opacity:0}to{opacity:1}}
 </style>
 <script src="/assets/theme.js" defer></script>
 <!-- X conversion tracking base code -->
@@ -1076,6 +1101,7 @@ a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,
 twq('config','re3b4');
 </script>
 <!-- End X conversion tracking base code -->
+<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
@@ -1552,20 +1578,13 @@ function bootstrapData(data) {
 }
 
 /* ---------- topics: one desk at a time, remembered like the language ---------- */
-/* Filled inline SVGs: unique gradient ids, CSS variables for theme, no extra request */
-const TOPIC_ICONS = {
-  'ai': `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-ai" x1="7" y1="3" x2="16" y2="20" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-ai-hi)"/><stop offset="1" stop-color="var(--desk-ai)"/></linearGradient></defs><path d="M12 4.2a2.6 2.6 0 0 0-4.6 1.5 2.4 2.4 0 0 0-.9 4.1V12h11V9.8a2.4 2.4 0 0 0-.9-4.1A2.6 2.6 0 0 0 12 4.2Z" fill="url(#er-desk-ai)"/><rect x="7.5" y="12" width="9" height="6.5" rx="1.4" fill="url(#er-desk-ai)" fill-opacity=".88"/><path d="M10 18.5v2M14 18.5v2M16.5 14h2M16.5 16.5h2M5.5 14h2M5.5 16.5h2" fill="none" stroke="var(--desk-ai)" stroke-width="1.4" stroke-linecap="round"/><ellipse cx="10" cy="7.2" rx="3.6" ry="2.2" fill="#fff" fill-opacity=".3"/></svg>`,
-  'geopolitics': `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-geo" x1="5" y1="3" x2="19" y2="21" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-geo-hi)"/><stop offset="1" stop-color="var(--desk-geo)"/></linearGradient></defs><circle cx="12" cy="12" r="8.6" fill="url(#er-desk-geo)"/><ellipse cx="12" cy="12" rx="3.6" ry="8.6" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.1"/><path d="M3.5 9.2h17M3.5 14.8h17" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.1"/><ellipse cx="9.2" cy="8.2" rx="4.4" ry="2.6" fill="#fff" fill-opacity=".28"/></svg>`,
-  'economics-markets': `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-eco" x1="4" y1="6" x2="20" y2="20" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-eco-hi)"/><stop offset="1" stop-color="var(--desk-eco)"/></linearGradient></defs><path d="M3 19 4.5 15.5 8 8.5l3.5 4 3-6.5 5 9.5L21 19Z" fill="url(#er-desk-eco)"/><path d="M4.5 15.5 8 8.5l3.5 4 3-6.5 5 9.5" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="11" cy="10" rx="4" ry="2.2" fill="#fff" fill-opacity=".22"/></svg>`,
-  'science': `<svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="er-desk-sci" x1="8" y1="10" x2="16" y2="21" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="var(--desk-sci-hi)"/><stop offset="1" stop-color="var(--desk-sci)"/></linearGradient></defs><path d="M9.5 3h5M10.5 3v6.2L5.4 18a1.6 1.6 0 0 0 1.4 2.4h10.4a1.6 1.6 0 0 0 1.4-2.4L13.5 9.2V3" fill="none" stroke="var(--desk-sci-hi)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.05 15 6.8 18a1.6 1.6 0 0 0 1.4 2.4h7.6a1.6 1.6 0 0 0 1.4-2.4L15.95 15Z" fill="url(#er-desk-sci)"/><ellipse cx="10.4" cy="16.6" rx="3.1" ry="1.35" fill="#fff" fill-opacity=".28"/></svg>`,
-};
 const TOPICS = [
-  {id:'geopolitics', symbol:'🗺️', label:{tr:'Jeopolitik', en:'Geopolitics'}, pageMeta:{
+  {id:'geopolitics', label:{tr:'Jeopolitik', en:'Geopolitics'}, pageMeta:{
     tr:{page:'Eigen Radar — Jeopolitik',
         title:'Dünyanın değişen güç dengeleri.'},
     en:{page:'Eigen Radar — Geopolitics',
         title:'The world’s shifting balance of power.'}}},
-  {id:'economics-markets', symbol:'💹', label:{tr:'Ekonomi', en:'Economics'}, pageMeta:{
+  {id:'economics-markets', label:{tr:'Ekonomi', en:'Economics'}, pageMeta:{
     tr:{page:'Eigen Radar — Ekonomi ve Piyasalar',
         title:'Piyasalardaki son gelişmeler.'},
     en:{page:'Eigen Radar — Economics & Markets',
@@ -1589,12 +1608,12 @@ const TOPICS = [
         +'Making an investment decision based solely on this information may therefore '
         +'not produce the results you expect. Do your own research.',
     }},
-  {id:'ai', symbol:'🧠', label:{tr:'Yapay Zekâ', en:'AI'}, pageMeta:{
+  {id:'ai', label:{tr:'Yapay Zekâ', en:'AI'}, pageMeta:{
     tr:{page:'Eigen Radar — Yapay Zekâ',
         title:'Yapay zekadaki son gelişmeler.'},
     en:{page:'Eigen Radar — Artificial Intelligence',
         title:'The latest in artificial intelligence.'}}},
-  {id:'science', symbol:'🧪', label:{tr:'Bilim', en:'Science'}, pageMeta:{
+  {id:'science', label:{tr:'Bilim', en:'Science'}, pageMeta:{
     tr:{page:'Eigen Radar — Bilim',
         title:'Bilginin yeni sınırları.'},
     en:{page:'Eigen Radar — Science',
@@ -2243,6 +2262,46 @@ function syncBriefRailCue(rail){
   cue.hidden = BRIEF_STACK_MEDIA.matches || rail.scrollHeight <= rail.clientHeight + 1
     || rail.scrollTop + rail.clientHeight >= rail.scrollHeight - 1;
 }
+function clearBriefDeckHeights(){
+  const track = $('featured');
+  if (!track) return;
+  track.style.height = '';
+  track.style.overflowY = '';
+  briefTrackPages().forEach(page=>{
+    page.style.height = '';
+    page.style.overflow = '';
+  });
+}
+function measureBriefPageHeight(page){
+  const grid = page?.querySelector('.featured-grid');
+  return grid ? Math.ceil(grid.scrollHeight) : 0;
+}
+function syncBriefDeckHeight(){
+  const track = $('featured');
+  if (!track) return;
+  if (!BRIEF_STACK_MEDIA.matches){
+    clearBriefDeckHeights();
+    return;
+  }
+  const pages = briefTrackPages();
+  if (!pages.length) return;
+  const activePage = pages.find(page=>page.dataset.editionKey===selectedBriefDate)
+    || pages[briefPageIndex()] || pages[pages.length - 1];
+  pages.forEach(page=>{
+    page.style.height = '';
+    page.style.overflow = '';
+  });
+  track.style.height = '';
+  track.style.overflowY = '';
+  const activeHeight = measureBriefPageHeight(activePage);
+  if (!activeHeight) return;
+  pages.forEach(page=>{
+    page.style.height = `${activeHeight}px`;
+    page.style.overflow = 'hidden';
+  });
+  track.style.height = `${activeHeight}px`;
+  track.style.overflowY = 'hidden';
+}
 function syncBriefRailHeights(){
   document.querySelectorAll('.featured-grid').forEach(grid=>{
     const feature = grid.querySelector(':scope > .brief-feature');
@@ -2279,6 +2338,7 @@ function syncBriefRailHeights(){
     rail.style.maxHeight = `${featureHeight}px`;
     syncBriefRailCue(rail);
   });
+  syncBriefDeckHeight();
 }
 
 function renderBriefs(){
@@ -2307,7 +2367,9 @@ function renderBriefs(){
     const rail = document.createElement('div');
     rail.className = 'brief-rail';
     rail.setAttribute('aria-label', UI[LANG].featTitle);
-    rail.addEventListener('wheel', event=>event.stopPropagation(), {passive:true});
+    rail.addEventListener('wheel', event => {
+      if (briefRailWheelConsumes(rail, event.deltaY)) event.stopPropagation();
+    }, {passive:true});
     rail.addEventListener('scroll', ()=>syncBriefRailCue(rail), {passive:true});
     items.filter(brief=>brief!==selected).forEach((brief,index)=>{
       const card = briefCard(brief, index + 1, key===selectedBriefDate, pageIndex);
@@ -2357,6 +2419,7 @@ function revealBriefCard(card){
   if (!card.querySelector('.brief-media') || !card.querySelector('.brief-content')) return false;
   card.style.setProperty('--brief-reveal-height', `${card.getBoundingClientRect().height}px`);
   card.classList.add('is-brief-revealed');
+  if (BRIEF_STACK_MEDIA.matches) requestAnimationFrame(syncBriefRailHeights);
   const brief = findBriefById(card.dataset.briefId);
   if (brief){
     fetchBriefFullText(brief).then(data=>{
@@ -2422,6 +2485,12 @@ const briefRevealPreferenceChange = ()=>{
     query.addListener(briefRevealPreferenceChange);
   }
 });
+const briefStackPreferenceChange = ()=>syncBriefRailHeights();
+if (typeof BRIEF_STACK_MEDIA.addEventListener === 'function') {
+  BRIEF_STACK_MEDIA.addEventListener('change', briefStackPreferenceChange);
+} else {
+  BRIEF_STACK_MEDIA.addListener(briefStackPreferenceChange);
+}
 $('briefsSection').addEventListener('pointerdown', cancelBriefReveal, {passive:true});
 $('briefsSection').addEventListener('pointerup', scheduleBriefReveal, {passive:true});
 $('briefsSection').addEventListener('pointercancel', scheduleBriefReveal, {passive:true});
@@ -3902,6 +3971,7 @@ function syncBriefEditionFromScroll(){
   }
   briefProgrammaticKey = null;
   adoptBriefEdition(key);
+  syncBriefRailHeights();
 }
 
 function renderWriters(){
@@ -4077,7 +4147,7 @@ function renderTopics(){
     b.href = topicRoute(t.id, LANG);
     if (t.id===TOPIC) b.setAttribute('aria-current', 'page');
     b.title = t.label[LANG];
-    b.innerHTML = `${TOPIC_ICONS[t.id] || t.symbol}<span class="topic-label">${escapeHTML(t.label[LANG])}</span>`;
+    b.innerHTML = `<span class="topic-label">${escapeHTML(t.label[LANG])}</span>`;
     el.appendChild(b);
     if (t.id === 'economics-markets') {
       const u = UI[LANG];
@@ -4136,6 +4206,7 @@ document.addEventListener('keydown', e=>{
 $('briefDateSel').addEventListener('change', e=>{
   adoptBriefEdition(e.target.value);
   scrollBriefTrack(true);
+  requestAnimationFrame(syncBriefRailHeights);
 });
 const refreshCompactEditionLabels=()=>renderBriefDateSelect();
 if(typeof EDITION_LABEL_MEDIA.addEventListener==='function'){
@@ -4146,6 +4217,15 @@ if(typeof EDITION_LABEL_MEDIA.addEventListener==='function'){
 $('briefsPrev').addEventListener('click', ()=>briefArrowStep(-1));
 $('briefsNext').addEventListener('click', ()=>briefArrowStep(1));
 let briefWheelGesture = 0;
+function briefRailFromEvent(event){
+  return event.target?.closest?.('.brief-rail-card, .brief-rail')?.closest?.('.brief-rail') || null;
+}
+function briefRailWheelConsumes(rail, dy){
+  if (!dy) return false;
+  return dy > 0
+    ? rail.scrollTop + rail.clientHeight < rail.scrollHeight - 1
+    : rail.scrollTop > 1;
+}
 function handleDateWheel(event,targetForDirection,step){
   if (!BRIEF_REVEAL_MEDIA.matches || !event.deltaY
       || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
@@ -4160,6 +4240,8 @@ function handleDateWheel(event,targetForDirection,step){
 }
 $('featured').addEventListener('wheel', event=>{
   if (BRIEF_REVEAL_MEDIA.matches && event.target?.closest?.('.brief-card.is-brief-reading')) return;
+  const rail = briefRailFromEvent(event);
+  if (rail && briefRailWheelConsumes(rail, event.deltaY)) return;
   handleDateWheel(event,
     dir=>briefTrackPages()[briefPageIndex() + dir],
     dir=>briefWheelStep(dir));
