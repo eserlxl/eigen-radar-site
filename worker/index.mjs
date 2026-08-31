@@ -264,7 +264,9 @@ export async function dependencyEtag(
     String(siteVersion ?? ""),
     String(rendererVersion),
   ]));
-  return `"${digest}"`;
+  // Weak form on purpose: Cloudflare's HTML transforms drop strong ETags end-to-end,
+  // and a weak validator survives them while keeping the dependency composition.
+  return `W/"${digest}"`;
 }
 
 export function currentIstanbulDate(now = new Date()) {
@@ -363,7 +365,7 @@ function ifNoneMatch(request, response) {
   }
   const matched = supplied.split(",").some((candidate) => {
     const tag = candidate.trim();
-    return tag === "*" || tag.replace(/^W\//, "") === expected;
+    return tag === "*" || tag.replace(/^W\//, "") === expected.replace(/^W\//, "");
   });
   return matched
     ? new Response(null, { status: 304, headers: new Headers(response.headers) })

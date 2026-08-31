@@ -4,20 +4,6 @@
 /assets/videos/* https://media.eigenradar.com/assets/videos/:splat 301
 /about /tr/about/ 301
 
-# BEGIN distinct-column pass-throughs (build.py owns this block; do not edit)
-# END distinct-column pass-throughs
-
-# Legacy edition-suffix column URLs consolidated to the writer's daily page (2026-08-29).
-# Collapsed to placeholder rules: Cloudflare Workers static assets cap _redirects at 100
-# dynamic rules and counted the previous 1,078 exact-path rules against that cap, so the
-# per-URL list was undeployable (deploy error 100324). Editions never exceed n=4, and a
-# Brief id must contain a letter, so the literal /2/ /3/ /4/ tails cannot collide with any
-# live route. A published distinctColumn /N/ page is served past these rules by the
-# generated pass-through block above, which build.py maintains from the routes the site
-# generator actually wrote.
-/tr/:topic/:writer/:date/2/ /tr/:topic/:writer/:date/ 301
-/tr/:topic/:writer/:date/3/ /tr/:topic/:writer/:date/ 301
-/tr/:topic/:writer/:date/4/ /tr/:topic/:writer/:date/ 301
-/en/:topic/:writer/:date/2/ /en/:topic/:writer/:date/ 301
-/en/:topic/:writer/:date/3/ /en/:topic/:writer/:date/ 301
-/en/:topic/:writer/:date/4/ /en/:topic/:writer/:date/ 301
+# Edition-suffix /N/ column URLs are owned by the Worker after the SSR cutover: a
+# non-distinct slot 301s to the writer's base page and a published distinctColumn
+# renders, so no static redirect rule may shadow them.
