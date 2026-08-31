@@ -232,7 +232,22 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .topic-btn[data-topic="geopolitics"]{--desk:var(--desk-geo-hi)}
   .topic-btn[data-topic="economics-markets"]{--desk:var(--desk-eco-hi)}
   .topic-btn[data-topic="science"]{--desk:var(--desk-sci-hi)}
-  .markets-nav{--desk:var(--desk-eco-hi);color:var(--desk-eco-hi);margin-left:0}
+  /* The desk tint drives the underline only; the label follows the other topics and
+     turns to --text when this page is the current one. */
+  .markets-nav{--desk:var(--desk-eco-hi);margin-left:0}
+  /* Desktop masthead height, matching template.html: with the desk symbols gone the
+     labels fill about half the bar, so halve the vertical breathing room and trim the
+     oversized pills. Nothing reaches the rules above or below, and every control stays
+     at or above the 24px minimum target. A coarse pointer is excluded at any width, so
+     a finger keeps the 44px targets. */
+  @media(min-width:1000px) and (pointer:fine),(min-width:1000px) and (pointer:none){
+    .header-inner{padding-block:7px}
+    .logo-mark{width:30px;height:30px}
+    .archive-link{min-height:36px;padding:4px 0}
+    .lang-btn{min-width:26px;min-height:26px}
+    .theme-switch{height:22px}
+    .topic-btn,.markets-nav{min-height:28px;padding:2px 10px 5px}
+  }
   @media(max-width:640px){
     .topic-switch{
       order:3;width:100%;margin:0;display:grid;align-items:start;

@@ -256,7 +256,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .topic-btn[data-topic="geopolitics"]{--desk:var(--desk-geo-hi)}
   .topic-btn[data-topic="economics-markets"]{--desk:var(--desk-eco-hi)}
   .topic-btn[data-topic="science"]{--desk:var(--desk-sci-hi)}
-  .markets-nav{--desk:var(--desk-eco-hi);color:var(--desk-eco-hi);margin-left:0}
+  /* The desk tint drives the hover underline only; an unselected Markets label reads
+     like every other topic label instead of looking permanently active. */
+  .markets-nav{--desk:var(--desk-eco-hi);margin-left:0}
   /* Desktop masthead height: with the desk symbols gone the labels fill about half
      the bar, so halve the vertical breathing room and trim the oversized pills.
      Nothing reaches the rules above or below, and every control stays at or above
@@ -433,7 +435,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .fcard h3{font-size:1.05rem;line-height:1.4;letter-spacing:-.01em;margin:10px 0 8px}
   .fcard .summary{color:var(--muted);font-size:.88rem}
   .featured-grid > .brief-feature{grid-row:auto;align-self:start;padding:clamp(24px,4vw,36px)}
-  .featured-grid > .brief-feature h3{font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.25}
+  /* A long headline is what pushes the feature past the rail column, so the big card's
+     title runs one step smaller than the rail cards' visual weight would suggest. */
+  .featured-grid > .brief-feature h3{font-size:clamp(1.2rem,2.4vw,1.6rem);line-height:1.25}
   .fcard.brief-card{padding:0}
   .featured-grid > .brief-feature{padding:0}
   .brief-media{margin:0;background:var(--media-bg)}
@@ -2229,6 +2233,7 @@ function pageItems(items, requestedPage, pageSize){
 const BRIEF_STACK_MEDIA = matchMedia('(max-width:640px)');
 const briefFeatureHeights = new Map();
 const briefRailCardHeights = new Map();
+const briefRailFilledHeights = new Map();
 function syncBriefRailCue(rail){
   const cue = rail.parentElement?.querySelector(':scope > .brief-rail-cue');
   if (!cue) return;
@@ -2307,7 +2312,20 @@ function syncBriefRailHeights(){
     briefFeatureHeights.set(key, height);
     feature.style.height = `${height}px`;
     const featureHeight = Math.ceil(feature.getBoundingClientRect().height);
-    railCards.forEach(card=>card.style.height = `${railCardHeight}px`);
+    // The feature is as tall as the taller column, so the rail cards have to grow into
+    // that height as well: at their natural height the rail column ends above the
+    // feature and the big card visibly hangs below it. The filled height is cached
+    // under the same key as the frame, so promoting a rail card cannot resize the rail.
+    let filledRailCardHeight = briefRailFilledHeights.get(key);
+    if (filledRailCardHeight === undefined){
+      filledRailCardHeight = visibleRailCards
+        ? Math.max(railCardHeight,
+                   Math.floor((featureHeight - railGap * Math.max(0, visibleRailCards - 1))
+                              / visibleRailCards))
+        : railCardHeight;
+      briefRailFilledHeights.set(key, filledRailCardHeight);
+    }
+    railCards.forEach(card=>card.style.height = `${filledRailCardHeight}px`);
     rail.style.maxHeight = `${featureHeight}px`;
     syncBriefRailCue(rail);
   });
