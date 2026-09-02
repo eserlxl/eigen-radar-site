@@ -637,6 +637,8 @@ export function renderArchiveMonthPage(
   });
 }
 
+const WRITER_HUB_LIMIT = 30; // dated columns listed before the archive link
+
 export function renderWriterPage(payload, site, lang, opts = {}) {
   const baseUrl = opts.baseUrl || "https://eigenradar.com";
   const u = UI[lang];
@@ -658,7 +660,6 @@ export function renderWriterPage(payload, site, lang, opts = {}) {
     ? `<img src="${esc(avatar)}" width="64" height="64" loading="eager" decoding="async" alt="">`
     : "";
   const roleLine = [role, topicLabel(topic, lang)].filter(Boolean).join(" · ");
-  const disclosureWording = u.footer_notice;
   const crumbsHtml =
     `<nav class="breadcrumbs" aria-label="${esc(u.breadcrumb_label)}">` +
     `<a href="/">${esc(u.home)}</a><span>/</span>` +
@@ -669,7 +670,7 @@ export function renderWriterPage(payload, site, lang, opts = {}) {
     '<main id="main" class="writer-hub-main wrap">',
     crumbsHtml,
     `<header class="writer-hub-header"><div class="wtop"><div class="avatar">${avatarHtml}</div><div><div class="wname"><h1>${esc(h1Text)}</h1></div><div class="wrole">${esc(roleLine)}</div></div></div>`,
-    `<p class="writer-disclosure"><strong>${esc(u.footer_notice_label)}</strong> ${esc(disclosureWording)}</p></header>`,
+    "</header>",
   ];
 
   const columns = [...(payload.columns || [])].sort((a, b) => {
@@ -680,12 +681,23 @@ export function renderWriterPage(payload, site, lang, opts = {}) {
     return (b.n || 1) - (a.n || 1);
   });
 
+  // The newest column is the destination readers came for: lead with it, then the
+  // dated list (capped like the reader's selector), then the archive for the rest.
+  if (columns.length) {
+    const latest = columns[0];
+    const latestPath = articlePublicPath(lang, topic, writerId, latest.date, latest.routeSlot || 1);
+    const latestTitle = localized(latest.title, lang) || writerId;
+    bodyParts.push(
+      `<p class="writer-latest"><a class="writer-latest-link" href="${esc(latestPath)}">${esc(latestTitle)}</a> ` +
+      `<time datetime="${esc(latest.date)}">${esc(formatDate(latest.date, lang))}</time></p>`,
+    );
+  }
   bodyParts.push(
     `<section class="hub-group"><h2 class="hub-group-title">${esc(u.columns)}</h2>`,
   );
   if (columns.length) {
     bodyParts.push("<ul class=\"hub-list\">");
-    for (const column of columns) {
+    for (const column of columns.slice(0, WRITER_HUB_LIMIT)) {
       const dateStr = column.date;
       const routeSlot = column.routeSlot || 1;
       const title = localized(column.title, lang) || writerId;
@@ -695,6 +707,11 @@ export function renderWriterPage(payload, site, lang, opts = {}) {
       );
     }
     bodyParts.push("</ul>");
+    if (columns.length > WRITER_HUB_LIMIT) {
+      bodyParts.push(
+        `<p class="hub-more"><a href="${esc(archivePublicPath(lang))}">${esc(u.archive_older)} · ${esc(u.archive)} →</a></p>`,
+      );
+    }
   } else {
     bodyParts.push(`<p>${esc(u.no_columns)}</p>`);
   }

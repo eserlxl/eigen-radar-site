@@ -4197,7 +4197,8 @@ function renderWriters(){
     const a = latest.get(w.id);
     const card = document.createElement('a');
     card.className = 'wcard';
-    card.href = `/${LANG}/${TOPIC}/${w.id}/`;
+    // The card opens the column itself; the writer's index page is one click further.
+    card.href = a ? articleRoute(a, LANG) : `/${LANG}/${TOPIC}/${w.id}/`;
     card.innerHTML = `
       <div class="wtop">
         <div class="avatar">${avatarOf(w)}</div>
