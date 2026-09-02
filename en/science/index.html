@@ -443,7 +443,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .brief-media{margin:0;background:var(--media-bg)}
   .brief-media picture{display:block;aspect-ratio:16/9;overflow:hidden}
   @media(min-width:641px){.brief-rail-card .brief-media picture{aspect-ratio:5/2}}
-  .brief-media img{display:block;width:100%;height:100%;object-fit:cover}
+  /* The picture above already reserves the box, so the layout never moves. What the reader
+     saw was the browser painting this img's own alt text inside that reserved box until the
+     bytes arrived, then the image covering it — which reads as copy loading first and
+     jumping away. Suppressing the placeholder text is enough; the accessible name is
+     untouched, and a genuine load failure is already handled by the capture-phase error
+     listener below, which removes the whole picture rather than falling back to alt text. */
+  .brief-media img{display:block;width:100%;height:100%;object-fit:cover;
+    color:transparent;font-size:0}
   .brief-media-link{display:block}
   .brief-media-link:focus-visible{outline:3px solid var(--focus);outline-offset:-5px}
   .brief-content{position:relative;padding:18px 22px 22px}
@@ -757,8 +764,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .read-more{font-size:.8rem;font-weight:600;color:var(--accent);margin-top:12px;display:inline-block}
   .date-select{
     margin-left:auto;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);
-    border-radius:8px;padding:6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;cursor:pointer;
+    border-radius:8px;padding:6px 28px 6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;
+    cursor:pointer;text-align:end;
   }
+  /* The closed control is styled by us; the open list is drawn by the browser and only some
+     engines honour alignment on the rows. Set it anyway so the date and its edition symbol sit
+     against the same right edge wherever the engine allows it. */
+  .date-select option{text-align:end}
   .date-select:hover{border-color:var(--accent)}
   .wchip{
     display:flex;align-items:center;gap:11px;
@@ -979,7 +991,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-button{font-size:.74rem;padding-inline:1px}
     #briefsSection > .section-title .date-select{
       flex:0 0 140px;width:140px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 15px 5px 4px;font-size:.72rem;
+      min-height:40px;margin-left:auto;padding:5px 24px 5px 0;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
     .news-grid{grid-template-columns:minmax(0,1fr)}
@@ -1019,7 +1031,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-button{font-size:.74rem}
     #briefsSection > .section-title .date-select{
       flex:0 0 145px;width:145px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 24px 5px 8px;font-size:.72rem;
+      min-height:40px;margin-left:auto;padding:5px 26px 5px 4px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
   }

@@ -443,7 +443,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .brief-media{margin:0;background:var(--media-bg)}
   .brief-media picture{display:block;aspect-ratio:16/9;overflow:hidden}
   @media(min-width:641px){.brief-rail-card .brief-media picture{aspect-ratio:5/2}}
-  .brief-media img{display:block;width:100%;height:100%;object-fit:cover}
+  /* The picture above already reserves the box, so the layout never moves. What the reader
+     saw was the browser painting this img's own alt text inside that reserved box until the
+     bytes arrived, then the image covering it — which reads as copy loading first and
+     jumping away. Suppressing the placeholder text is enough; the accessible name is
+     untouched, and a genuine load failure is already handled by the capture-phase error
+     listener below, which removes the whole picture rather than falling back to alt text. */
+  .brief-media img{display:block;width:100%;height:100%;object-fit:cover;
+    color:transparent;font-size:0}
   .brief-media-link{display:block}
   .brief-media-link:focus-visible{outline:3px solid var(--focus);outline-offset:-5px}
   .brief-content{position:relative;padding:18px 22px 22px}
@@ -757,8 +764,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .read-more{font-size:.8rem;font-weight:600;color:var(--accent);margin-top:12px;display:inline-block}
   .date-select{
     margin-left:auto;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);
-    border-radius:8px;padding:6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;cursor:pointer;
+    border-radius:8px;padding:6px 28px 6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;
+    cursor:pointer;text-align:end;
   }
+  /* The closed control is styled by us; the open list is drawn by the browser and only some
+     engines honour alignment on the rows. Set it anyway so the date and its edition symbol sit
+     against the same right edge wherever the engine allows it. */
+  .date-select option{text-align:end}
   .date-select:hover{border-color:var(--accent)}
   .wchip{
     display:flex;align-items:center;gap:11px;
@@ -979,7 +991,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-button{font-size:.74rem;padding-inline:1px}
     #briefsSection > .section-title .date-select{
       flex:0 0 140px;width:140px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 15px 5px 4px;font-size:.72rem;
+      min-height:40px;margin-left:auto;padding:5px 24px 5px 0;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
     .news-grid{grid-template-columns:minmax(0,1fr)}
@@ -1019,7 +1031,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-button{font-size:.74rem}
     #briefsSection > .section-title .date-select{
       flex:0 0 145px;width:145px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 24px 5px 8px;font-size:.72rem;
+      min-height:40px;margin-left:auto;padding:5px 26px 5px 4px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
   }
@@ -1308,7 +1320,7 @@ twq('config','re3b4');
 <h2><a href="/en/geopolitics/">Geopolitics</a></h2>
 <h3 lang="en">Briefs</h3><div class="featured-grid">
 <article class="fcard brief-card" aria-labelledby="brief-heading-7">
-<figure class="brief-media"><a class="brief-media-link" href="/en/geopolitics/briefs/2026-09-01/pacific-islands-forum-absences/" aria-labelledby="brief-heading-7"><picture><source type="image/webp" srcset="/assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-640.4589aade3b9c.webp 640w, /assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-1280.e4b9a28c6c24.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)"><img src="/assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-1280.e4b9a28c6c24.webp" srcset="/assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-640.4589aade3b9c.webp 640w, /assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-1280.e4b9a28c6c24.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)" width="1280" height="720" loading="lazy" decoding="async" alt="In an open lagoon-side pavilion, national flags line the stage behind the delegates, who sit facing inward with their backs to the camera around a conspicuous row of empty seats." title="No clickbait. No endless feeds. Insight over noise."></picture></a></figure><div class="brief-content"><h3 id="brief-heading-7"><a class="brief-detail-link" href="/en/geopolitics/briefs/2026-09-01/pacific-islands-forum-absences/">China warns of &#x27;consequences&#x27; as Taiwan attends the Pacific Islands Forum</a></h3>
+<figure class="brief-media"><a class="brief-media-link" href="/en/geopolitics/briefs/2026-09-01/pacific-islands-forum-absences/" aria-labelledby="brief-heading-7"><picture><source type="image/webp" srcset="/assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-640.9b16c6f56c44.webp 640w, /assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-1280.3a3a391ba042.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)"><img src="/assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-1280.3a3a391ba042.webp" srcset="/assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-640.9b16c6f56c44.webp 640w, /assets/briefs/2026-09-01/geo-n3-pacific-islands-forum-absences-1280.3a3a391ba042.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)" width="1280" height="720" loading="lazy" decoding="async" alt="In an open lagoon-side pavilion, six Forum member flags stand behind the stage; seven delegates sit facing inward on the left while five chairs on the right stay empty." title="No clickbait. No endless feeds. Insight over noise."></picture></a></figure><div class="brief-content"><h3 id="brief-heading-7"><a class="brief-detail-link" href="/en/geopolitics/briefs/2026-09-01/pacific-islands-forum-absences/">China warns of &#x27;consequences&#x27; as Taiwan attends the Pacific Islands Forum</a></h3>
 <p class="summary">China warned of &quot;consequences&quot; for Taiwan after officials from Beijing and Taipei attended the opening ceremony of the Pacific Islands Forum leaders&#x27; meeting in Palau. The summit began with five heads of government absent from the retreat, while escalating diplomatic tensions over influence in the strategic region threatened to overshadow the official agenda.</p><small class="radar-stamp"><time datetime="2026-09-01T21:32:22+00:00">21:32 UTC</time></small></div></article>
 <article class="fcard brief-card" aria-labelledby="brief-heading-8">
 <figure class="brief-media"><a class="brief-media-link" href="/en/geopolitics/briefs/2026-09-01/kyiv-russian-strikes/" aria-labelledby="brief-heading-8"><picture><source type="image/webp" srcset="/assets/briefs/2026-09-01/geo-n3-kyiv-russian-strikes-640.79dad3aab86c.webp 640w, /assets/briefs/2026-09-01/geo-n3-kyiv-russian-strikes-1280.53aca4ab9954.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)"><img src="/assets/briefs/2026-09-01/geo-n3-kyiv-russian-strikes-1280.53aca4ab9954.webp" srcset="/assets/briefs/2026-09-01/geo-n3-kyiv-russian-strikes-640.79dad3aab86c.webp 640w, /assets/briefs/2026-09-01/geo-n3-kyiv-russian-strikes-1280.53aca4ab9954.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)" width="1280" height="720" loading="lazy" decoding="async" alt="In pre-dawn blue light a torn catenary wire hangs over a buckled rail, with a service building missing its corner behind, dull fire at the broken edge and smoke bending downwind." title="Every article is continuously reviewed for clarity, sources, and consistency."></picture></a></figure><div class="brief-content"><h3 id="brief-heading-8"><a class="brief-detail-link" href="/en/geopolitics/briefs/2026-09-01/kyiv-russian-strikes/">Russian overnight strikes kill at least 12 in Kyiv and Boryspil</a></h3>
@@ -1691,7 +1703,7 @@ document.addEventListener('error', event=>{
   }
 }, true);
 
-const ROUTE_DATA_URL = "/assets/data/app-2ad1a8b3.json";
+const ROUTE_DATA_URL = "/assets/data/app-5ad80309.json";
 const FILE_ASSET_PREFIX = "../";
 let DATA = null;
 let WRITERS = [];
