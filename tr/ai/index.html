@@ -4254,7 +4254,9 @@ document.addEventListener('keydown', e=>{
 /* ---------- date select ---------- */
 $('briefDateSel').addEventListener('change', e=>{
   adoptBriefEdition(e.target.value);
-  scrollBriefTrack(true);
+  // A picked date is a jump, not a journey: land on it at once. The arrows and a manual
+  // scroll keep their motion.
+  scrollBriefTrack(false);
   requestAnimationFrame(syncBriefRailHeights);
 });
 const refreshCompactEditionLabels=()=>renderBriefDateSelect();
