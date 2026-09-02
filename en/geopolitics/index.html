@@ -769,6 +769,11 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     /* Size the closed control to the selected option, not the widest one, so no empty run
        opens up on its left (engines without field-sizing keep the widest-option width). */
     field-sizing:content;
+    /* Draw the chevron ourselves: the native menulist reserves its own arrow strip inside
+       the box on top of the padding, which is what clipped the label on its left. */
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center;background-size:12px 8px;
   }
   /* The open list is drawn by the browser: Chromium ignores text-align on its rows but does
      honour writing direction, so each row is laid out right-to-left while the label itself is
@@ -993,7 +998,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     #briefsSection .home-view-nav{flex:0 0 auto}
     .home-view-button{font-size:.74rem;padding-inline:1px}
     #briefsSection > .section-title .date-select{
-      flex:0 1 auto;max-width:140px;min-width:0;
+      flex:0 1 auto;max-width:185px;min-width:0;
       min-height:40px;margin-left:auto;padding:5px 24px 5px 6px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
@@ -1033,7 +1038,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     #briefsSection .home-view-nav{flex:0 0 auto}
     .home-view-button{font-size:.74rem}
     #briefsSection > .section-title .date-select{
-      flex:0 1 auto;max-width:145px;min-width:0;
+      flex:0 1 auto;max-width:190px;min-width:0;
       min-height:40px;margin-left:auto;padding:5px 26px 5px 6px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
@@ -3816,12 +3821,23 @@ function fitBriefDateSelect(){
   const label = (sel.selectedOptions[0]?.textContent || '').replace(/[\u2066\u2069]/g, '');
   if (!label){ sel.style.width = ''; return; }
   const cs = getComputedStyle(sel);
-  if (!briefDateMeasureContext) briefDateMeasureContext = document.createElement('canvas').getContext('2d');
-  briefDateMeasureContext.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-  const text = briefDateMeasureContext.measureText(label).width;
+  // Measure with a real text node in the same font: canvas metrics miss the emoji and
+  // fallback-font glyphs the control actually paints.
+  if (!briefDateMeasureContext){
+    briefDateMeasureContext = document.createElement('span');
+    briefDateMeasureContext.setAttribute('aria-hidden', 'true');
+    briefDateMeasureContext.style.cssText =
+      'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre;pointer-events:none';
+    document.body.appendChild(briefDateMeasureContext);
+  }
+  const m = briefDateMeasureContext.style;
+  m.fontFamily = cs.fontFamily; m.fontSize = cs.fontSize; m.fontWeight = cs.fontWeight;
+  m.fontStyle = cs.fontStyle; m.letterSpacing = cs.letterSpacing; m.textTransform = cs.textTransform;
+  briefDateMeasureContext.textContent = label;
+  const text = briefDateMeasureContext.getBoundingClientRect().width;
   const extra = ['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth']
     .reduce((sum, key)=>sum + (parseFloat(cs[key]) || 0), 0);
-  sel.style.width = `${Math.ceil(text + extra) + 2}px`;
+  sel.style.width = `${Math.ceil(text + extra) + 3}px`;
 }
 
 function enableCarouselMouseDrag(track, onSettle){
