@@ -764,16 +764,15 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .read-more{font-size:.8rem;font-weight:600;color:var(--accent);margin-top:12px;display:inline-block}
   .date-select{
     margin-left:auto;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);
-    border-radius:8px;padding:6px 28px 6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;
+    border-radius:8px;padding:6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;
     cursor:pointer;text-align:end;
     /* Size the closed control to the selected option, not the widest one, so no empty run
        opens up on its left (engines without field-sizing keep the widest-option width). */
     field-sizing:content;
-    /* Draw the chevron ourselves: the native menulist reserves its own arrow strip inside
-       the box on top of the padding, which is what clipped the label on its left. */
+    /* No arrow at all: the native menulist reserves its own arrow strip inside the box on
+       top of the padding (which clipped the label on its left), and the label alone reads
+       as the control. */
     appearance:none;-webkit-appearance:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238a93a8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 10px center;background-size:12px 8px;
   }
   /* The open list is drawn by the browser: Chromium ignores text-align on its rows but does
      honour writing direction, so each row is laid out right-to-left while the label itself is
@@ -999,7 +998,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-button{font-size:.74rem;padding-inline:1px}
     #briefsSection > .section-title .date-select{
       flex:0 1 auto;max-width:185px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 24px 5px 6px;font-size:.72rem;
+      min-height:40px;margin-left:auto;padding:5px 8px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
     .news-grid{grid-template-columns:minmax(0,1fr)}
@@ -1039,7 +1038,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-button{font-size:.74rem}
     #briefsSection > .section-title .date-select{
       flex:0 1 auto;max-width:190px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 26px 5px 6px;font-size:.72rem;
+      min-height:40px;margin-left:auto;padding:5px 8px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
   }
