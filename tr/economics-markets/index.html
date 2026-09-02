@@ -1102,7 +1102,17 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
      paragraphs never flash at the top on slow loads. visibility (not display)
      keeps their box, so the rail cannot collapse and pull the footer up; the
      per-desk static preview sections stay visible as the loading state. */
-  html.js .static-edition > p{visibility:hidden}
+  html.js .static-edition > p{display:none}
+  /* The static fallback is also the loading state, so it must look like the hydrated
+     Briefs rail: one desk, its card grid only — no desk heading, no news list, no
+     writers. The desk is the one the reader will land on (route pin, else the remembered
+     desk, else geopolitics), chosen by the inline script after the desk nav. */
+  html.js .static-edition > section{display:none;padding-top:0}
+  html.js .static-edition > section > :not(.featured-grid){display:none}
+  html.js.static-topic-ai #static-ai,
+  html.js.static-topic-geopolitics #static-geopolitics,
+  html.js.static-topic-economics-markets #static-economics-markets,
+  html.js.static-topic-science #static-science{display:block}
   @media (prefers-reduced-motion: no-preference){
     html.js .brief-track .brief-card{animation:brief-card-in .35s ease both}
   }
@@ -1131,6 +1141,7 @@ twq('config','re3b4');
       <span class="proto-badge" id="protoBadge">Ekonomi</span>
     </a>
     <nav class="topic-switch" id="topicSwitch" aria-label="Konu masaları"><a class="topic-btn" data-topic="geopolitics" href="/tr/geopolitics/" title="Jeopolitik"><span class="topic-label">Jeopolitik</span></a><a class="topic-btn active" data-topic="economics-markets" href="/tr/economics-markets/" aria-current="page" title="Ekonomi"><span class="topic-label">Ekonomi</span></a><a class="markets-nav" href="/markets" title="Piyasalar" aria-label="Piyasalar"><span class="topic-label">Piyasalar</span></a><a class="topic-btn" data-topic="ai" href="/tr/ai/" title="Yapay Zekâ"><span class="topic-label">Yapay Zekâ</span></a><a class="topic-btn" data-topic="science" href="/tr/science/" title="Bilim"><span class="topic-label">Bilim</span></a></nav>
+    <script id="staticDeskPick">(function(){var r="economics-markets",k=['ai','geopolitics','economics-markets','science'],t=r;try{if(k.indexOf(t)<0)t=localStorage.getItem('topic')}catch(e){}if(k.indexOf(t)<0)t='geopolitics';document.documentElement.classList.add('static-topic-'+t);var n=document.getElementById('topicSwitch');if(n){var a=n.querySelector('.topic-btn.active'),b=n.querySelector('.topic-btn[data-topic="'+t+'"]');if(a&&b&&a!==b){a.classList.remove('active');a.removeAttribute('aria-current');b.classList.add('active');b.setAttribute('aria-current','page')}}})();</script>
     <div class="header-right">
       <a class="archive-link" id="archiveLink" href="/tr/archive/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h16v12H4z"/><path d="M3 4.5h18v3H3z"/><path d="M9 11.5h6"/></svg><span class="archive-label" id="archiveLabel">Arşiv</span></a>
       <div class="utility-switches">
@@ -3769,6 +3780,23 @@ function renderBriefDateSelect(){
       ? option.dataset.compactLabel : option.dataset.fullLabel) + '\u2069';
   });
   sel.style.display = editions.length ? '' : 'none';
+  fitBriefDateSelect();
+}
+/* A native select is as wide as its widest option, so a right-aligned short label leaves
+   a dead run on its left. Fit the box to the selected label (text + paddings + borders);
+   field-sizing:content does the same where the engine supports it. */
+let briefDateMeasureContext = null;
+function fitBriefDateSelect(){
+  const sel = $('briefDateSel');
+  const label = (sel.selectedOptions[0]?.textContent || '').replace(/[\u2066\u2069]/g, '');
+  if (!label){ sel.style.width = ''; return; }
+  const cs = getComputedStyle(sel);
+  if (!briefDateMeasureContext) briefDateMeasureContext = document.createElement('canvas').getContext('2d');
+  briefDateMeasureContext.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const text = briefDateMeasureContext.measureText(label).width;
+  const extra = ['paddingLeft','paddingRight','borderLeftWidth','borderRightWidth']
+    .reduce((sum, key)=>sum + (parseFloat(cs[key]) || 0), 0);
+  sel.style.width = `${Math.ceil(text + extra) + 2}px`;
 }
 
 function enableCarouselMouseDrag(track, onSettle){
@@ -3876,6 +3904,7 @@ function adoptBriefEdition(key){
   resetBriefReading();
   selectedBriefDate = key;
   $('briefDateSel').value = key;
+  fitBriefDateSelect();
   newsPage = 0;
   renderWriters();
   renderNews();
