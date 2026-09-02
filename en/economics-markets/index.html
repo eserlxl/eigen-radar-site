@@ -766,11 +766,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     margin-left:auto;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);
     border-radius:8px;padding:6px 28px 6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;
     cursor:pointer;text-align:end;
+    /* Size the closed control to the selected option, not the widest one, so no empty run
+       opens up on its left (engines without field-sizing keep the widest-option width). */
+    field-sizing:content;
   }
-  /* The closed control is styled by us; the open list is drawn by the browser and only some
-     engines honour alignment on the rows. Set it anyway so the date and its edition symbol sit
-     against the same right edge wherever the engine allows it. */
-  .date-select option{text-align:end}
+  /* The open list is drawn by the browser: Chromium ignores text-align on its rows but does
+     honour writing direction, so each row is laid out right-to-left while the label itself is
+     kept left-to-right by the isolate marks the script wraps around it. */
+  .date-select option{text-align:end;direction:rtl}
   .date-select:hover{border-color:var(--accent)}
   .wchip{
     display:flex;align-items:center;gap:11px;
@@ -990,8 +993,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     #briefsSection .home-view-nav{flex:0 0 auto}
     .home-view-button{font-size:.74rem;padding-inline:1px}
     #briefsSection > .section-title .date-select{
-      flex:0 0 140px;width:140px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 24px 5px 0;font-size:.72rem;
+      flex:0 1 auto;max-width:140px;min-width:0;
+      min-height:40px;margin-left:auto;padding:5px 24px 5px 6px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
     .news-grid{grid-template-columns:minmax(0,1fr)}
@@ -1030,8 +1033,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     #briefsSection .home-view-nav{flex:0 0 auto}
     .home-view-button{font-size:.74rem}
     #briefsSection > .section-title .date-select{
-      flex:0 0 145px;width:145px;min-width:0;
-      min-height:40px;margin-left:auto;padding:5px 26px 5px 4px;font-size:.72rem;
+      flex:0 1 auto;max-width:145px;min-width:0;
+      min-height:40px;margin-left:auto;padding:5px 26px 5px 6px;font-size:.72rem;
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
   }
@@ -1127,7 +1130,7 @@ twq('config','re3b4');
       <span id="siteName">Eigen Radar</span>
       <span class="proto-badge" id="protoBadge">Economics</span>
     </a>
-    <nav class="topic-switch" id="topicSwitch" aria-label="Topic desks"></nav>
+    <nav class="topic-switch" id="topicSwitch" aria-label="Topic desks"><a class="topic-btn" data-topic="geopolitics" href="/en/geopolitics/" title="Geopolitics"><span class="topic-label">Geopolitics</span></a><a class="topic-btn active" data-topic="economics-markets" href="/en/economics-markets/" aria-current="page" title="Economics"><span class="topic-label">Economics</span></a><a class="markets-nav" href="/markets" title="Markets" aria-label="Markets"><span class="topic-label">Markets</span></a><a class="topic-btn" data-topic="ai" href="/en/ai/" title="AI"><span class="topic-label">AI</span></a><a class="topic-btn" data-topic="science" href="/en/science/" title="Science"><span class="topic-label">Science</span></a></nav>
     <div class="header-right">
       <a class="archive-link" id="archiveLink" href="/en/archive/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h16v12H4z"/><path d="M3 4.5h18v3H3z"/><path d="M9 11.5h6"/></svg><span class="archive-label" id="archiveLabel">Archive</span></a>
       <div class="utility-switches">
@@ -1180,7 +1183,7 @@ twq('config','re3b4');
     </nav>
     <div class="podcast-bar" id="podcastBar" role="group" hidden></div>
     <select class="date-select" id="briefDateSel" aria-controls="featured podcastBar news writersGrid"
-      aria-label="Edition date"></select>
+      aria-label="Edition date"><option value="2026-09-02|3" selected>September 2, 2026 🕯️</option></select>
   </div>
   <div id="briefsPanel" class="home-view" aria-labelledby="briefsViewButton">
   <div class="brief-shell">
@@ -3758,11 +3761,12 @@ function renderBriefDateSelect(){
     const desktop = briefDateDesktopLabel(date, brief);
     const compact = briefDateCompactLabel(date, brief);
     const accessible = `${date} · ${editionLabel(brief)}`;
-    return `<option value="${escapeHTML(key)}" data-full-label="${escapeHTML(desktop)}" data-compact-label="${escapeHTML(compact)}" aria-label="${escapeHTML(accessible)}"${key===selectedBriefDate?' selected':''}>${escapeHTML(desktop)}</option>`;
+    return `<option value="${escapeHTML(key)}" data-full-label="${escapeHTML(desktop)}" data-compact-label="${escapeHTML(compact)}" dir="rtl" aria-label="${escapeHTML(accessible)}"${key===selectedBriefDate?' selected':''}>${escapeHTML(desktop)}</option>`;
   }).join('');
   [...sel.options].forEach(option=>{
-    option.textContent = EDITION_LABEL_MEDIA.matches
-      ? option.dataset.compactLabel : option.dataset.fullLabel;
+    // U+2066 LRI … U+2069 PDI: the label reads left-to-right inside the right-to-left row.
+    option.textContent = '\u2066' + (EDITION_LABEL_MEDIA.matches
+      ? option.dataset.compactLabel : option.dataset.fullLabel) + '\u2069';
   });
   sel.style.display = editions.length ? '' : 'none';
 }
