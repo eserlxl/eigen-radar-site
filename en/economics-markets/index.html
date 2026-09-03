@@ -2290,6 +2290,9 @@ function syncBriefRailHeights(){
     feature.style.height = '';
     railCards.forEach(card=>card.style.height = '');
     const rect = feature.getBoundingClientRect();
+    // A hidden panel (another home view is open) measures 0×0; caching that would pin the
+    // feature to height:0px and leave a collapsed strip when the reader returns to Gündem.
+    if (!rect.width || !rect.height) return;
     const railGap = parseFloat(getComputedStyle(rail).rowGap) || 0;
     const visibleRailCards = Math.min(2, railCards.length);
     const naturalRailCardHeight = Math.max(0,
@@ -4110,7 +4113,10 @@ function setHomeView(view){
   });
   Object.entries(panels).forEach(([name, id])=>{ $(id).hidden = name !== view; });
   $('briefsSection').dataset.activeHomeView = view;
-  if (view === 'briefs') scheduleBriefReveal();
+  if (view === 'briefs') {
+    requestAnimationFrame(syncBriefRailHeights);  // panel was hidden: measure it now that it is visible
+    scheduleBriefReveal();
+  }
   else cancelBriefReveal();
 }
 $('homeViewNav').addEventListener('click', event=>{
