@@ -26,6 +26,7 @@ footer{border-top:1px solid var(--line);margin-top:2.5rem;padding:1.875rem 0;col
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,::before,::after{animation:none!important;transition:none!important}}
 
 .archive-link{gap:.4rem;width:auto;padding:.45rem 0;border:0;border-radius:0;background:transparent}
+.archive-link svg{display:none}
 .archive-link:hover,.archive-link[aria-current=page]{border-color:transparent;background:transparent;color:var(--text)}
 @media(min-width:641px) and (max-width:1000px) and (max-height:500px) and (orientation:landscape){.archive-link{width:auto;padding:.45rem 0}.archive-label{position:static!important;width:auto!important;height:auto!important;padding:0!important;margin:0!important;overflow:visible!important;clip:auto!important;white-space:nowrap!important}}
 @media(max-width:360px){.archive-link{width:auto;padding:.45rem 0}.archive-label{position:static!important;width:auto!important;height:auto!important;padding:0!important;margin:0!important;overflow:visible!important;clip:auto!important;white-space:nowrap!important}}

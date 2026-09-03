@@ -24,14 +24,13 @@ import {
   shell,
 } from "./render.mjs";
 
-export const ARCHIVE_PAGE_SIZE = 100;
+export const ARCHIVE_PAGE_SIZE = 10;
 
 export const ARCHIVE_STYLE = `
-.archive-hero{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem .9rem;padding:.9rem 0 .35rem}.archive-hero h1{margin:0;max-width:none;font-size:clamp(1.45rem,3vw,1.85rem);line-height:1.2;letter-spacing:-.02em}.archive-hero .deck{margin:0;font-size:.95rem}.archive-controls{display:grid;grid-template-columns:minmax(14rem,2fr) repeat(2,minmax(10rem,1fr)) auto;align-items:end;gap:.75rem;margin:.6rem 0 .9rem;padding:.75rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft)}.archive-controls[hidden]{display:none}.archive-field{display:grid;gap:.35rem;color:var(--muted);font-size:.75rem;font-weight:700}.archive-field input,.archive-field select{width:100%;min-height:2.75rem;padding:.55rem .7rem;border:1px solid var(--line);border-radius:.55rem;background:var(--bg);color:var(--text)}.archive-field input:focus,.archive-field select:focus{border-color:var(--accent)}.archive-clear{min-height:2.75rem;padding:.55rem .85rem;border:1px solid var(--line);border-radius:.55rem;background:transparent;color:var(--text);cursor:pointer}.archive-clear:hover{border-color:var(--accent);background:var(--accent-soft)}.archive-status{margin:.5rem 0 1.25rem;color:var(--muted);font-size:.86rem}.archive-empty{margin:1rem 0;padding:1rem;border-left:.2rem solid var(--accent);color:var(--muted)}.archive-empty[hidden],.archive-edition[hidden],.archive-result[hidden]{display:none}.archive-edition+.archive-edition{margin-top:2rem}.archive-edition>h2{padding-bottom:.65rem;border-bottom:1px solid var(--line);color:var(--muted);font-size:.92rem;letter-spacing:.03em}.archive-list{display:grid;gap:.7rem;margin:.8rem 0 0;padding:0;list-style:none}.archive.is-searching .archive-results{display:grid;gap:.7rem}.archive.is-searching .archive-edition,.archive.is-searching .archive-list{display:contents}.archive.is-searching .archive-edition>h2{display:none}.archive-result>a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.7rem 1rem;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:.75rem;background:var(--card);color:var(--text);text-decoration:none;transition:.15s}.archive-result>a:hover{transform:translateY(-2px);border-color:var(--accent);background:var(--card-hover)}.archive-result-main{min-width:0}.archive-result-tags{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;color:var(--muted);font-size:.72rem}.archive-result h3{margin:.25rem 0 .35rem;font-size:1rem}.archive-result p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:.25rem 0;color:var(--muted);font-size:.84rem}.archive-kind,.archive-topic{display:inline-flex;width:max-content;padding:.12rem .45rem;border-radius:.35rem;font-size:.68rem;font-weight:800}.archive-kind{background:var(--accent-soft);color:var(--accent);letter-spacing:.04em;text-transform:uppercase}.archive-kind.is-brief{background:var(--brief-kind-soft);color:var(--brief-kind)}.archive-topic{border:1px solid var(--line);color:var(--muted)}.archive-result .meta{margin-top:.5rem}.archive-arrow{align-self:center;color:var(--accent);font-size:1.1rem;font-weight:800}
+.archive-hero{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem .9rem;padding:.7rem 0 .35rem}.archive-hero h1{margin:0;max-width:none;font-size:clamp(1.45rem,3vw,1.85rem);line-height:1.2;letter-spacing:-.02em}.archive-hero .deck{margin:0;font-size:.95rem}.archive-controls{display:grid;grid-template-columns:minmax(12rem,2fr) repeat(2,minmax(8.5rem,1fr)) repeat(2,minmax(8rem,1fr)) auto;align-items:end;gap:.75rem;margin:.6rem 0 .9rem;padding:.75rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--soft)}.archive-controls[hidden]{display:none}.archive-field{display:grid;gap:.35rem;color:var(--muted);font-size:.75rem;font-weight:700}.archive-field input,.archive-field select{width:100%;min-height:2.75rem;padding:.55rem .7rem;border:1px solid var(--line);border-radius:.55rem;background:var(--bg);color:var(--text)}.archive-field input:focus,.archive-field select:focus{border-color:var(--accent)}.archive-clear{min-height:2.75rem;padding:.55rem .85rem;border:1px solid var(--line);border-radius:.55rem;background:transparent;color:var(--text);cursor:pointer}.archive-clear:hover{border-color:var(--accent);background:var(--accent-soft)}.archive-status{margin:.5rem 0 1.25rem;color:var(--muted);font-size:.86rem}.archive-empty{margin:1rem 0;padding:1rem;border-left:.2rem solid var(--accent);color:var(--muted)}.archive-empty[hidden],.archive-edition[hidden],.archive-result[hidden]{display:none}.archive-edition+.archive-edition{margin-top:2rem}.archive-edition>h2{padding-bottom:.65rem;border-bottom:1px solid var(--line);color:var(--muted);font-size:.92rem;letter-spacing:.03em}.archive-list{display:grid;gap:.7rem;margin:.8rem 0 0;padding:0;list-style:none}.archive.is-searching .archive-results{display:grid;gap:.7rem}.archive.is-searching .archive-edition,.archive.is-searching .archive-list{display:contents}.archive.is-searching .archive-edition>h2{display:none}.archive-result>a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.7rem 1rem;padding:1rem 1.1rem;border:1px solid var(--line);border-radius:.75rem;background:var(--card);color:var(--text);text-decoration:none;transition:.15s}.archive-result>a:hover{transform:translateY(-2px);border-color:var(--accent);background:var(--card-hover)}.archive-result-main{min-width:0}.archive-result-tags{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;color:var(--muted);font-size:.72rem}.archive-result h3{margin:.25rem 0 .35rem;font-size:1rem}.archive-result p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:.25rem 0;color:var(--muted);font-size:.84rem}.archive-kind,.archive-topic{display:inline-flex;width:max-content;padding:.12rem .45rem;border-radius:.35rem;font-size:.68rem;font-weight:800}.archive-kind{background:var(--accent-soft);color:var(--accent);letter-spacing:.04em;text-transform:uppercase}.archive-kind.is-brief{background:var(--brief-kind-soft);color:var(--brief-kind)}.archive-topic{border:1px solid var(--line);color:var(--muted)}.archive-result .meta{margin-top:.5rem}.archive-arrow{align-self:center;color:var(--accent);font-size:1.1rem;font-weight:800}
 @media(max-width:760px){.archive-controls{grid-template-columns:1fr 1fr}.archive-field:first-child{grid-column:1/-1}.archive-clear{align-self:end}}
 @media(max-width:480px){.archive-controls{grid-template-columns:1fr}.archive-field:first-child{grid-column:auto}.archive-result>a{grid-template-columns:minmax(0,1fr)}.archive-arrow{display:none}}
-.archive-months{display:flex;gap:.45rem;flex-wrap:wrap;margin:.6rem 0 .6rem;padding:0}.archive-months a{display:inline-flex;padding:.3rem .65rem;border:1px solid var(--line);border-radius:.55rem;color:var(--muted);font-size:.78rem;font-weight:700;text-decoration:none;white-space:nowrap;transition:.12s}.archive-months a:hover{border-color:var(--accent);color:var(--text);background:var(--accent-soft)}.archive-months a[aria-current=page]{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.archive-pagination{display:flex;align-items:center;gap:1rem;margin:2rem 0 .5rem;padding:1rem 0;border-top:1px solid var(--line)}.archive-pagination a{display:inline-flex;padding:.45rem .85rem;border:1px solid var(--line);border-radius:.55rem;color:var(--text);font-size:.86rem;font-weight:700;text-decoration:none;transition:.12s}.archive-pagination a:hover{border-color:var(--accent);background:var(--accent-soft)}.archive-page-indicator{color:var(--muted);font-size:.82rem}
+.archive-pagination[hidden]{display:none}.archive-pagination{display:flex;align-items:center;gap:1rem;margin:2rem 0 .5rem;padding:1rem 0;border-top:1px solid var(--line)}.archive-pagination a{display:inline-flex;padding:.45rem .85rem;border:1px solid var(--line);border-radius:.55rem;color:var(--text);font-size:.86rem;font-weight:700;text-decoration:none;transition:.12s}.archive-pagination a:hover{border-color:var(--accent);background:var(--accent-soft)}.archive-page-indicator{color:var(--muted);font-size:.82rem}
 `;
 
 export const ARCHIVE_SCRIPT = `
@@ -43,42 +42,73 @@ export const ARCHIVE_SCRIPT = `
   const query=root.querySelector('[data-archive-query]');
   const type=root.querySelector('[data-archive-type]');
   const topic=root.querySelector('[data-archive-topic]');
+  const from=root.querySelector('[data-archive-from]');
+  const to=root.querySelector('[data-archive-to]');
   const clear=root.querySelector('[data-archive-clear]');
   const status=root.querySelector('[data-archive-status]');
   const empty=root.querySelector('[data-archive-empty]');
-  const items=[...root.querySelectorAll('[data-archive-item]')];
-  const groups=[...root.querySelectorAll('[data-archive-group]')];
-  if(!controls||!query||!type||!topic||!clear||!status||!empty)return;
+  // Re-queried on every pass: restoring the server list or rendering a shard page
+  // replaces .archive-results, so a list captured once goes stale on the first filter.
+  const itemNodes=()=>[...root.querySelectorAll('[data-archive-item]')];
+  const groupNodes=()=>[...root.querySelectorAll('[data-archive-group]')];
+  if(!controls||!query||!type||!topic||!from||!to||!clear||!status||!empty)return;
   const lang=root.dataset.archiveLang||'en';
   const emptyText=lang==='tr'?'Aramanızla eşleşen arşiv '+'içeriği yok.':'No archive items match your '+'search.';
   const manifestUrl=root.dataset.archiveManifest||'';
   const loadingTpl=root.dataset.loadingTemplate||'';
   const partialNote=root.dataset.partialNote||'';
+  const pageSize=Number(root.dataset.pageSize)||10;
+  const newerLabel=root.dataset.newerLabel||'';
+  const olderLabel=root.dataset.olderLabel||'';
+  const pageTpl=root.dataset.pageTemplate||'';
   const resultsBox=root.querySelector('.archive-results');
+  const serverPager=root.querySelector('.archive-pagination');
+  const pager=document.createElement('nav');
+  pager.className='archive-pagination';
+  pager.hidden=true;
+  root.appendChild(pager);
   let serverHTML=resultsBox?resultsBox.innerHTML:'';
   let manifest=null;
   let shardCache={};
   let shardPartial=false;
+  let page=1;
   const fold=value=>String(value??'').normalize('NFKD').toLocaleLowerCase('tr-TR')
     .replace(/ı/g,'i').replace(/[\u0300-\u036f]/g,'');
   const hasOption=(select,value)=>[...select.options].some(option=>option.value===value);
-  const isDefault=()=>!query.value.trim()&&type.value==='all'&&topic.value==='all';
+  const isDefault=()=>!query.value.trim()&&type.value==='all'&&topic.value==='all'
+    &&!from.value&&!to.value;
+  const inRange=date=>(!from.value||date>=from.value)&&(!to.value||date<=to.value);
   const readParams=()=>{
-    const params=new URLSearchParams(location.search);
+    const params=new URLSearchParams(location.hash.slice(1)||location.search.slice(1));
     query.value=params.get('q')||'';
     const requestedType=params.get('type')||'all';
     const requestedTopic=params.get('topic')||'all';
     type.value=hasOption(type,requestedType)?requestedType:'all';
     topic.value=hasOption(topic,requestedTopic)?requestedTopic:'all';
+    from.value=params.get('from')||'';
+    to.value=params.get('to')||'';
+    page=Math.max(1,Math.floor(Number(params.get('page')))||1);
   };
-  const syncUrl=()=>{
+  const stateParams=()=>{
     const params=new URLSearchParams();
     const q=query.value.trim();
     if(q)params.set('q',q);
     if(type.value!=='all')params.set('type',type.value);
     if(topic.value!=='all')params.set('topic',topic.value);
-    const search=params.toString();
-    history.replaceState(null,'',location.pathname+(search?'?'+search:'')+location.hash);
+    if(from.value)params.set('from',from.value);
+    if(to.value)params.set('to',to.value);
+    return params;
+  };
+  const pageHref=n=>{
+    const params=stateParams();
+    if(n>1)params.set('page',String(n));
+    return '#'+params.toString();
+  };
+  const syncUrl=()=>{
+    const params=stateParams();
+    if(page>1)params.set('page',String(page));
+    const hash=params.toString();
+    history.replaceState(null,'',location.pathname+(hash?'#'+hash:''));
   };
   const renderItem=e=>{
     const bc=e.kind==='brief'?' is-brief':'';
@@ -89,28 +119,45 @@ export const ARCHIVE_SCRIPT = `
       \`<a href="\${esc(e.url)}"><div class="archive-result-main">\`+
       \`<div class="archive-result-tags"><span class="archive-kind\${bc}">\${esc(e.kind_label||e.kind)}</span>\`+
       \`<span class="archive-topic">\${esc(e.topic_label||e.topic)}</span>\`+
-      \`<time datetime="\${e.date}">\${esc(e.date)}</time></div>\`+
+      \`<time datetime="\${e.date}">\${fmtDate(e.date)}</time></div>\`+
       \`<h3>\${esc(e.title)}</h3>\${summary}\${byline}</div>\`+
       \`<span class="archive-arrow" aria-hidden="true">→</span></a></li>\`;
   };
-  const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML.replace(/"/g,'&quot;');};
+  const esc=s=>{const d=document.createElement('div');d.textContent=s;return d.innerHTML.replace(/"/g,'&quot;');};const fmtDate=v=>{const m=/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/.exec(v||'');if(!m)return esc(v);try{return esc(new Date(Date.UTC(+m[1],+m[2]-1,+m[3])).toLocaleDateString(lang==='tr'?'tr-TR':'en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}));}catch{return esc(v);}};
+  const renderPager=(current,total)=>{
+    if(total<=1){pager.hidden=true;pager.innerHTML='';return;}
+    const indicator=pageTpl.replace('{n}',String(current)).replace('{total}',String(total));
+    let html='';
+    if(current>1)html+=\`<a href="\${esc(pageHref(current-1))}">\${esc(newerLabel)}</a>\`;
+    html+=\`<span class="archive-page-indicator">\${esc(indicator)}</span>\`;
+    if(current<total)html+=\`<a href="\${esc(pageHref(current+1))}">\${esc(olderLabel)}</a>\`;
+    pager.setAttribute('aria-label',indicator);
+    pager.innerHTML=html;
+    pager.hidden=false;
+  };
   const applyLocal=sync=>{
     const q=fold(query.value.trim());
     let count=0;
-    items.forEach(item=>{
+    itemNodes().forEach(item=>{
+      const stamp=item.querySelector('time');
       const visible=(!q||fold(item.dataset.search).includes(q))
         &&(type.value==='all'||item.dataset.type===type.value)
-        &&(topic.value==='all'||item.dataset.topic===topic.value);
+        &&(topic.value==='all'||item.dataset.topic===topic.value)
+        &&inRange(stamp?stamp.getAttribute('datetime'):'');
       item.hidden=!visible;
       if(visible)count+=1;
     });
     root.classList.toggle('is-searching',Boolean(q));
-    groups.forEach(group=>{group.hidden=!group.querySelector('[data-archive-item]:not([hidden])');});
+    groupNodes().forEach(group=>{group.hidden=!group.querySelector('[data-archive-item]:not([hidden])');});
     status.textContent=count===1
       ?root.dataset.countOne
       :root.dataset.countTemplate.replace('{count}',String(count));
     empty.hidden=count!==0;
     if(count===0)empty.textContent=emptyText;
+    // One server page never holds more than pageSize items, so the local
+    // fallback is always a single page: show no client pager at all.
+    renderPager(1,1);
+    if(serverPager)serverPager.hidden=!isDefault();
     if(sync)syncUrl();
   };
   const fetchManifest=async()=>{
@@ -143,12 +190,18 @@ export const ARCHIVE_SCRIPT = `
         :root.dataset.countTemplate.replace('{count}',String(ct));
       empty.hidden=ct!==0;
       if(ct===0)empty.textContent=emptyText;
+      renderPager(1,1);
+      if(serverPager)serverPager.hidden=false;
       if(sync)syncUrl();
       return;
     }
+    if(serverPager)serverPager.hidden=true;
     const m=await fetchManifest();
     if(!m||!m.shards){applyLocal(sync);return;}
-    const langShards=m.shards.filter(s=>s.lang===lang);
+    const fromMonth=from.value?from.value.slice(0,7):'';
+    const toMonth=to.value?to.value.slice(0,7):'';
+    const langShards=m.shards.filter(s=>s.lang===lang
+      &&(!fromMonth||s.month>=fromMonth)&&(!toMonth||s.month<=toMonth));
     const total=langShards.length;
     let done=0;
     let allEntries=[];
@@ -168,21 +221,27 @@ export const ARCHIVE_SCRIPT = `
       (!q||fold(e.search||'').includes(q))
       &&(tv==='all'||e.kind===tv)
       &&(tpv==='all'||e.topic===tpv)
+      &&inRange(e.date)
     );
+    filtered.sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    const count=filtered.length;
+    const pageCount=Math.max(1,Math.ceil(count/pageSize));
+    if(page>pageCount)page=pageCount;
+    const shown=filtered.slice((page-1)*pageSize,page*pageSize);
     root.classList.toggle('is-searching',Boolean(q));
     if(resultsBox){
       const grouped={};
-      filtered.forEach(e=>{(grouped[e.date]=grouped[e.date]||[]).push(e);});
+      shown.forEach(e=>{(grouped[e.date]=grouped[e.date]||[]).push(e);});
       let html='';
       for(const[date,entries]of Object.entries(grouped)){
         const id='search-'+lang+'-'+date;
         html+=\`<section class="archive-edition" data-archive\${'-group'} aria-labelledby="\${id}">\`;
-        html+=\`<h2 id="\${id}"><time datetime="\${date}">\${esc(date)}</time></h2>\`;
+        html+=\`<h2 id="\${id}"><time datetime="\${date}">\${fmtDate(date)}</time></h2>\`;
         html+=\`<ol class="archive-list">\${entries.map(renderItem).join('')}</ol></section>\`;
       }
       resultsBox.innerHTML=html;
     }
-    const count=filtered.length;
+    renderPager(page,pageCount);
     if(!shardPartial){
       status.textContent=count===1?root.dataset.countOne
         :root.dataset.countTemplate.replace('{count}',String(count));
@@ -198,14 +257,18 @@ export const ARCHIVE_SCRIPT = `
       applyShards(sync);
     }
   };
+  const rerun=()=>{page=1;apply(true);};
   controls.hidden=false;
   readParams();
   controls.addEventListener('submit',event=>event.preventDefault());
-  query.addEventListener('input',()=>apply(true));
-  type.addEventListener('change',()=>apply(true));
-  topic.addEventListener('change',()=>apply(true));
-  clear.addEventListener('click',()=>{query.value='';type.value='all';topic.value='all';apply(true);query.focus();});
+  query.addEventListener('input',rerun);
+  type.addEventListener('change',rerun);
+  topic.addEventListener('change',rerun);
+  from.addEventListener('change',rerun);
+  to.addEventListener('change',rerun);
+  clear.addEventListener('click',()=>{query.value='';type.value='all';topic.value='all';from.value='';to.value='';rerun();query.focus();});
   addEventListener('popstate',()=>{readParams();apply(false);});
+  addEventListener('hashchange',()=>{readParams();apply(false);});
   document.addEventListener('keydown',e=>{
     if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey)return;
     const t=e.target;
@@ -280,6 +343,21 @@ export function sortArchiveEntries(entries, lang) {
   return sorted;
 }
 
+// Oldest and newest selectable day for the archive date-range inputs: `months` is
+// the newest-first [yearMonth, count] list the search manifest is built from, so its
+// two ends are the archive's two ends.  Mirrors _archive_date_bounds in site_pages.py.
+function archiveDateBounds(months) {
+  if (!months.length) {
+    return ["", ""];
+  }
+  const newest = months[0][0];
+  const oldest = months[months.length - 1][0];
+  const lastDay = new Date(
+    Date.UTC(Number(newest.slice(0, 4)), Number(newest.slice(5, 7)), 0),
+  ).getUTCDate();
+  return [`${oldest}-01`, `${newest}-${String(lastDay).padStart(2, "0")}`];
+}
+
 export function paginateArchiveEntries(entries) {
   if (!entries.length) {
     return [];
@@ -345,7 +423,7 @@ function renderArchivePage(
     h1Text = u.archive_title;
     pageTitle = `${u.archive_title} — Eigen Radar`;
     crumbsHtml =
-      `<nav class="breadcrumbs" aria-label="${esc(u.breadcrumb_label)}">` +
+      `<nav class="breadcrumbs visually-hidden" aria-label="${esc(u.breadcrumb_label)}">` +
       `<a href="/">${esc(u.home)}</a><span>/</span>` +
       `<span aria-current="page">${esc(u.archive)}</span></nav>`;
     breadcrumbItems = [
@@ -373,7 +451,7 @@ function renderArchivePage(
         .replace("{total}", String(totalPages));
       pageTitle = `${monthLabel} — ${pageLabel} — ${u.archive_title} — Eigen Radar`;
       crumbsHtml =
-        `<nav class="breadcrumbs" aria-label="${esc(u.breadcrumb_label)}">` +
+        `<nav class="breadcrumbs visually-hidden" aria-label="${esc(u.breadcrumb_label)}">` +
         `<a href="/">${esc(u.home)}</a><span>/</span>` +
         `<a href="${esc(archiveRoot)}">${esc(u.archive)}</a><span>/</span>` +
         `<a href="${esc(monthRoot)}">${esc(monthLabel)}</a><span>/</span>` +
@@ -396,7 +474,7 @@ function renderArchivePage(
       ];
     } else {
       crumbsHtml =
-        `<nav class="breadcrumbs" aria-label="${esc(u.breadcrumb_label)}">` +
+        `<nav class="breadcrumbs visually-hidden" aria-label="${esc(u.breadcrumb_label)}">` +
         `<a href="/">${esc(u.home)}</a><span>/</span>` +
         `<a href="${esc(archiveRoot)}">${esc(u.archive)}</a><span>/</span>` +
         `<span aria-current="page">${esc(monthLabel)}</span></nav>`;
@@ -451,20 +529,6 @@ function renderArchivePage(
     );
   }
 
-  let monthsHtml = "";
-  if (months.length) {
-    const monthLinks = months.map(([yearMonth, count]) => {
-      const href = archiveMonthPublicPath(lang, yearMonth);
-      const label = `${formatMonth(yearMonth, lang)} (${count})`;
-      const current =
-        !isBase && month === yearMonth ? ' aria-current="page"' : "";
-      return `<a href="${esc(href)}"${current}>${esc(label)}</a>`;
-    });
-    monthsHtml =
-      `<nav class="archive-months" aria-label="${esc(u.archive_months)}">` +
-      `${monthLinks.join("")}</nav>`;
-  }
-
   let newerHref = null;
   if (!isBase && month && pageNo > 1) {
     newerHref = archiveMonthPublicPath(lang, month, pageNo - 1);
@@ -512,14 +576,18 @@ function renderArchivePage(
     .join("");
 
   const countText = u.archive_results.replace("{count}", String(entries.length));
+  const [dateMin, dateMax] = archiveDateBounds(months);
+  const rangeAttrs = dateMin ? ` min="${dateMin}" max="${dateMax}"` : "";
   const body =
     `${crumbsHtml}` +
-    `<div class="archive" data-archive data-count-template="${esc(u.archive_results)}" data-count-one="${esc(u.archive_result_one)}" data-archive-lang="${esc(lang)}" data-archive-manifest="/assets/archive-index/manifest.json" data-loading-template="${esc(u.archive_search_loading)}" data-partial-note="${esc(u.archive_search_partial)}">` +
+    `<div class="archive" data-archive data-count-template="${esc(u.archive_results)}" data-count-one="${esc(u.archive_result_one)}" data-archive-lang="${esc(lang)}" data-archive-manifest="/assets/archive-index/manifest.json" data-loading-template="${esc(u.archive_search_loading)}" data-partial-note="${esc(u.archive_search_partial)}" data-page-size="${ARCHIVE_PAGE_SIZE}" data-newer-label="${esc(u.archive_newer)}" data-older-label="${esc(u.archive_older)}" data-page-template="${esc(u.archive_page_of)}">` +
     `<header class="archive-hero"><h1>${esc(h1Text)}</h1><p class="deck">${esc(u.archive_deck)}</p></header>` +
-    `${monthsHtml}<form class="archive-controls" data-archive-controls role="search" hidden>` +
+    `<form class="archive-controls" data-archive-controls role="search" hidden>` +
     `<label class="archive-field"><span>${esc(u.archive_search)}</span><input type="search" data-archive-query autocomplete="off" enterkeyhint="search" placeholder="${esc(u.archive_search)}"></label>` +
     `<label class="archive-field"><span>${esc(u.archive_type)}</span><select data-archive-type><option value="all">${esc(u.archive_all_types)}</option><option value="column">${esc(u.archive_columns)}</option><option value="brief">${esc(u.archive_briefs)}</option></select></label>` +
     `<label class="archive-field"><span>${esc(u.archive_topic)}</span><select data-archive-topic><option value="all">${esc(u.archive_all_topics)}</option>${topicOptions}</select></label>` +
+    `<label class="archive-field"><span>${esc(u.archive_from)}</span><input type="date" data-archive-from${rangeAttrs}></label>` +
+    `<label class="archive-field"><span>${esc(u.archive_to)}</span><input type="date" data-archive-to${rangeAttrs}></label>` +
     `<button class="archive-clear" type="button" data-archive-clear>${esc(u.archive_clear)}</button>` +
     `</form>` +
     `<p class="archive-status" data-archive-status role="status" aria-live="polite" aria-atomic="true">${esc(countText)}</p>` +
