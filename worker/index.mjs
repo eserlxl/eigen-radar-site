@@ -81,7 +81,7 @@ function parseDetailRoute(parts) {
   let slot = 1;
   if (parts.length === 5) {
     const parsed = Number.parseInt(parts[4], 10);
-    if (!Number.isInteger(parsed) || parsed < 2) {
+    if (!/^\d+$/.test(parts[4]) || !Number.isSafeInteger(parsed) || parsed < 2) {
       return null;
     }
     slot = parsed;
@@ -167,7 +167,8 @@ function parseAggregateRoute(parts) {
   ) {
     const yearMonth = `${parts[2]}-${parts[3]}`;
     const pageNo = Number.parseInt(parts[5], 10);
-    if (!YEAR_MONTH_RE.test(yearMonth) || !Number.isInteger(pageNo) || pageNo < 2) {
+    if (!YEAR_MONTH_RE.test(yearMonth) || !/^\d+$/.test(parts[5])
+        || !Number.isSafeInteger(pageNo) || pageNo < 2) {
       return null;
     }
     return {
