@@ -57,7 +57,7 @@
   });
 
   addEventListener('storage', event => {
-    if (event.key === storageKey) apply(event.newValue);
+    if (event.key === null || event.key === storageKey) apply(event.newValue);
   });
 
   apply(root.dataset.theme);
@@ -107,7 +107,7 @@
     apply(scales[(scales.indexOf(current) + 1) % scales.length], true);
   });
   addEventListener('storage', event => {
-    if (event.key === storageKey) apply(event.newValue || '1');
+    if (event.key === null || event.key === storageKey) apply(event.newValue || '1');
   });
   window.refreshTextScaleSwitch = () => apply(root.dataset.textScale || stored());
   apply(stored());

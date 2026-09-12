@@ -183,6 +183,7 @@
       label.textContent = button.dataset.shareLabel;
       button.setAttribute('aria-label', button.dataset.shareLabel);
       button.classList.remove('is-confirmed', 'is-error');
+      status.textContent = '';
     };
     const feedback = (message, state) => {
       clearTimeout(resetTimer);
