@@ -537,13 +537,16 @@ export async function handleRequest(request, env) {
   const requestUrl = new URL(request.url);
 
   if (request.method === "GET" && requestUrl.pathname === "/__worker/health") {
-    const site = await loadSite(env);
+    const site = await loadSite(env).catch(() => null);
+    const siteVersion = typeof site?.value?.version === "string" && site.value.version
+      ? site.value.version
+      : null;
     return new Response(JSON.stringify({
-      ok: true,
+      ok: siteVersion !== null,
       rendererVersion: RENDERER_VERSION,
-      siteVersion: site?.value?.version ?? null,
+      siteVersion,
     }), {
-      status: 200,
+      status: siteVersion === null ? 503 : 200,
       headers: workerHeaders({
         "content-type": "application/json; charset=utf-8",
         "cache-control": "no-store",
