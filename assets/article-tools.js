@@ -225,8 +225,10 @@
     };
 
     button.addEventListener('click', async () => {
-      const main = button.closest('main');
-      const heading = main && main.querySelector('.article-header h1');
+      // Scope the headline to the enclosing article, not to main: a page that ever
+      // carries more than one article would otherwise share the first one's title.
+      const article = button.closest('article');
+      const heading = article && article.querySelector('.article-header h1');
       const canonical = document.querySelector('link[rel="canonical"]');
       const payload = {
         title: heading ? heading.textContent.trim() : document.title,
