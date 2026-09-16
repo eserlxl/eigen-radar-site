@@ -739,23 +739,24 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   /* ---------- writers ---------- */
   #briefsSection{padding-top:10px}
   .radar-ticker{
-    display:flex;align-items:center;gap:10px;
-    margin:0 0 8px;min-height:1.75rem;z-index:1;
-    font-size:.78rem;line-height:1.3;color:var(--muted);
+    --radar-row:1.2rem;
+    display:flex;align-items:center;gap:8px;
+    margin:2px 0 3px;padding:2px 0;min-height:0;z-index:1;
+    font-size:.78rem;line-height:1.2;color:var(--muted);
   }
   .radar-ticker[hidden]{display:none}
   .radar-kicker{
     flex:0 0 auto;font-size:.62rem;font-weight:800;letter-spacing:.08em;
     text-transform:uppercase;color:var(--accent);
   }
-  .radar-viewport{flex:1 1 auto;min-width:0;overflow:hidden;height:1.5rem}
+  .radar-viewport{flex:1 1 auto;min-width:0;overflow:hidden;height:var(--radar-row)}
   .radar-track{display:flex;flex-direction:column}
   .radar-track.is-sliding{
     transition:transform .2s ease-in;
-    transform:translateY(-1.5rem);
+    transform:translateY(calc(-1 * var(--radar-row)));
   }
   .radar-row{
-    display:flex;align-items:center;gap:8px;height:1.5rem;min-width:0;
+    display:flex;align-items:center;gap:8px;height:var(--radar-row);min-width:0;
     color:inherit;text-decoration:none;white-space:nowrap;
   }
   .radar-row:hover,.radar-row:focus-visible{color:var(--text)}
@@ -771,12 +772,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .radar-entity{flex:0 0 auto;font-weight:700;color:var(--text)}
   .radar-sep{flex:0 0 auto;opacity:.55}
   .radar-title{min-width:0;overflow:hidden;text-overflow:ellipsis}
-  .radar-pause{
-    flex:0 0 auto;min-width:44px;min-height:44px;padding:0;border:0;
-    background:transparent;color:var(--muted);font:700 .7rem/1 inherit;cursor:pointer;
-  }
-  .radar-pause:hover,.radar-pause:focus-visible{color:var(--text)}
-  .radar-pause:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
   .writer-carousel-arrow{
     position:absolute;z-index:3;top:50%;transform:translateY(-50%);
     display:grid;place-items:center;width:44px;height:44px;padding:0;
@@ -1222,7 +1217,6 @@ twq('config','re3b4');
     <div class="radar-viewport" id="radarViewport">
       <div class="radar-track" id="radarTrack"></div>
     </div>
-    <button type="button" class="radar-pause" id="radarPause" aria-pressed="false"></button>
   </div>
   <div class="section-title">
     <h2 class="visually-hidden" id="featTitle">Briefs</h2>
@@ -1468,8 +1462,6 @@ const UI = {
     skip:"Ana içeriğe geç",
     featTitle:"Gündem",
     radarLabel:"RADAR",
-    radarPause:"Şeridi duraklat",
-    radarPlay:"Şeridi sürdür",
     newsTitle:"Son Gelişmeler",
     homeViewNav:"İçerik görünümleri",
     filtersLabel:"Haber filtreleri",
@@ -1548,8 +1540,6 @@ const UI = {
     skip:"Skip to main content",
     featTitle:"Briefs",
     radarLabel:"RADAR",
-    radarPause:"Pause ticker",
-    radarPlay:"Resume ticker",
     newsTitle:"Latest Stories",
     homeViewNav:"Content views",
     filtersLabel:"News filters",
@@ -1703,7 +1693,6 @@ let BRIEFS = [];
 let DATE_LABELS = {};
 let ARTICLES = [];
 let DATES = [];
-let radarPaused = false;
 let radarItems = [];
 let radarIndex = 0;
 let radarTimer = 0;
@@ -2009,11 +1998,6 @@ function renderChrome(){
   $('pageTitle').textContent = pageMeta.title;
   $('featTitle').textContent = u.featTitle;
   $('radarKicker').textContent = u.radarLabel;
-  const radarPause = $('radarPause');
-  if (radarPause){
-    radarPause.setAttribute('aria-label', radarPaused ? u.radarPlay : u.radarPause);
-    radarPause.textContent = radarPaused ? '▶' : '❚❚';
-  }
   $('briefsViewButton').textContent = u.featTitle;
   $('homeViewNav').setAttribute('aria-label', u.homeViewNav);
   $('filters').setAttribute('aria-label', u.filtersLabel);
@@ -2189,6 +2173,7 @@ function newsCard(n, featured){
     : escapeHTML(detailText);
   el.className = featured ? 'fcard' : 'card';
   el.dataset.tag = n.tag;
+  el.dataset.newsUrl = typeof n.url==='string' ? n.url : '';
   const detailId = `news-detail-${newsCardSequence++}`;
   el.innerHTML = `
     <div class="meta-row">
@@ -3236,22 +3221,25 @@ $('featured').addEventListener('click', event=>{
   openBriefReading(card);
 });
 
-function renderNews(){
-  const u = UI[LANG];
-  $('news').innerHTML = '';
+function visibleNewsItems(){
   const q = searchFold(searchQuery.trim());
   const {date} = briefEditionParts(selectedBriefDate);
   const latestDate = (DATA.newsDates || {})[TOPIC] || '';
   const source = !date || date===latestDate ? LATEST_NEWS : NEWS_HISTORY;
-  const items = source.filter(n => newsTopicOf(n)===TOPIC &&
+  return source.filter(n => newsTopicOf(n)===TOPIC &&
     (!date || date===latestDate || n.editionDate===date) &&
     (activeFilter==='all' || n.tag===activeFilter) &&
     (!q || newsHaystack(n).includes(q)));
+}
+function renderNews(){
+  const u = UI[LANG];
+  $('news').innerHTML = '';
+  const items = visibleNewsItems();
   const view = pageItems(items, newsPage, NEWS_PAGE_SIZE);
   newsPage = view.page;
   view.items.forEach(n => $('news').appendChild(newsCard(n, false)));
   if (!items.length) $('news').innerHTML =
-    `<p class="empty-note">${q ? u.noResults : u.emptyDesk}</p>`;
+    `<p class="empty-note">${searchQuery.trim() ? u.noResults : u.emptyDesk}</p>`;
   const pager = $('newsPager');
   pager.setAttribute('aria-label', u.newsPages);
   pager.hidden = view.pages <= 1;
@@ -4104,6 +4092,7 @@ function adoptBriefEdition(key){
   newsPage = 0;
   renderWriters();
   renderNews();
+  renderRadar();
   renderPodcast();
   scheduleBriefReveal();
 }
@@ -4489,8 +4478,7 @@ window.addEventListener('resize', ()=>{
 }, {passive:true});
 
 /* ---------- boot ---------- */
-const RADAR_LIMIT = 8;
-const RADAR_DWELL_MS = 5000;
+const RADAR_DWELL_MS = 10000;
 const RADAR_SLIDE_MS = 200;
 const RADAR_REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)');
 const FLAG_ASSET_PATH = /^\/assets\/flags\/[a-z]{2}\.svg$/;
@@ -4516,12 +4504,17 @@ function radarSortKey(n){
   }
   return 0;
 }
+function radarDeskNews(){
+  const {date} = briefEditionParts(selectedBriefDate);
+  const latestDate = (DATA.newsDates || {})[TOPIC] || '';
+  const source = !date || date===latestDate ? LATEST_NEWS : NEWS_HISTORY;
+  return source.filter(n => newsTopicOf(n)===TOPIC &&
+    (!date || date===latestDate || n.editionDate===date));
+}
 function radarPool(){
-  return LATEST_NEWS
-    .filter(n => newsTopicOf(n)===TOPIC)
+  return radarDeskNews()
     .slice()
-    .sort((a,b) => radarSortKey(b) - radarSortKey(a) || String(a.url||'').localeCompare(String(b.url||'')))
-    .slice(0, RADAR_LIMIT);
+    .sort((a,b) => radarSortKey(b) - radarSortKey(a) || String(a.url||'').localeCompare(String(b.url||'')));
 }
 function radarClock(n){
   const updated = typeof n?.radarUpdatedAt==='string' && n.radarUpdatedAt.trim();
@@ -4570,7 +4563,6 @@ function radarChip(n){
   return `${img}<span class="radar-entity">${escapeHTML(name)}</span>`;
 }
 function radarRowHTML(n){
-  const href = safeHref(n.url);
   const title = localized(n.title);
   const clock = radarClock(n);
   const chip = radarChip(n);
@@ -4581,18 +4573,8 @@ function radarRowHTML(n){
   const inner = `${time}${chip}${sep}<span class="radar-title">${escapeHTML(title)}</span>`;
   const label = [clock ? `${clock.time} ${clock.zone}` : '', localized(n.locus && n.locus.kind==='company' ? (COMPANIES[n.locus.company]||{}) : (COUNTRIES[(n.locus&&n.locus.iso2)||'']||{})), title]
     .filter(Boolean).join(' — ');
-  if (!href){
-    return `<span class="radar-row" aria-label="${escapeHTML(label)}">${inner}</span>`;
-  }
-  return `<a class="radar-row" href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHTML(label)}">${inner}</a>`;
-}
-function syncRadarPauseButton(){
-  const u = UI[LANG];
-  const button = $('radarPause');
-  if (!button) return;
-  button.setAttribute('aria-pressed', String(radarPaused));
-  button.setAttribute('aria-label', radarPaused ? u.radarPlay : u.radarPause);
-  button.textContent = radarPaused ? '▶' : '❚❚';
+  const url = typeof n.url==='string' ? n.url : '';
+  return `<a class="radar-row" href="#view=news" data-news-url="${escapeHTML(url)}" aria-label="${escapeHTML(label)}">${inner}</a>`;
 }
 function paintRadarRow(item){
   const track = $('radarTrack');
@@ -4603,10 +4585,10 @@ function paintRadarRow(item){
 }
 function scheduleRadarAdvance(){
   stopRadarTimer();
-  if (radarPaused || radarItems.length < 2 || document.hidden) return;
+  if (radarItems.length < 2 || document.hidden) return;
   radarTimer = setTimeout(() => {
     radarTimer = 0;
-    if (radarPaused || radarItems.length < 2 || document.hidden || radarSliding) return;
+    if (radarItems.length < 2 || document.hidden || radarSliding) return;
     const nextIndex = (radarIndex + 1) % radarItems.length;
     const track = $('radarTrack');
     if (!track) return;
@@ -4630,6 +4612,35 @@ function scheduleRadarAdvance(){
     }, RADAR_SLIDE_MS);
   }, RADAR_DWELL_MS);
 }
+function openRadarNews(n){
+  if (!n) return;
+  if (currentArticle) closeArticle();
+  activeFilter = 'all';
+  searchQuery = '';
+  const date = typeof n.editionDate==='string' ? n.editionDate : '';
+  const editions = topicHomeEditions();
+  const latest = editions[0] ? editions[0][0] : null;
+  const match = date
+    ? editions.find(entry => String(entry[0]).startsWith(`${date}|`))
+    : null;
+  const key = (match && match[0]) || (date ? `${date}|1` : latest);
+  if (key) adoptBriefEdition(key);
+  const url = typeof n.url==='string' ? n.url : '';
+  const items = visibleNewsItems();
+  const index = items.findIndex(item => item.url === url);
+  newsPage = index >= 0 ? Math.floor(index / NEWS_PAGE_SIZE) : 0;
+  setHomeView('news');
+  setFilterPopover(false);
+  renderFilters();
+  renderNews();
+  const card = [...$('news').children].find(el => el.dataset.newsUrl === url);
+  if (!card) return;
+  if (!card.classList.contains('open')){
+    const toggle = card.querySelector('.detail-toggle');
+    if (toggle) toggle.click();
+  }
+  card.scrollIntoView({block:'nearest'});
+}
 function renderRadar(){
   const ticker = $('radarTicker');
   const track = $('radarTrack');
@@ -4646,29 +4657,32 @@ function renderRadar(){
     return;
   }
   paintRadarRow(radarItems[0]);
-  syncRadarPauseButton();
   scheduleRadarAdvance();
 }
 function bindRadarChrome(){
   const ticker = $('radarTicker');
-  const pause = $('radarPause');
   if (!ticker || ticker.dataset.radarBound) return;
   ticker.dataset.radarBound = '1';
   ticker.addEventListener('mouseenter', () => { stopRadarTimer(); });
-  ticker.addEventListener('mouseleave', () => { if (!radarPaused) scheduleRadarAdvance(); });
+  ticker.addEventListener('mouseleave', () => { scheduleRadarAdvance(); });
   ticker.addEventListener("focusin", () => { stopRadarTimer(); });
   ticker.addEventListener("focusout", event => {
-    if (!ticker.contains(event.relatedTarget) && !radarPaused) scheduleRadarAdvance();
+    if (!ticker.contains(event.relatedTarget)) scheduleRadarAdvance();
   });
-  pause.addEventListener('click', () => {
-    radarPaused = !radarPaused;
-    syncRadarPauseButton();
-    if (radarPaused) stopRadarTimer();
-    else scheduleRadarAdvance();
+  ticker.addEventListener('click', event => {
+    const row = event.target.closest('a.radar-row');
+    if (!row || !ticker.contains(row) || !isPlainClick(event)) return;
+    event.preventDefault();
+    const url = row.dataset.newsUrl;
+    const item = radarItems.find(n => n.url === url)
+      || LATEST_NEWS.find(n => n.url === url)
+      || NEWS_HISTORY.find(n => n.url === url);
+    if (item) openRadarNews(item);
+    else setHomeView('news');
   });
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopRadarTimer();
-    else if (!radarPaused) scheduleRadarAdvance();
+    else scheduleRadarAdvance();
   });
   if (typeof RADAR_REDUCED_MOTION.addEventListener==='function'){
     RADAR_REDUCED_MOTION.addEventListener('change', () => { renderRadar(); });
