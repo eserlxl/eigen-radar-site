@@ -737,9 +737,12 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .source-link:hover .src{text-decoration:underline}
 
   /* ---------- writers ---------- */
-  #briefsSection{padding-top:10px}
+  #briefsSection{padding-top:4px}
   .radar-ticker{
-    --radar-row:1.2rem;
+    /* 1.2rem against a .78rem face clipped every descender, and the viewport's overflow
+       hid the evidence. The row now carries the line box the type actually needs; the
+       space comes from the padding above, which was doing nothing. */
+    --radar-row:1.55rem;
     display:flex;align-items:center;flex-wrap:nowrap;gap:8px;
     margin:0 0 2px;padding:0;min-height:0;height:var(--radar-row);z-index:1;
     font-size:.78rem;line-height:1;color:var(--muted);
@@ -750,18 +753,22 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     font-size:.62rem;font-weight:800;letter-spacing:.08em;line-height:1;
     text-transform:uppercase;color:var(--accent);
   }
-  .radar-viewport{flex:1 1 0;min-width:0;max-width:55%;overflow:hidden;height:var(--radar-row)}
+  .radar-viewport{flex:1 1 0;min-width:0;max-width:none;overflow:hidden;height:var(--radar-row)}
   .radar-viewport[hidden]{display:none}
+  /* The search sits in the view nav, between the writers and podcast controls. It no
+     longer stretches to fill a row, so it takes a fixed width instead of flex:1, and the
+     nav's 44px line gives it the height the ticker row could not. */
   .radar-search{
-    flex:1 1 0;position:relative;display:flex;align-items:center;
-    min-width:8rem;min-height:0;height:var(--radar-row);max-height:var(--radar-row);
-    margin:0;padding:0;box-sizing:border-box;
+    --search-height:2rem;
+    flex:0 0 auto;position:relative;display:flex;align-items:center;
+    width:11.5rem;min-width:0;min-height:0;height:var(--search-height);
+    margin:0 2px;padding:0;box-sizing:border-box;
   }
   .radar-search input{
-    width:100%;height:var(--radar-row);min-width:0;min-height:0;max-height:var(--radar-row);
-    margin:0;padding:0 1.45rem 0 .55rem;box-sizing:border-box;
+    width:100%;height:100%;min-width:0;min-height:0;
+    margin:0;padding:0 1.8rem 0 .7rem;box-sizing:border-box;
     border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--text);
-    font:inherit;font-size:.72rem;line-height:1;appearance:none;-webkit-appearance:none;
+    font:inherit;font-size:.74rem;line-height:1;appearance:none;-webkit-appearance:none;
   }
   .radar-search input::-webkit-search-decoration,
   .radar-search input::-webkit-search-cancel-button,
@@ -772,14 +779,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .radar-search input::placeholder{color:var(--muted)}
   .radar-search input:focus{outline:2px solid var(--focus);outline-offset:1px}
   .radar-search-icon{
-    position:absolute;right:.42rem;width:12px;height:12px;pointer-events:none;color:var(--muted);
+    position:absolute;right:.6rem;width:13px;height:13px;pointer-events:none;color:var(--muted);
   }
   .radar-search-icon svg,.radar-search-toggle svg{display:block;width:100%;height:100%}
   .radar-search-toggle{
-    display:none;flex:0 0 auto;position:relative;width:16px;height:16px;margin:0;padding:0;
+    display:none;flex:0 0 auto;position:relative;width:18px;height:18px;margin:0 2px;padding:0;
     border:0;background:transparent;color:var(--accent);cursor:pointer;
   }
-  .radar-search-toggle svg{width:14px;height:14px}
+  .radar-search-toggle svg{width:16px;height:16px}
   .radar-search-toggle::after{content:"";position:absolute;inset:-14px}
   .search-hit-count{
     font-weight:700;color:var(--accent);margin-inline-start:.15em;font-variant-numeric:tabular-nums;
@@ -801,8 +808,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     flex:0 0 auto;font-variant-numeric:tabular-nums;font-weight:700;color:var(--text);
   }
   .radar-mark{
+    /* No frame: the 1px var(--line) outline read blue-violet on the dark theme and sat
+       directly on 20x15 flag artwork, and the soft plate behind it was only there to fill
+       what the outline enclosed. The artwork carries its own edge. */
     flex:0 0 auto;width:20px;height:15px;object-fit:cover;border-radius:2px;
-    border:1px solid var(--line);background:var(--bg-soft);
   }
   .radar-mark.radar-logo{width:16px;height:16px;border-radius:3px;object-fit:contain}
   .radar-entity{flex:0 0 auto;font-weight:700;color:var(--text)}
@@ -1141,13 +1150,22 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     .radar-ticker{flex-wrap:wrap;height:auto}
     .radar-viewport{flex:1 1 auto;max-width:none}
+    /* Five nav controls plus a 11.5rem field do not fit a phone, so the field collapses to
+       its icon. Asked for, it drops onto its own line rather than squeezing the buttons. */
     .radar-search-toggle{display:grid;place-items:center}
-    .radar-search{
-      display:none;flex:1 1 100%;width:100%;min-width:0;height:var(--radar-row);order:5;
+    .radar-search{display:none}
+    #briefsSection .home-view-nav.is-search-open{flex-wrap:wrap}
+    .home-view-nav.is-search-open .radar-search{
+      display:flex;flex:1 1 100%;width:100%;order:9;margin-inline:0;margin-top:2px;
     }
-    .radar-ticker.is-search-open .radar-search{display:flex}
   }
   @media(max-width:360px){
+    /* At 320px the nav and the date selector share one row with nothing to spare: the
+       search icon costs 22px and pushed the selector onto a second line. It keeps its
+       44px touch target through the toggle's ::after inset, so only the box shrinks. */
+    #briefsSection .home-view-nav{gap:0}
+    .radar-search-toggle{width:14px;height:14px;margin:0}
+    .radar-search-toggle svg{width:13px;height:13px}
     .header-inner{padding-inline:8px;gap:4px}
     .logo{gap:6px;font-size:.95rem}
     .header-right{gap:3px}
@@ -1252,28 +1270,9 @@ twq('config','re3b4');
 <section id="briefsSection">
   <div class="radar-ticker" id="radarTicker" hidden>
     <span class="radar-kicker" id="radarKicker">RADAR</span>
-    <button type="button" class="radar-search-toggle" id="radarSearchToggle"
-      aria-controls="radarSearch" aria-expanded="false">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
-      </svg>
-      <span class="visually-hidden" id="radarSearchToggleLabel">Ara</span>
-    </button>
     <div class="radar-viewport" id="radarViewport">
       <div class="radar-track" id="radarTrack"></div>
     </div>
-    <form class="radar-search" id="radarSearchForm" role="search">
-      <label class="visually-hidden" for="radarSearch" id="radarSearchLabel">Bu masada ara…</label>
-      <input type="search" id="radarSearch" name="q" autocomplete="off" enterkeyhint="search"
-        placeholder="Bu masada ara…">
-      <span class="radar-search-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
-        </svg>
-      </span>
-    </form>
   </div>
   <div class="section-title">
     <h2 class="visually-hidden" id="featTitle">Gündem</h2>
@@ -1289,6 +1288,25 @@ twq('config','re3b4');
         data-home-view="videos" aria-controls="videosSection" aria-pressed="false" hidden>Videolar</button>
       <button class="home-view-button" id="writersViewButton" type="button"
         data-home-view="writers" aria-controls="columnsSection" aria-pressed="false">Yazarlar</button>
+      <button type="button" class="radar-search-toggle" id="radarSearchToggle"
+        aria-controls="radarSearch" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+        </svg>
+        <span class="visually-hidden" id="radarSearchToggleLabel">Ara</span>
+      </button>
+      <form class="radar-search" id="radarSearchForm" role="search">
+        <label class="visually-hidden" for="radarSearch" id="radarSearchLabel">Bu masada ara…</label>
+        <input type="search" id="radarSearch" name="q" autocomplete="off" enterkeyhint="search"
+          placeholder="Bu masada ara…">
+        <span class="radar-search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+          </svg>
+        </span>
+      </form>
       <button class="home-view-button podcast-trigger" id="podcastTrigger" type="button"
         aria-controls="podcastBar" aria-expanded="false" hidden>
         <span>Podcast</span> <span aria-hidden="true">🎧</span>
@@ -3930,6 +3948,14 @@ function syncFromHash(){
     if (home.view) setHomeView(home.view);
     const input = $('radarSearch');
     if (input) input.value = searchQuery;
+    // A deep link sets the query here rather than through setRadarSearch, so the open
+    // state has to be set too: on a phone the field is collapsed to its icon, and a
+    // shared #q= link would otherwise filter everything with no visible search box and
+    // no way to read or edit the query it is filtering on.
+    const searchNav = $('homeViewNav');
+    if (searchNav) searchNav.classList.toggle('is-search-open', Boolean(searchQuery.trim()));
+    const searchToggle = $('radarSearchToggle');
+    if (searchToggle) searchToggle.setAttribute('aria-expanded', String(Boolean(searchQuery.trim())));
     if (home.q || home.view){
       renderBriefDateSelect();
       renderBriefs();
@@ -4366,10 +4392,10 @@ function setRadarSearch(value, fromHash){
   newsPage = 0;
   const input = $('radarSearch');
   if (input && input.value !== searchQuery) input.value = searchQuery;
-  const ticker = $('radarTicker');
+  const nav = $('homeViewNav');
   const toggle = $('radarSearchToggle');
-  if (searchQuery.trim()) ticker && ticker.classList.add('is-search-open');
-  if (toggle) toggle.setAttribute('aria-expanded', String(Boolean(ticker && ticker.classList.contains('is-search-open'))));
+  if (searchQuery.trim()) nav && nav.classList.add('is-search-open');
+  if (toggle) toggle.setAttribute('aria-expanded', String(Boolean(nav && nav.classList.contains('is-search-open'))));
   if (!fromHash) syncSearchHash();
   if (!currentArticle){
     $('btnTr').href = homeLanguageRoute('tr') + homeShareHash();
@@ -4383,18 +4409,17 @@ function setRadarSearch(value, fromHash){
   paintHomeViewCounts();
 }
 function clearRadarSearch(){
-  const ticker = $('radarTicker');
-  if (ticker) ticker.classList.remove('is-search-open');
+  const nav = $('homeViewNav');
+  if (nav) nav.classList.remove('is-search-open');
   const toggle = $('radarSearchToggle');
   if (toggle) toggle.setAttribute('aria-expanded', 'false');
   setRadarSearch('');
 }
 function openRadarSearchField(){
-  const ticker = $('radarTicker');
-  if (ticker){
-    ticker.hidden = false;
-    ticker.classList.add('is-search-open');
-  }
+  // The field lives in the view nav now, so it no longer depends on the ticker being
+  // shown: a desk with no radar headlines is still searchable.
+  const nav = $('homeViewNav');
+  if (nav) nav.classList.add('is-search-open');
   const toggle = $('radarSearchToggle');
   if (toggle) toggle.setAttribute('aria-expanded', 'true');
   const input = $('radarSearch');
@@ -4416,10 +4441,10 @@ function bindRadarSearch(){
   if (toggle){
     toggle.addEventListener('click', event => {
       event.preventDefault();
-      const ticker = $('radarTicker');
-      if (!ticker) return;
-      const open = !ticker.classList.contains('is-search-open');
-      ticker.classList.toggle('is-search-open', open);
+      const nav = $('homeViewNav');
+      if (!nav) return;
+      const open = !nav.classList.contains('is-search-open');
+      nav.classList.toggle('is-search-open', open);
       toggle.setAttribute('aria-expanded', String(open));
       if (open && input) input.focus();
     });
@@ -4484,7 +4509,7 @@ document.addEventListener('keydown', event=>{
     setPodcastPopover(false,true);
     return;
   }
-  if (searchQuery.trim() || ($('radarTicker') && $('radarTicker').classList.contains('is-search-open'))) {
+  if (searchQuery.trim() || ($('homeViewNav') && $('homeViewNav').classList.contains('is-search-open'))) {
     clearRadarSearch();
     const input = $('radarSearch');
     if (input) input.blur();
@@ -4593,8 +4618,8 @@ function setTopic(id){
   searchQuery = '';      // a query is a per-desk thought; don't carry it across
   const searchInput = $('radarSearch');
   if (searchInput) searchInput.value = '';
-  const ticker = $('radarTicker');
-  if (ticker) ticker.classList.remove('is-search-open');
+  const nav = $('homeViewNav');
+  if (nav) nav.classList.remove('is-search-open');
   const toggle = $('radarSearchToggle');
   if (toggle) toggle.setAttribute('aria-expanded', 'false');
   newsPage = 0;
