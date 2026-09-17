@@ -2100,6 +2100,10 @@ function briefCard(brief, index, eager=true, pageIndex=0){
   </figure>` : '';
   el.className = 'fcard brief-card';
   el.dataset.briefId = briefId;
+  // A Brief id repeats across dates -- the Tera default carried the same id on
+  // 16 and 17 September -- so anything that resolves a card by id alone picks the
+  // wrong one. Carry the edition too and look up on all three.
+  el.dataset.briefKey = briefKeyOf(brief);
   el.setAttribute('aria-labelledby', headingId);
   const heading = detailHref
     ? `<a class="brief-detail-link" href="${escapeHTML(detailHref)}" aria-expanded="false">${escapeHTML(localized(brief.title))}</a>`
@@ -2558,7 +2562,8 @@ function revealBriefCard(card){
   card.style.setProperty('--brief-reveal-height', `${card.getBoundingClientRect().height}px`);
   card.classList.add('is-brief-revealed');
   if (BRIEF_STACK_MEDIA.matches) requestAnimationFrame(syncBriefRailHeights);
-  const brief = findBriefById(card.dataset.briefId);
+  const brief = findBriefByKey(card.dataset.briefKey)
+    || findBriefById(card.dataset.briefId);
   if (brief){
     fetchBriefFullText(brief).then(data=>{
       if (!card.isConnected || !card.classList.contains('is-brief-revealed')
@@ -2575,7 +2580,8 @@ function scheduleBriefReveal(){
   const page = briefTrackPages().find(item=>item.dataset.editionKey===selectedBriefDate);
   const card = page?.querySelector('.brief-card');
   if (!card || card.classList.contains('is-brief-revealed')) return;
-  const brief = findBriefById(card.dataset.briefId);
+  const brief = findBriefByKey(card.dataset.briefKey)
+    || findBriefById(card.dataset.briefId);
   if (brief) fetchBriefFullText(brief);
   const generation = briefRevealGeneration;
   briefRevealTimer = setTimeout(()=>{
@@ -2640,6 +2646,16 @@ let briefReadingState = null;
 let briefReadingTextSizeStep = 0;
 const BRIEF_READING_TEXT_SIZES = ['.88rem', '.98rem', '1.08rem'];
 
+function briefKeyOf(brief){
+  const id = typeof brief?.id==='string' ? brief.id : '';
+  const date = typeof brief?.editionDate==='string' ? brief.editionDate : '';
+  const n = brief?.n==null ? '' : String(brief.n);
+  return `${date}|${n}|${id}`;
+}
+function findBriefByKey(key){
+  if (typeof key!=='string' || !key) return undefined;
+  return BRIEFS.find(brief=>brief && briefKeyOf(brief)===key);
+}
 function findBriefById(id){
   return BRIEFS.find(brief=>brief && brief.id===id);
 }
@@ -2710,20 +2726,24 @@ function parseBriefPageSections(html, href){
 function fetchBriefFullText(brief){
   const id = typeof brief?.id==='string' ? brief.id : '';
   if (!id) return Promise.resolve(null);
-  if (briefFullTextCache.has(id)) return Promise.resolve(briefFullTextCache.get(id));
   const href = briefPath(brief);
   if (!href) return Promise.resolve(null);
+  // Key the cache on what is actually fetched. briefPath carries the language, so keying
+  // on the id alone served the Turkish body after a switch to English: the card's own
+  // payload re-rendered in the new language while the fetched continuation stayed in the
+  // old one, which is why only the sections past the preview looked wrong.
+  if (briefFullTextCache.has(href)) return Promise.resolve(briefFullTextCache.get(href));
   const pending = fetch(href).then(async resp=>{
     if (!resp.ok) throw new Error('brief fetch failed');
     const parsed = parseBriefPageSections(await resp.text(), href);
-    briefFullTextCache.set(id, parsed);
+    briefFullTextCache.set(href, parsed);
     return parsed;
   }).catch(()=>{
     const fallback = {sections:null, references:null, href, failed:true};
-    briefFullTextCache.set(id, fallback);
+    briefFullTextCache.set(href, fallback);
     return fallback;
   });
-  briefFullTextCache.set(id, pending);
+  briefFullTextCache.set(href, pending);
   return pending;
 }
 function appendBriefParagraphContent(p, parts, refElements){
@@ -3128,7 +3148,8 @@ function applyBriefReadingDom(card, grid, originalOrder){
   bindBriefReadingEvents(card);
   briefReadingState = {card, grid, originalOrder, detailLink, scrollContainer, previewHtml, refElements:{}};
   installBriefReadingControls(card, briefReadingState);
-  const brief = findBriefById(card.dataset.briefId);
+  const brief = findBriefByKey(card.dataset.briefKey)
+    || findBriefById(card.dataset.briefId);
   /* The full-page link is unconditional in reading mode: it appears the moment the
      card opens (after the restore snapshot is taken) and survives fetch failure or an
      empty parse; a successful populate rebuilds the content and re-appends it. */
