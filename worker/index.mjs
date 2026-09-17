@@ -33,6 +33,9 @@ const SECURITY_HEADERS = {
   "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
 };
 const HTML_CACHE_CONTROL = "public, max-age=0, must-revalidate";
+// Internal only: carries the content object's write time from the renderer to the cache
+// decision, and never reaches a reader.
+const CONTENT_WRITTEN_HEADER = "x-eigen-content-written";
 
 const FALLBACK_404 = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Page not found — Eigen Radar</title></head><body><h1>Page not found</h1></body></html>`;
 
@@ -228,6 +231,10 @@ async function readJson(binding, key) {
   return {
     value: JSON.parse(text),
     identity: object.httpEtag || object.etag || await sha256Hex(text),
+    // When this object was last written. A past edition is cached hard because it does
+    // not change; a republished correction does, and needs to reach readers before that
+    // day expires.
+    uploaded: object.uploaded instanceof Date ? object.uploaded.getTime() : null,
   };
 }
 
@@ -304,6 +311,10 @@ async function ssrResponse(body, {
     "etag",
     await dependencyEtag(content.identity, site?.value?.version),
   );
+  if (typeof content?.uploaded === "number") {
+    // Read and removed by the caller before the response leaves the Worker.
+    headers.set(CONTENT_WRITTEN_HEADER, String(content.uploaded));
+  }
   return new Response(body, { status, headers });
 }
 
@@ -340,7 +351,13 @@ async function htmlResponse(body, content, site, status = 200) {
   });
 }
 
-function routeEdgeTtl(route, status) {
+// A past edition's page is pinned for a day because it does not change. Republishing a
+// correction breaks that assumption, and on 2026-09-17 a corrected card stayed stale at
+// the edge for hours while the origin served the new one: cf-cache-status HIT, age 29980.
+// An object written within this window is treated as still settling.
+const RECENT_WRITE_MS = 24 * 60 * 60 * 1000;
+
+function routeEdgeTtl(route, status, uploadedMs = null) {
   if (status === 301 || status === 404) {
     return 60;
   }
@@ -349,7 +366,9 @@ function routeEdgeTtl(route, status) {
     (route?.kind === "article" || route?.kind === "brief") &&
     route.date < currentIstanbulDate()
   ) {
-    return 86400;
+    const recent = typeof uploadedMs === "number"
+      && Date.now() - uploadedMs < RECENT_WRITE_MS;
+    return recent ? 300 : 86400;
   }
   return 300;
 }
@@ -588,7 +607,11 @@ export async function handleRequest(request, env) {
     return ifNoneMatch(request, response);
   }
 
-  const ttl = routeEdgeTtl(route, response.status);
+  const writtenAt = Number(response.headers.get(CONTENT_WRITTEN_HEADER));
+  response.headers.delete(CONTENT_WRITTEN_HEADER);
+  const ttl = routeEdgeTtl(
+    route, response.status, Number.isFinite(writtenAt) && writtenAt > 0 ? writtenAt : null,
+  );
   response.headers.set(
     "cache-control",
     `${HTML_CACHE_CONTROL}, s-maxage=${ttl}`,
