@@ -818,6 +818,18 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
      each theme (edgeDark / edgeLight in data/countries.json and data/companies.json,
      measured by scripts/compute-mark-edges.py). A white-fielded flag vanishes into the
      light page and a near-black mark into the dark one; everything else is left alone. */
+  /* Over the picture's top-left corner, on a solid accent so it reads against any
+     illustration. A card with no image keeps it above the headline instead. */
+  .brief-media{position:relative}
+  .brief-choice-badge{
+    position:absolute;top:.5rem;left:.5rem;z-index:2;
+    display:inline-flex;align-items:center;gap:.25rem;
+    padding:.2rem .5rem;border-radius:999px;
+    background:var(--accent);color:#04121a;
+    font-size:.62rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    box-shadow:0 1px 6px rgba(0,0,0,.45);
+  }
+  .brief-content > .brief-choice-badge{position:static;margin:0 0 .35rem}
   .radar-mark{
     flex:0 0 auto;width:20px;height:15px;object-fit:cover;border-radius:2px;
   }
@@ -2321,8 +2333,16 @@ function briefCard(brief, index, eager=true, pageIndex=0){
       `<section class="brief-preview-section">${index ? '' : `<h4>${escapeHTML(sectionHeading)}</h4>`}<p>${escapeHTML(paragraph)}</p></section>`
     ) : [];
   }).flat().slice(0,2).join('') : '';
-  el.innerHTML = `${media}<div class="brief-content">
-    <h3 id="${escapeHTML(headingId)}">${heading}</h3>
+  // The card's own mark. It was rendered server-side and then dropped here on every
+  // hydration, so an editor's choice never carried one on a live page; the operator saw
+  // the badge only in the HTML. It sits on the image now rather than above the headline,
+  // where a small uppercase line disappeared into the text.
+  const choice = brief.editorsChoice === true
+    ? `<span class="brief-choice-badge">${escapeHTML(UI[LANG].brief_editors_choice)}</span>`
+    : '';
+  el.innerHTML = `${media ? media.replace('<figure class="brief-media">',
+      `<figure class="brief-media">${choice}`) : ''}<div class="brief-content">
+    ${media ? '' : choice}<h3 id="${escapeHTML(headingId)}">${heading}</h3>
     <p class="summary">${escapeHTML(localized(brief.summary))}</p>
     ${radarStampHTML(brief)}
     ${preview ? `<div class="brief-preview">${preview}</div>` : ''}
