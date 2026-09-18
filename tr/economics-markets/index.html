@@ -811,13 +811,18 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .radar-time{
     flex:0 0 auto;font-variant-numeric:tabular-nums;font-weight:700;color:var(--text);
   }
+  /* No frame by default. A blanket outline framed 167 flags that already carry their own
+     edge, and it looked like what it was: a hairline drawn around artwork that needs none.
+     An outline is a property of the symbol, so each one records whether it needs one on
+     each theme (edgeDark / edgeLight in data/countries.json and data/companies.json,
+     measured by scripts/compute-mark-edges.py). A white-fielded flag vanishes into the
+     light page and a near-black mark into the dark one; everything else is left alone. */
   .radar-mark{
-    /* A thin edge, taking its colour from the theme rather than from --line: white on
-       dark, black on light. --line is a blue-violet at both ends of the palette, and
-       drawn at 20x15 over a flag it tinted the artwork it was meant to separate. */
     flex:0 0 auto;width:20px;height:15px;object-fit:cover;border-radius:2px;
-    border:1px solid var(--radar-mark-edge);
   }
+  :root .radar-mark.edge-dark{border:1px solid var(--radar-mark-edge)}
+  :root[data-theme="light"] .radar-mark.edge-dark{border:0}
+  :root[data-theme="light"] .radar-mark.edge-light{border:1px solid var(--radar-mark-edge)}
   .radar-mark.radar-logo{width:16px;height:16px;border-radius:3px;object-fit:contain}
   .radar-entity{flex:0 0 auto;font-weight:700;color:var(--text)}
   .radar-sep{flex:0 0 auto;opacity:.55}
@@ -1657,7 +1662,7 @@ document.addEventListener('error', event=>{
   }
 }, true);
 
-const ROUTE_DATA_URL = "/assets/data/app-5c2d1989.json";
+const ROUTE_DATA_URL = "/assets/data/app-7db3d54a.json";
 const FILE_ASSET_PREFIX = "../../";
 let DATA = null;
 let WRITERS = [];
@@ -4775,13 +4780,13 @@ const RADAR_MARKETS = [
 // label, so a story matching no subject now falls through to its country instead.
 // planet.svg already draws a ringed planet, so space keeps it and only the word changes.
 const RADAR_SCIENCE = [
-  {slug:'rna', src:'/assets/science/rna.svg', tr:'RNA', en:'RNA', keys:['rna', 'mrna', 'mirna', 'ribonükleik', 'ribonucleic']},
-  {slug:'dna', src:'/assets/science/dna.svg', tr:'DNA', en:'DNA', keys:['dna', 'crispr', 'genom', 'genome', 'genetik', 'genetic', 'kromozom', 'chromosome', 'gen düzenle', 'gene-edited', 'çaprazlama', 'crossing-over']},
-  {slug:'space', src:'/assets/science/planet.svg', tr:'Uzay', en:'Space', keys:['uzay', 'space', 'ötegezegen', 'exoplanet', 'gezegen', 'planet', 'jupiter', 'jüpiter', 'saturn', 'satürn', 'neptune', 'uranus', 'mars', 'krater', 'crater', 'asteroit', 'asteroid', 'teleskop', 'telescope', 'galaksi', 'galaxy', 'yörünge', 'orbit', 'rover', 'curiosity']},
-  {slug:'atom', src:'/assets/science/atom.svg', tr:'Fizik', en:'Physics', keys:['kuantum', 'quantum', 'hadron', 'cern', 'parçacık', 'antiproton', 'süperiletken', 'superconduct', 'dekoherans', 'decoherence']},
-  {slug:'leaf', src:'/assets/science/leaf.svg', tr:'İklim', en:'Climate', keys:['iklim', 'climate', 'karbon', 'carbon', 'ısı kubbesi', 'heat dome']},
-  {slug:'tube', src:'/assets/science/tube.svg', tr:'Laboratuvar', en:'Laboratory', keys:['deney tüpü', 'test tube', 'laboratuvar', 'laboratory', 'petri', 'in vitro']},
-  {slug:'chip', src:'/assets/science/chip.svg', tr:'Teknoloji', en:'Technology', keys:['nöron', 'neuron', 'nanomembran', 'nanomembrane', 'fotonik', 'photonic']}
+  {slug:'rna', src:'/assets/science/rna.svg', tr:'RNA', en:'RNA', keys:['rna', 'mrna', 'mirna', 'ribonükleik', 'ribonucleic'], edgeDark:true, edgeLight:false},
+  {slug:'dna', src:'/assets/science/dna.svg', tr:'DNA', en:'DNA', keys:['dna', 'crispr', 'genom', 'genome', 'genetik', 'genetic', 'kromozom', 'chromosome', 'gen düzenle', 'gene-edited', 'çaprazlama', 'crossing-over'], edgeDark:true, edgeLight:false},
+  {slug:'space', src:'/assets/science/planet.svg', tr:'Uzay', en:'Space', keys:['uzay', 'space', 'ötegezegen', 'exoplanet', 'gezegen', 'planet', 'jupiter', 'jüpiter', 'saturn', 'satürn', 'neptune', 'uranus', 'mars', 'krater', 'crater', 'asteroit', 'asteroid', 'teleskop', 'telescope', 'galaksi', 'galaxy', 'yörünge', 'orbit', 'rover', 'curiosity'], edgeDark:true, edgeLight:false},
+  {slug:'atom', src:'/assets/science/atom.svg', tr:'Fizik', en:'Physics', keys:['kuantum', 'quantum', 'hadron', 'cern', 'parçacık', 'antiproton', 'süperiletken', 'superconduct', 'dekoherans', 'decoherence'], edgeDark:true, edgeLight:false},
+  {slug:'leaf', src:'/assets/science/leaf.svg', tr:'İklim', en:'Climate', keys:['iklim', 'climate', 'karbon', 'carbon', 'ısı kubbesi', 'heat dome'], edgeDark:true, edgeLight:false},
+  {slug:'tube', src:'/assets/science/tube.svg', tr:'Laboratuvar', en:'Laboratory', keys:['deney tüpü', 'test tube', 'laboratuvar', 'laboratory', 'petri', 'in vitro'], edgeDark:true, edgeLight:false},
+  {slug:'chip', src:'/assets/science/chip.svg', tr:'Teknoloji', en:'Technology', keys:['nöron', 'neuron', 'nanomembran', 'nanomembrane', 'fotonik', 'photonic'], edgeDark:true, edgeLight:false}
 ];
 // Only where the tag itself names a subject. `biology` and `tech` are grab-bags -- they
 // carried archaeology, immunology and instrument stories alike -- so they fall through.
@@ -4871,15 +4876,22 @@ function radarWordIndex(hay, key){
   const match = new RegExp('(?:^|[^a-z0-9])' + escaped + '(?:$|[^a-z0-9])').exec(hay);
   return match ? match.index : -1;
 }
-function radarLogoRecord(name, src){
+function markEdgeClass(record){
+  const parts = [];
+  if (record && record.edgeDark === true) parts.push('edge-dark');
+  if (record && record.edgeLight === true) parts.push('edge-light');
+  return parts.join(' ');
+}
+function radarLogoRecord(name, src, edges){
   const href = src || '';
   if (!name && !href) return null;
-  return {name: name||'', src: href, markClass: 'radar-logo', width: 16, height: 16};
+  return {name: name||'', src: href, markClass: 'radar-logo', width: 16, height: 16,
+          edgeClass: markEdgeClass(edges)};
 }
 function radarCompanyRecord(slug){
   const co = COMPANIES[slug];
   if (!co) return null;
-  return radarLogoRecord(localized(co) || String(slug), safeEntityAsset(co.src));
+  return radarLogoRecord(localized(co) || String(slug), safeEntityAsset(co.src), co);
 }
 function radarCountryRecord(iso2){
   const country = COUNTRIES[iso2];
@@ -4887,7 +4899,8 @@ function radarCountryRecord(iso2){
   const flag = safeFlagAsset(iso2);
   const name = localized(country);
   if (!name && !flag) return null;
-  return {name: name||'', src: flag, markClass: 'radar-flag', width: 20, height: 15};
+  return {name: name||'', src: flag, markClass: 'radar-flag', width: 20, height: 15,
+          edgeClass: markEdgeClass(country)};
 }
 function radarCatalogHit(hay, items, assetFn){
   let best = null;
@@ -4901,7 +4914,7 @@ function radarCatalogHit(hay, items, assetFn){
     }
   }
   if (!best) return null;
-  return radarLogoRecord(localized(best), assetFn(best.src));
+  return radarLogoRecord(localized(best), assetFn(best.src), best);
 }
 function radarCompanyHint(n){
   const hay = radarHaystack(n);
@@ -4946,7 +4959,7 @@ function radarScienceHint(n){
   if (!slug) return null;
   const item = RADAR_SCIENCE.find(entry => entry.slug===slug);
   if (!item) return null;
-  return radarLogoRecord(localized(item), safeScienceAsset(item.src));
+  return radarLogoRecord(localized(item), safeScienceAsset(item.src), item);
 }
 function radarChipRecord(n){
   const locus = n && n.locus;
@@ -4971,8 +4984,9 @@ function radarChipRecord(n){
 }
 function radarChipHTML(rec){
   if (!rec) return '';
+  const edge = rec.edgeClass ? ` ${rec.edgeClass}` : '';
   const img = rec.src
-    ? `<img class="radar-mark ${rec.markClass}" src="${escapeHTML(rec.src)}" alt="" width="${rec.width}" height="${rec.height}">`
+    ? `<img class="radar-mark ${rec.markClass}${edge}" src="${escapeHTML(rec.src)}" alt="" width="${rec.width}" height="${rec.height}">`
     : '';
   const name = rec.name
     ? `<span class="radar-entity">${escapeHTML(rec.name)}</span>`
