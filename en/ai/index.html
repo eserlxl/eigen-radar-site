@@ -686,11 +686,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   }
   .video-title{margin:6px 0 4px;font-size:1.05rem;line-height:1.35;letter-spacing:-.01em}
   .video-context{margin:0;color:var(--muted);font-size:.88rem;line-height:1.45}
-  .video-watch-link{
-    display:inline-flex;align-items:center;min-height:44px;margin-top:4px;
-    color:var(--accent);font-size:.8rem;font-weight:600;text-decoration:none;
-  }
-  .video-watch-link:hover{text-decoration:underline}
   .video-mobile-card{
     background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     padding:14px;min-width:0;
@@ -757,6 +752,15 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     flex:0 0 auto;display:flex;align-items:center;height:var(--radar-row);
     font-size:.62rem;font-weight:800;letter-spacing:.08em;line-height:1;
     text-transform:uppercase;color:var(--accent);
+  }
+  /* Phones show a radar glyph instead of the word: the word pushed the ticker text onto a
+     second line. The label stays in the accessibility tree. */
+  .radar-kicker-icon{display:none;width:14px;height:14px}
+  @media(max-width:640px){
+    .radar-kicker-icon{display:block}
+    .radar-kicker-text{
+      position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;
+    }
   }
   .radar-viewport{flex:1 1 0;min-width:0;max-width:none;overflow:hidden;height:var(--radar-row)}
   .radar-viewport[hidden]{display:none}
@@ -842,7 +846,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   :root[data-theme="light"] .radar-mark.edge-light{border:1px solid var(--radar-mark-edge)}
   .radar-mark.radar-logo{width:16px;height:16px;border-radius:3px;object-fit:contain}
   .radar-entity{flex:0 0 auto;font-weight:700;color:var(--text)}
-  .radar-sep{flex:0 0 auto;opacity:.55}
   .radar-title{min-width:0;overflow:hidden;text-overflow:ellipsis}
   .writer-carousel-arrow{
     position:absolute;z-index:3;top:50%;transform:translateY(-50%);
@@ -1179,8 +1182,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     #briefsSection > .section-title .podcast-seek{
       flex:1 1 auto;width:70px;min-width:48px;max-width:none;margin:0;
     }
-    .radar-ticker{flex-wrap:wrap;height:auto}
-    .radar-viewport{flex:1 1 auto;max-width:none}
     /* Five nav controls plus a 11.5rem field do not fit a phone, so the field collapses to
        its icon. Asked for, it drops onto its own line rather than squeezing the buttons. */
     .radar-search-toggle{display:grid;place-items:center}
@@ -1303,7 +1304,7 @@ twq('config','re3b4');
 
 <section id="briefsSection">
   <div class="radar-ticker" id="radarTicker" hidden>
-    <span class="radar-kicker" id="radarKicker">RADAR</span>
+    <span class="radar-kicker" id="radarKicker"><svg class="radar-kicker-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".7"/><path d="M8 8 13.2 3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="1.3" fill="currentColor"/></svg><span class="radar-kicker-text" id="radarKickerText">RADAR</span></span>
     <div class="radar-viewport" id="radarViewport">
       <div class="radar-track" id="radarTrack"></div>
     </div>
@@ -1446,8 +1447,8 @@ twq('config','re3b4');
 
   <div class="home-view" id="videosSection" aria-labelledby="videosViewButton" hidden>
   <div class="videos-layout" id="videosLayout">
-    <div class="videos-rail-wrap"><div class="videos-rail" id="videosRail" role="list"></div></div>
     <div class="videos-stage" id="videosStage"></div>
+    <div class="videos-rail-wrap"><div class="videos-rail" id="videosRail" role="list"></div></div>
     <div class="videos-mobile" id="videosMobile"></div>
   </div>
   </div>
@@ -1495,7 +1496,6 @@ const UI = {
     readMore:"Yazının tamamı →",
     back:"← Geri Dön",
     emptyDesk:"Bu masa için henüz bir baskı yok.",
-    watchOnYoutube:"YouTube'da izle",
     videoPlay:"Videoyu oynat",
     videosList:"Masa videoları",
     details:"Ayrıntılar",
@@ -1576,7 +1576,6 @@ const UI = {
     readMore:"Read the full piece →",
     back:"← Back to the edition",
     emptyDesk:"No edition for this desk yet.",
-    watchOnYoutube:"Watch on YouTube",
     videoPlay:"Play video",
     videosList:"Desk videos",
     details:"Details",
@@ -2032,7 +2031,7 @@ function renderChrome(){
   $('protoBadge').textContent = topicMeta(TOPIC).label[LANG];
   $('pageTitle').textContent = pageMeta.title;
   $('featTitle').textContent = u.featTitle;
-  $('radarKicker').textContent = u.radarLabel;
+  $('radarKickerText').textContent = u.radarLabel;
   const searchInput = $('radarSearch');
   if (searchInput){
     searchInput.placeholder = u.searchPlaceholder;
@@ -3377,13 +3376,6 @@ function videoContext(v){
   const fallback = LANG === 'tr' ? v.contextEn : v.contextTr;
   return String(primary || fallback || '').trim();
 }
-function videoWatchHref(v){
-  const id = videoIdOf(v);
-  if (!id) return '';
-  const expected = `https://www.youtube.com/watch?v=${id}`;
-  const href = safeHref(typeof v?.url === 'string' ? v.url : expected);
-  return href || safeHref(expected);
-}
 function videoById(id){
   return deskVideos().find(v => videoIdOf(v) === id) || null;
 }
@@ -3419,12 +3411,6 @@ function videoRailCardHTML(v){
     <span class="video-rail-channel">${escapeHTML(channel)}</span>
     <span class="video-rail-title">${escapeHTML(title)}</span>`;
 }
-function videoWatchLinkHTML(v){
-  const u = UI[LANG];
-  const watch = videoWatchHref(v);
-  if (!watch) return '';
-  return `<a class="video-watch-link" href="${escapeHTML(watch)}" rel="noopener noreferrer external" target="_blank">${escapeHTML(u.watchOnYoutube)}</a>`;
-}
 function videoMetaHTML(v){
   const title = videoTitleOf(v);
   const channel = String(v?.channel || '').trim();
@@ -3432,8 +3418,7 @@ function videoMetaHTML(v){
   return `
     ${channel ? `<div class="video-channel">${escapeHTML(channel)}</div>` : ''}
     ${title ? `<h3 class="video-title">${escapeHTML(title)}</h3>` : ''}
-    ${context ? `<p class="video-context">${escapeHTML(context)}</p>` : ''}
-    ${videoWatchLinkHTML(v)}`;
+    ${context ? `<p class="video-context">${escapeHTML(context)}</p>` : ''}`;
 }
 function injectVideoEmbed(container, v){
   if (!container || !v) return false;
@@ -3552,13 +3537,11 @@ $('videosRail').addEventListener('click', event=>{
   selectDeskVideo(card.dataset.videoId);
 });
 $('videosStage').addEventListener('click', event=>{
-  if (event.target.closest('a.video-watch-link')) return;
   const play = event.target.closest('[data-video-play]');
   if (!play || !$('videosStage').contains(play)) return;
   selectDeskVideo(play.getAttribute('data-video-play'), {play:true});
 });
 $('videosMobile').addEventListener('click', event=>{
-  if (event.target.closest('a.video-watch-link')) return;
   const play = event.target.closest('[data-video-play]');
   if (!play || !$('videosMobile').contains(play)) return;
   const id = play.getAttribute('data-video-play');
@@ -5076,8 +5059,7 @@ function radarRowHTML(n){
   const time = clock
     ? `<time class="radar-time" datetime="${escapeHTML(clock.raw)}">${escapeHTML(clock.time)}</time>`
     : '';
-  const sep = chip ? `<span class="radar-sep" aria-hidden="true">—</span>` : '';
-  const inner = `${time}${chip}${sep}<span class="radar-title">${escapeHTML(title)}</span>`;
+  const inner = `${time}${chip}<span class="radar-title">${escapeHTML(title)}</span>`;
   const label = [clock ? `${clock.time} ${clock.zone}` : '', rec && rec.name, title]
     .filter(Boolean).join(' — ');
   const url = typeof n.url==='string' ? n.url : '';
