@@ -792,7 +792,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     border:0;background:transparent;color:var(--accent);cursor:pointer;
   }
   .radar-search-toggle svg{width:16px;height:16px}
-  .radar-search-toggle::after{content:"";position:absolute;inset:-14px}
+  /* The touch target grows vertically only. It is absolutely positioned, so it paints over
+     the unpositioned buttons beside it: grown sideways as well, it swallowed most of the
+     icon-only podcast button on a phone and every tap there opened the search (2026-09-23). */
+  .radar-search-toggle::after{content:"";position:absolute;inset:-14px 0}
   .search-hit-count{
     font-weight:700;color:var(--accent);margin-inline-start:.15em;font-variant-numeric:tabular-nums;
   }
@@ -1088,6 +1091,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .featured-grid{grid-template-columns:1fr}
     .brief-rail{overflow:visible;overscroll-behavior:auto}
     .featured-grid > .brief-feature h3{font-size:1.05rem;line-height:1.4}
+    /* The lead summary is clamped like every rail card's: on a phone it ran to seven lines
+       above cards showing two (operator, 2026-09-23). */
+    .featured-grid > .brief-feature .summary{display:-webkit-box;
+      -webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
     .featured-grid > .brief-feature .brief-content{padding:18px 22px 22px}
     #briefsSection > .section-title{
       display:flex;align-items:center;justify-content:space-between;gap:0;flex-wrap:wrap;
@@ -1179,14 +1186,17 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .radar-search-toggle{display:grid;place-items:center}
     .radar-search{display:none}
     #briefsSection .home-view-nav.is-search-open{flex-wrap:wrap}
+    /* width:0 keeps the open field out of the nav's own width, so min-width:100% spans the
+       tab row and no further; flex:1 1 100% let the input's intrinsic width widen the nav
+       until the field ran past the screen edge (451px on a 390px phone, 2026-09-23). */
     .home-view-nav.is-search-open .radar-search{
-      display:flex;flex:1 1 100%;width:100%;order:9;margin-inline:0;margin-top:2px;
+      display:flex;flex:0 0 auto;width:0;min-width:100%;order:9;margin-inline:0;margin-top:2px;
     }
   }
   @media(max-width:360px){
     /* At 320px the nav and the date selector share one row with nothing to spare: the
-       search icon costs 22px and pushed the selector onto a second line. It keeps its
-       44px touch target through the toggle's ::after inset, so only the box shrinks. */
+       search icon costs 22px and pushed the selector onto a second line. Its ::after inset
+       keeps the touch target 42px tall; it does not widen it, so only the box shrinks. */
     #briefsSection .home-view-nav{gap:0}
     .radar-search-toggle{width:14px;height:14px;margin:0}
     .radar-search-toggle svg{width:13px;height:13px}
