@@ -168,13 +168,17 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .live-score-wrap{display:grid;gap:2px}
   .live-score-note{color:var(--muted);font-size:.72rem}
   .legal{margin-top:16px;padding:12px 16px;background:var(--accent-soft);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;font-size:.8rem;color:var(--muted)}
+  /* Same width steps as the home page (template.html, 2026-09-30/10-01). */
   @media(min-width:1440px){
     html{font-size:106.25%}
-    :root{--page-max:76rem}
+    :root{--page-max:80rem}
+  }
+  @media(min-width:1680px){
+    :root{--page-max:88rem}
   }
   @media(min-width:1920px){
     html{font-size:112.5%}
-    :root{--page-max:84rem}
+    :root{--page-max:94rem}
   }
   @media(min-width:2560px){
     html{font-size:125%}

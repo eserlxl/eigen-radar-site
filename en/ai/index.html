@@ -380,6 +380,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     :root[data-theme="light"] .podcast-bar audio{display:none}
     :root[data-theme="light"] .podcast-bar .podcast-desktop-controls{display:flex}
   }
+  /* Operator 2026-10-01: the bar is about half again as wide on desktop, and Chromium
+     only draws the native timeline once the control has room for it (190px hid it). */
+  @media(min-width:960px){
+    .podcast-bar audio{width:250px}
+    .podcast-desktop-controls{width:250px}
+  }
+  @media(min-width:1200px){
+    .podcast-bar audio{width:340px}
+    .podcast-desktop-controls{width:340px}
+  }
   .listen-btn{margin:6px 0 2px;padding:6px 14px;border-radius:99px;border:1px solid var(--line);
     min-height:44px;background:var(--accent-soft);color:var(--accent);font-size:.8rem;cursor:pointer}
   .listen-btn.speaking{background:var(--accent);color:var(--card)}
@@ -419,42 +429,39 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   /* ---------- featured ---------- */
   .featured-grid{position:relative;display:grid;grid-template-columns:minmax(0,2fr) minmax(16rem,1fr);
     gap:16px;align-items:start}
-  .brief-rail{display:grid;gap:16px;overflow-y:auto;overscroll-behavior:contain}
-  /* Operator 2026-09-30: a desk with more Briefs spreads its rail over columns instead of
-     hiding cards behind a scroll. Three Briefs keep one column, four or five use two, six or
-     seven use three where the page is wide enough for readable cards. renderBriefs sets the
-     class while building the page, so the first paint already has the final layout. */
-  @media(min-width:960px){
-    .featured-grid:is(.rail-cols-2,.rail-cols-3){grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
-    .featured-grid:is(.rail-cols-2,.rail-cols-3) > .brief-rail{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .featured-grid:is(.rail-cols-2,.rail-cols-3) .brief-rail-card:last-child:nth-child(odd){grid-column:span 2}
-    /* The rail cards are stretched to the lead card's height; let the picture take the spare
-       height instead of leaving an empty band under a short headline. */
-    .featured-grid:is(.rail-cols-2,.rail-cols-3) .brief-rail-card{display:flex;flex-direction:column}
-    .featured-grid:is(.rail-cols-2,.rail-cols-3) .brief-rail-card :is(.brief-media,.brief-media-link){
+  /* Operator 2026-10-01: one grid per edition. syncBriefRailHeights places each card --
+     the selected one spans 2x2 where it stands, the rest fill the free cells -- and sets
+     --mosaic-cols for the card count, so a click grows a card in place and the others
+     reflow around it. Rows take their height from the cards in them. */
+  .featured-grid.brief-mosaic{
+    grid-template-columns:repeat(var(--mosaic-cols,2),minmax(0,1fr));
+    grid-auto-rows:minmax(15rem,auto);align-items:stretch}
+  @media(min-width:641px){
+    .featured-grid.brief-mosaic > .brief-card{display:flex;flex-direction:column;min-height:0}
+    .featured-grid.brief-mosaic > .brief-card .brief-media{
+      flex:1 1 0;min-height:7rem;overflow:hidden;display:flex;flex-direction:column}
+    .featured-grid.brief-mosaic > .brief-card .brief-media-link{
       flex:1 1 0;min-height:0;display:flex;flex-direction:column}
-    .featured-grid:is(.rail-cols-2,.rail-cols-3) .brief-rail-card .brief-media picture{
-      aspect-ratio:auto;flex:1 1 0;min-height:5.5rem}
-    .featured-grid:is(.rail-cols-2,.rail-cols-3) .brief-rail-card .brief-content{flex:0 0 auto;padding:12px 14px 14px}
-    .featured-grid:is(.rail-cols-2,.rail-cols-3) .brief-rail-card h3{
+    .featured-grid.brief-mosaic > .brief-card .brief-media picture{
+      aspect-ratio:auto;flex:1 1 0;min-height:0}
+    .featured-grid.brief-mosaic > .brief-card .brief-content{flex:0 0 auto}
+    .featured-grid.brief-mosaic > .brief-rail-card .brief-content{padding:12px 14px 14px}
+    .featured-grid.brief-mosaic > .brief-rail-card h3{
       font-size:.92rem;line-height:1.3;margin:4px 0;display:-webkit-box;
       -webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+    .featured-grid.brief-mosaic > .brief-rail-card .summary{display:none}
+    /* The big card keeps its 16:9 picture and sets the height of its two rows, as the
+       lead card did before, so the reveal preview has the same room; the small cards
+       stretch to those rows and their pictures take the spare height. */
+    .featured-grid.brief-mosaic > .brief-feature .brief-media{flex:0 0 auto;min-height:0}
+    .featured-grid.brief-mosaic > .brief-feature .brief-media-link{flex:0 0 auto}
+    .featured-grid.brief-mosaic > .brief-feature .brief-media picture{aspect-ratio:16/9;flex:0 0 auto}
+    .featured-grid.brief-mosaic > .brief-rail-card{cursor:pointer}
   }
-  @media(min-width:1200px){
-    .featured-grid.rail-cols-3{grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
-    .featured-grid.rail-cols-3 > .brief-rail{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .featured-grid.rail-cols-3 .brief-rail-card .summary{display:none}
-    /* An odd last row would leave a hole beside the last card; widen it instead. */
-    .featured-grid.rail-cols-3 .brief-rail-card:last-child:nth-child(odd){grid-column:auto}
-    .featured-grid.rail-cols-3 .brief-rail-card:last-child:nth-child(3n+2){grid-column:span 2}
+  @media(prefers-reduced-motion:reduce){
+    ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){
+      animation:none!important}
   }
-  .brief-rail-cue{
-    position:absolute;right:18px;bottom:10px;z-index:4;display:grid;place-items:center;
-    width:30px;height:30px;border:1px solid var(--line);border-radius:50%;
-    background:var(--card);color:var(--accent);box-shadow:0 4px 14px var(--drawer-shadow);
-    font-size:1rem;line-height:1;pointer-events:none
-  }
-  .brief-rail-cue[hidden]{display:none}
   .fcard{
     background:linear-gradient(160deg,var(--card) 0%,var(--card-gradient-end) 100%);
     border:1px solid var(--line);border-radius:var(--radius);
@@ -813,6 +820,12 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .radar-search input::-webkit-search-results-decoration{
     display:none;-webkit-appearance:none;
   }
+  /* Operator 2026-10-01: half again as wide where the row has room. Below 1440px the page
+     is capped at 70rem and the row is full with the podcast bar and the date, so the field
+     keeps 11.5rem there; a flexible width would wrap the row instead of shrinking. */
+  @media(min-width:1440px){
+    .radar-search{width:17.25rem}
+  }
   .radar-search input::placeholder{color:var(--muted)}
   .radar-search input:focus{outline:2px solid var(--focus);outline-offset:1px}
   .radar-search-icon{
@@ -886,6 +899,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .writer-carousel-arrow:hover:not(:disabled){color:var(--text)}
   .writer-carousel-arrow:disabled{opacity:0;pointer-events:none;cursor:default}
   .writers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:16px}
+  /* Operator 2026-10-01: the desk's writers under the Gündem cards -- one per row on a
+     phone, two on a tablet, three on desktop, so a desk's six writers close their rows. */
+  .brief-writers-section{margin-top:28px}
+  .brief-writers-title{margin:0 0 12px;font-size:.78rem;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted)}
+  .writers-grid.brief-writers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  @media(min-width:960px){.writers-grid.brief-writers{grid-template-columns:repeat(3,minmax(0,1fr))}}
   .wcard{
     background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
     display:block;height:19rem;overflow:hidden;padding:22px;cursor:pointer;transition:.15s;font-family:inherit;
@@ -1125,7 +1145,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     section{padding-left:16px;padding-right:16px}
     .featured-grid{grid-template-columns:1fr}
-    .brief-rail{overflow:visible;overscroll-behavior:auto}
+    /* Phones keep one column with the selected card on top, rows sized by content. */
+    .featured-grid.brief-mosaic{grid-auto-rows:auto}
+    .featured-grid.brief-mosaic > .brief-feature{order:-1}
     .featured-grid > .brief-feature h3{font-size:1.05rem;line-height:1.4}
     /* The lead summary is clamped like every rail card's: on a phone it ran to seven lines
        above cards showing two (operator, 2026-09-23). */
@@ -1144,7 +1166,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .radar-entity{display:none}
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
     .news-grid{grid-template-columns:minmax(0,1fr)}
-    .writers-grid{grid-template-columns:minmax(0,1fr)}
+    .writers-grid,.writers-grid.brief-writers{grid-template-columns:minmax(0,1fr)}
     .card,.fcard,.wcard{min-width:0;padding:17px}
     .fcard.brief-card{padding:0}
   }
@@ -1152,7 +1174,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
      compact list -- square thumbnail, headline, stamp -- so seven Briefs scan in one
      screen instead of seven full-height cards. */
   @media(max-width:500px){
-    .brief-rail{gap:10px}
+    .featured-grid.brief-mosaic{gap:10px}
     .featured-grid .brief-rail-card.fcard.brief-card{
       display:grid;grid-template-columns:92px minmax(0,1fr);align-items:stretch}
     .brief-rail-card :is(.brief-media,.brief-media-link){height:100%}
@@ -1478,6 +1500,11 @@ twq('config','re3b4');
       aria-controls="featured" disabled><span aria-hidden="true">›</span></button>
   </div>
   <div class="news-grid brief-search-results" id="briefSearchResults" hidden></div>
+  <div class="brief-writers-section" id="briefWritersSection" role="region"
+    aria-labelledby="briefWritersTitle" hidden>
+    <h3 class="brief-writers-title" id="briefWritersTitle"></h3>
+    <div class="writers-grid brief-writers" id="briefWriters"></div>
+  </div>
   </div>
 
   <div class="home-view news-section" id="newsSection" aria-labelledby="newsViewButton">
@@ -1573,10 +1600,10 @@ const UI = {
     searchArchiveCta:"Daha eski köşe yazıları ve analizler için arşivde ara",
     searchSevenDays:"Son 7 gün",
     noResults:"Son 7 günde bu masada yok.",
-    podcastTitle:"Günlük Özet",
-    podcastAudioLabel:"Günlük sesli özeti oynat",
-    podcastPlay:"Günlük sesli özeti oynat",
-    podcastPause:"Günlük sesli özeti duraklat",
+    podcastTitle:"Sesli Özet",
+    podcastAudioLabel:"Sesli özeti oynat",
+    podcastPlay:"Sesli özeti oynat",
+    podcastPause:"Sesli özeti duraklat",
     podcastSeek:"Podcast konumu",
     podcastMute:"Sesi kapat",
     podcastUnmute:"Sesi aç",
@@ -1653,10 +1680,10 @@ const UI = {
     searchArchiveCta:"Search older columns and briefs in the archive",
     searchSevenDays:"Last 7 days",
     noResults:"Nothing on this desk in the last 7 days.",
-    podcastTitle:"Daily Audio Brief",
-    podcastAudioLabel:"Play the daily audio brief",
-    podcastPlay:"Play the daily audio brief",
-    podcastPause:"Pause the daily audio brief",
+    podcastTitle:"Audio Brief",
+    podcastAudioLabel:"Play the audio brief",
+    podcastPlay:"Play the audio brief",
+    podcastPause:"Pause the audio brief",
     podcastSeek:"Podcast position",
     podcastMute:"Mute",
     podcastUnmute:"Unmute",
@@ -2471,6 +2498,28 @@ window.addEventListener('pagehide', ()=>{
 });
 
 const NEWS_PAGE_SIZE = 6;
+// Operator 2026-10-01: a news page is two full rows of the grid as it is drawn (six on a
+// phone), so the wider page never leaves empty slots in the last row. Measure the grid
+// when it is shown; when another home view hides it, apply its auto-fill rule to the
+// page width instead.
+function newsColumns(){
+  if (BRIEF_STACK_MEDIA.matches) return 1;
+  const grid = $('news');
+  // A hidden grid reports its declared repeat() text, not resolved tracks: only a list
+  // of pixel widths is a drawn grid.
+  const tracks = (grid ? getComputedStyle(grid).gridTemplateColumns : '').split(' ').filter(Boolean);
+  if (tracks.length && tracks.every(track=>/^[\d.]+px$/.test(track))) return tracks.length;
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  const pageMax = parseFloat(getComputedStyle(document.documentElement)
+    .getPropertyValue('--page-max')) * rem || innerWidth;
+  const width = Math.min(innerWidth, pageMax) - 40;
+  return Math.max(1, Math.floor((width + 14) / (20 * rem + 14)));
+}
+function newsPageSize(){
+  const columns = newsColumns();
+  return columns * Math.max(2, Math.ceil(NEWS_PAGE_SIZE / columns));
+}
+let renderedNewsPageSize = 0;
 function pageItems(items, requestedPage, pageSize){
   const pages = Math.max(1, Math.ceil(items.length / pageSize));
   const page = Math.max(0, Math.min(requestedPage, pages - 1));
@@ -2479,25 +2528,6 @@ function pageItems(items, requestedPage, pageSize){
 }
 
 const BRIEF_STACK_MEDIA = matchMedia('(max-width:640px)');
-const briefFeatureHeights = new Map();
-const briefRailCardHeights = new Map();
-const briefRailFilledHeights = new Map();
-function syncBriefRailCue(rail){
-  const cue = rail.parentElement?.querySelector(':scope > .brief-rail-cue');
-  if (!cue) return;
-  cue.hidden = BRIEF_STACK_MEDIA.matches || rail.scrollHeight <= rail.clientHeight + 1
-    || rail.scrollTop + rail.clientHeight >= rail.scrollHeight - 1;
-}
-function clearBriefDeckHeights(){
-  const track = $('featured');
-  if (!track) return;
-  track.style.height = '';
-  track.style.overflowY = '';
-  briefTrackPages().forEach(page=>{
-    page.style.height = '';
-    page.style.overflow = '';
-  });
-}
 function measureBriefPageHeight(page){
   const grid = page?.querySelector('.featured-grid');
   return grid ? Math.ceil(grid.scrollHeight) : 0;
@@ -2505,10 +2535,8 @@ function measureBriefPageHeight(page){
 function syncBriefDeckHeight(){
   const track = $('featured');
   if (!track) return;
-  if (!BRIEF_STACK_MEDIA.matches){
-    clearBriefDeckHeights();
-    return;
-  }
+  // Every width (operator 2026-10-01): mosaic pages differ in height, and the deck would
+  // otherwise take the tallest edition's height and leave a gap under a shorter one.
   const pages = briefTrackPages();
   if (!pages.length) return;
   const activePage = pages.find(page=>page.dataset.editionKey===selectedBriefDate)
@@ -2525,64 +2553,133 @@ function syncBriefDeckHeight(){
     page.style.height = `${activeHeight}px`;
     page.style.overflow = 'hidden';
   });
-  track.style.height = `${activeHeight}px`;
+  // The deck's own padding sits inside its border-box height; leave room for it or the
+  // active page's bottom border is clipped.
+  const trackStyle = getComputedStyle(track);
+  const trackPadding = (parseFloat(trackStyle.paddingTop) || 0)
+    + (parseFloat(trackStyle.paddingBottom) || 0);
+  track.style.height = `${activeHeight + trackPadding}px`;
   track.style.overflowY = 'hidden';
 }
-function syncBriefRailHeights(){
-  document.querySelectorAll('.featured-grid').forEach(grid=>{
-    const feature = grid.querySelector(':scope > .brief-feature');
-    const rail = grid.querySelector(':scope > .brief-rail');
-    if (!feature || !rail) return;
-    const railCards = [...rail.querySelectorAll(':scope > .brief-rail-card')];
-    if (BRIEF_STACK_MEDIA.matches){
-      feature.style.height = '';
-      railCards.forEach(card=>card.style.height = '');
-      rail.style.maxHeight = '';
-      syncBriefRailCue(rail);
-      return;
+// Columns for one edition's mosaic: the big card takes 2x2 cells and every other card
+// one, so pick the column count that closes the rows for this many cards.
+function briefMosaicColumns(count){
+  if (BRIEF_STACK_MEDIA.matches) return 1;
+  if (count <= 1) return 2;
+  if (!BRIEF_REVEAL_MEDIA.matches) return 2;
+  const cells = 3 + count;
+  const options = innerWidth >= 1200 ? [4, 5, 3] : [4, 3];
+  return options.find(columns => cells % columns === 0 && cells / columns >= 2)
+    || options.reduce((best, columns) =>
+      ((columns - cells % columns) % columns) < ((best - cells % best) % best) ? columns : best);
+}
+// Place one edition's cards: the selected card spans 2x2 at the block holding its own
+// cell, the rest fill the free cells in order, and a cell left over at the end widens the
+// card before it (or the one above) so no hole opens. Explicit placement, not auto-flow,
+// is what keeps the selected card where it was.
+// The last placement of every edition's mosaic, by Brief id. Operator 2026-10-01: when a
+// card grows, the others must move as little as possible, not be dealt out afresh -- so
+// each layout starts from the previous one while the column count and the cards stay
+// the same.
+const briefMosaicLayouts = new Map();
+function briefMosaicKey(grid){
+  return `${TOPIC}|${grid.closest('.brief-page')?.dataset.editionKey || ''}`;
+}
+function briefGridStart(card){
+  const column = parseInt(card.style.gridColumn, 10);
+  const row = parseInt(card.style.gridRow, 10);
+  return Number.isFinite(column) && Number.isFinite(row) ? {r:row - 1, c:column - 1} : null;
+}
+// Place one edition's cards. With no usable previous layout (first paint, a new column
+// count) the selected card takes the 2x2 block at its own position in the edition order
+// and the rest fill the free cells in order. Otherwise the selected card grows over the
+// cell it last held, every card the block does not cover keeps its cell, and the cards it
+// displaces -- and the old big card -- take the free cells nearest their previous ones.
+// A cell left over at the end widens the card before it (or the one above) so no hole
+// opens. Explicit placement, not auto-flow, is what keeps cards where they were.
+function layoutBriefMosaic(grid){
+  const cards = [...grid.querySelectorAll(':scope > .brief-card')];
+  cards.forEach(card=>{ card.style.gridColumn = ''; card.style.gridRow = ''; });
+  const columns = briefMosaicColumns(cards.length);
+  grid.style.setProperty('--mosaic-cols', String(columns));
+  if (columns < 2) return;
+  const key = briefMosaicKey(grid);
+  const ids = cards.map(card=>card.dataset.briefId);
+  const featureIndex = Math.max(0, cards.findIndex(card=>card.classList.contains('brief-feature')));
+  const rows = Math.max(2, Math.ceil((cards.length + 3) / columns));
+  const owner = Array.from({length:rows}, ()=>Array(columns).fill(-1));
+  const span = cards.map(()=>({r:0, c:0, w:1, h:1}));
+  const previous = briefMosaicLayouts.get(key);
+  const usable = previous && previous.columns === columns && previous.cells.size === ids.length
+    && ids.every(id=>previous.cells.has(id));
+  const own = usable ? previous.cells.get(ids[featureIndex])
+    : {r:Math.floor(featureIndex / columns), c:featureIndex % columns};
+  const top = Math.min(own.r, rows - 2);
+  const left = Math.min(own.c, columns - 2);
+  span[featureIndex] = {r:top, c:left, w:2, h:2};
+  for (let r = top; r < top + 2; r++) for (let c = left; c < left + 2; c++) owner[r][c] = featureIndex;
+  const pending = [];
+  cards.forEach((card, index)=>{
+    if (index === featureIndex) return;
+    const cell = usable ? previous.cells.get(ids[index]) : null;
+    if (cell && cell.r < rows && cell.c < columns && owner[cell.r][cell.c] === -1){
+      owner[cell.r][cell.c] = index;
+      span[index] = {r:cell.r, c:cell.c, w:1, h:1};
+    } else {
+      pending.push(index);
     }
-    feature.style.height = '';
-    railCards.forEach(card=>card.style.height = '');
-    const rect = feature.getBoundingClientRect();
-    // A hidden panel (another home view is open) measures 0×0; caching that would pin the
-    // feature to height:0px and leave a collapsed strip when the reader returns to Gündem.
-    if (!rect.width || !rect.height) return;
-    const railGap = parseFloat(getComputedStyle(rail).rowGap) || 0;
-    // A multi-column rail shows its cards in up to two rows; one column keeps two cards.
-    const railColumns = Math.max(1,
-      getComputedStyle(rail).gridTemplateColumns.split(' ').filter(Boolean).length);
-    const visibleRailCards = Math.min(2, Math.ceil(railCards.length / railColumns));
-    const naturalRailCardHeight = Math.max(0,
-      ...railCards.map(card=>card.getBoundingClientRect().height));
-    const edition = grid.closest('.brief-page')?.dataset.editionKey || '';
-    const key = `${TOPIC}|${edition}|${Math.round(rect.width)}`;
-    const railCardHeight = briefRailCardHeights.get(key)
-      || Math.ceil(naturalRailCardHeight);
-    briefRailCardHeights.set(key, railCardHeight);
-    const railStackHeight = railCardHeight * visibleRailCards
-      + railGap * Math.max(0, visibleRailCards - 1);
-    const height = briefFeatureHeights.get(key)
-      || Math.max(Math.ceil(rect.height), Math.ceil(railStackHeight));
-    briefFeatureHeights.set(key, height);
-    feature.style.height = `${height}px`;
-    const featureHeight = Math.ceil(feature.getBoundingClientRect().height);
-    // The feature is as tall as the taller column, so the rail cards have to grow into
-    // that height as well: at their natural height the rail column ends above the
-    // feature and the big card visibly hangs below it. The filled height is cached
-    // under the same key as the frame, so promoting a rail card cannot resize the rail.
-    let filledRailCardHeight = briefRailFilledHeights.get(key);
-    if (filledRailCardHeight === undefined){
-      filledRailCardHeight = visibleRailCards
-        ? Math.max(railCardHeight,
-                   Math.floor((featureHeight - railGap * Math.max(0, visibleRailCards - 1))
-                              / visibleRailCards))
-        : railCardHeight;
-      briefRailFilledHeights.set(key, filledRailCardHeight);
-    }
-    railCards.forEach(card=>card.style.height = `${filledRailCardHeight}px`);
-    rail.style.maxHeight = `${featureHeight}px`;
-    syncBriefRailCue(rail);
   });
+  if (usable){
+    // Nearest free cell first, across every displaced card, so no card travels further
+    // than it has to; ties keep edition order and reading order.
+    while (pending.length){
+      let best = null;
+      pending.forEach((index, order)=>{
+        const from = previous.cells.get(ids[index]);
+        for (let r = 0; r < rows; r++) for (let c = 0; c < columns; c++){
+          if (owner[r][c] !== -1) continue;
+          const distance = (r - from.r) ** 2 + (c - from.c) ** 2;
+          if (!best || distance < best.distance) best = {order, index, r, c, distance};
+        }
+      });
+      if (!best) break;
+      owner[best.r][best.c] = best.index;
+      span[best.index] = {r:best.r, c:best.c, w:1, h:1};
+      pending.splice(best.order, 1);
+    }
+  } else {
+    let cursor = 0;
+    pending.forEach(index=>{
+      while (owner[Math.floor(cursor / columns)][cursor % columns] !== -1) cursor++;
+      const r = Math.floor(cursor / columns), c = cursor % columns;
+      owner[r][c] = index;
+      span[index] = {r, c, w:1, h:1};
+    });
+  }
+  for (let r = 0; r < rows; r++) for (let c = 0; c < columns; c++){
+    if (owner[r][c] !== -1) continue;
+    const leftOwner = c > 0 ? owner[r][c - 1] : -1;
+    const aboveOwner = r > 0 ? owner[r - 1][c] : -1;
+    if (leftOwner !== -1 && leftOwner !== featureIndex && span[leftOwner].h === 1
+        && span[leftOwner].r === r){
+      span[leftOwner].w += 1;
+      owner[r][c] = leftOwner;
+    } else if (aboveOwner !== -1 && aboveOwner !== featureIndex && span[aboveOwner].w === 1){
+      span[aboveOwner].h += 1;
+      owner[r][c] = aboveOwner;
+    }
+  }
+  const cells = new Map();
+  cards.forEach((card, index)=>{
+    const {r, c, w, h} = span[index];
+    card.style.gridColumn = `${c + 1} / span ${w}`;
+    card.style.gridRow = `${r + 1} / span ${h}`;
+    cells.set(ids[index], {r, c});
+  });
+  briefMosaicLayouts.set(key, {columns, cells});
+}
+function syncBriefRailHeights(){
+  document.querySelectorAll('.featured-grid.brief-mosaic').forEach(layoutBriefMosaic);
   syncBriefDeckHeight();
 }
 
@@ -2624,41 +2721,44 @@ function renderBriefs(){
     page.className = 'brief-page';
     page.dataset.editionKey = key;
     const grid = document.createElement('div');
-    grid.className = 'featured-grid';
+    // Operator 2026-10-01: every card of the edition sits in one grid in its own order;
+    // the selected one grows to the big card where it stands and the others reflow
+    // around it (syncBriefRailHeights places them), so a click never moves a card.
+    grid.className = 'featured-grid brief-mosaic';
+    grid.setAttribute('aria-label', UI[LANG].featTitle);
     const selected = items.find(brief=>brief.id===selectedBriefIds.get(`${TOPIC}|${key}`)) || items[0];
-    const feature = briefCard(selected, 0, key===selectedBriefDate, pageIndex);
-    feature.classList.add('brief-feature');
-    grid.appendChild(feature);
-    const rail = document.createElement('div');
-    rail.className = 'brief-rail';
-    rail.setAttribute('aria-label', UI[LANG].featTitle);
-    rail.addEventListener('wheel', event => {
-      if (briefRailWheelConsumes(rail, event.deltaY)) event.stopPropagation();
-    }, {passive:true});
-    rail.addEventListener('scroll', ()=>syncBriefRailCue(rail), {passive:true});
-    items.filter(brief=>brief!==selected).forEach((brief,index)=>{
-      const card = briefCard(brief, index + 1, key===selectedBriefDate, pageIndex);
-      card.classList.add('brief-rail-card');
-      card.dataset.briefSelect = brief.id;
-      rail.appendChild(card);
+    let railIndex = 0;
+    items.forEach(brief=>{
+      const isSelected = brief===selected;
+      const card = briefCard(brief, isSelected ? 0 : ++railIndex, key===selectedBriefDate, pageIndex);
+      if (isSelected){
+        card.classList.add('brief-feature');
+      } else {
+        card.classList.add('brief-rail-card');
+        card.dataset.briefSelect = brief.id;
+      }
+      card.style.viewTransitionName = `brief-${pageIndex}-${String(brief.id||railIndex).replace(/[^a-z0-9-]/gi,'-')}`;
+      grid.appendChild(card);
     });
-    grid.appendChild(rail);
-    // Rail columns follow the desk's Brief count: 3 -> one, 4-5 -> two, 6-7 -> three.
-    const railCount = items.length - 1;
-    grid.classList.toggle('rail-cols-2', railCount >= 3 && railCount < 5);
-    grid.classList.toggle('rail-cols-3', railCount >= 5);
-    const railCue = document.createElement('span');
-    railCue.className = 'brief-rail-cue';
-    railCue.textContent = '↓';
-    railCue.setAttribute('aria-hidden', 'true');
-    grid.appendChild(railCue);
+    // Placement needs only the card count and the viewport, so do it before the first
+    // paint; waiting for a frame showed every card unplaced and then jumped.
     page.appendChild(grid);
+    layoutBriefMosaic(grid);
     track.appendChild(page);
   });
   section.hidden = total===0;
   scrollBriefTrack(false);
   requestAnimationFrame(syncBriefRailHeights);
+  // Fonts, pictures and the reveal preview change a page's height after this frame; the
+  // deck follows the active page, so re-measure whenever any page grid resizes. Only the
+  // deck and page boxes are sized, never the grid itself, so this cannot loop.
+  briefDeckObserver?.disconnect();
+  if (typeof ResizeObserver === 'function'){
+    briefDeckObserver = new ResizeObserver(()=>syncBriefDeckHeight());
+    track.querySelectorAll('.featured-grid').forEach(grid=>briefDeckObserver.observe(grid));
+  }
 }
+let briefDeckObserver = null;
 addEventListener('resize', syncBriefRailHeights);
 
 const BRIEF_REVEAL_MEDIA = matchMedia('(min-width:960px)');
@@ -2705,7 +2805,7 @@ function scheduleBriefReveal(){
   if (briefReadingState || !BRIEF_REVEAL_MEDIA.matches || document.visibilityState !== 'visible'
       || activeHomeView !== 'briefs') return;
   const page = briefTrackPages().find(item=>item.dataset.editionKey===selectedBriefDate);
-  const card = page?.querySelector('.brief-card');
+  const card = page?.querySelector('.brief-feature');
   if (!card || card.classList.contains('is-brief-revealed')) return;
   const brief = findBriefByKey(card.dataset.briefKey)
     || findBriefById(card.dataset.briefId);
@@ -3336,8 +3436,13 @@ $('featured').addEventListener('click', event=>{
     const key = choice.closest('.brief-page')?.dataset.editionKey;
     if (key && key===selectedBriefDate){
       selectedBriefIds.set(`${TOPIC}|${key}`, choice.dataset.briefSelect);
-      renderBriefs();
-      scheduleBriefReveal();
+      const reflow = ()=>{ renderBriefs(); syncBriefRailHeights(); };
+      if (document.startViewTransition && !BRIEF_REDUCED_MOTION.matches){
+        document.startViewTransition(reflow).finished.then(scheduleBriefReveal);
+      } else {
+        reflow();
+        scheduleBriefReveal();
+      }
     }
     return;
   }
@@ -3379,8 +3484,10 @@ function renderNews(){
   const u = UI[LANG];
   $('news').innerHTML = '';
   const items = visibleNewsItems();
-  const view = pageItems(items, newsPage, NEWS_PAGE_SIZE);
+  const pageSize = newsPageSize();
+  const view = pageItems(items, newsPage, pageSize);
   newsPage = view.page;
+  renderedNewsPageSize = pageSize;
   view.items.forEach(n => $('news').appendChild(newsCard(n, false)));
   if (!items.length) $('news').innerHTML = searchQuery.trim()
     ? emptySearchNote('news')
@@ -3397,6 +3504,13 @@ function renderNews(){
   $('newsPageStatus').textContent = u.pageStatus
     .replace('{current}', view.page + 1).replace('{total}', view.pages);
 }
+// A resize that changes the row length re-pages around the first card on screen.
+addEventListener('resize', ()=>{
+  const pageSize = newsPageSize();
+  if (!renderedNewsPageSize || pageSize === renderedNewsPageSize) return;
+  newsPage = Math.floor(newsPage * renderedNewsPageSize / pageSize);
+  renderNews();
+});
 $('newsPrev').addEventListener('click', ()=>{ newsPage -= 1; renderNews(); });
 $('newsNext').addEventListener('click', ()=>{ newsPage += 1; renderNews(); });
 
@@ -4253,6 +4367,7 @@ function adoptBriefEdition(key){
   renderRadar();
   renderPodcast();
   scheduleBriefReveal();
+  syncBriefDeckHeight();
 }
 
 function briefArrowStep(dir){
@@ -4322,14 +4437,8 @@ function syncBriefEditionFromScroll(){
   syncBriefRailHeights();
 }
 
-function renderWriters(){
-  const u = UI[LANG];
-  const q = searchNeedle();
-  const grid = $('writersGrid');
-  grid.innerHTML = '';
-  WRITERS.filter(w=>w.topic===TOPIC).forEach(w=>{
-    const a = matchingWriterArticle(w);
-    if (q && !a && !searchFold(w.name).includes(q)) return;
+function writerCard(w, a){
+    const u = UI[LANG];
     const card = document.createElement('a');
     card.className = 'wcard';
     // The card opens the column itself; the writer's index page is one click further.
@@ -4347,9 +4456,25 @@ function renderWriters(){
       ${radarStampHTML(a,true)}
       <span class="read-more">${u.readMore}</span>` : ''}
     `;
-    grid.appendChild(card);
+    return card;
+}
+function renderWriters(){
+  const q = searchNeedle();
+  const grid = $('writersGrid');
+  grid.innerHTML = '';
+  const deskWriters = WRITERS.filter(w=>w.topic===TOPIC);
+  deskWriters.forEach(w=>{
+    const a = matchingWriterArticle(w);
+    if (q && !a && !searchFold(w.name).includes(q)) return;
+    grid.appendChild(writerCard(w, a));
   });
   if (q && !grid.children.length) grid.innerHTML = emptySearchNote('writers');
+  // The same cards under the Gündem cards; a search shows its own results there instead.
+  const strip = $('briefWriters');
+  strip.innerHTML = '';
+  if (!q) deskWriters.forEach(w=>strip.appendChild(writerCard(w, matchingWriterArticle(w))));
+  $('briefWritersTitle').textContent = UI[LANG].writersView;
+  $('briefWritersSection').hidden = !strip.children.length;
 }
 
 /* ---------- filter state ---------- */
@@ -4753,15 +4878,6 @@ if(typeof EDITION_LABEL_MEDIA.addEventListener==='function'){
 $('briefsPrev').addEventListener('click', ()=>briefArrowStep(-1));
 $('briefsNext').addEventListener('click', ()=>briefArrowStep(1));
 let briefWheelGesture = 0;
-function briefRailFromEvent(event){
-  return event.target?.closest?.('.brief-rail-card, .brief-rail')?.closest?.('.brief-rail') || null;
-}
-function briefRailWheelConsumes(rail, dy){
-  if (!dy) return false;
-  return dy > 0
-    ? rail.scrollTop + rail.clientHeight < rail.scrollHeight - 1
-    : rail.scrollTop > 1;
-}
 function handleDateWheel(event,targetForDirection,step){
   if (!BRIEF_REVEAL_MEDIA.matches || !event.deltaY
       || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
@@ -4776,8 +4892,6 @@ function handleDateWheel(event,targetForDirection,step){
 }
 $('featured').addEventListener('wheel', event=>{
   if (BRIEF_REVEAL_MEDIA.matches && event.target?.closest?.('.brief-card.is-brief-reading')) return;
-  const rail = briefRailFromEvent(event);
-  if (rail && briefRailWheelConsumes(rail, event.deltaY)) return;
   handleDateWheel(event,
     dir=>briefTrackPages()[briefPageIndex() + dir],
     dir=>briefWheelStep(dir));
@@ -5197,7 +5311,7 @@ function openRadarNews(n){
   const url = typeof n.url==='string' ? n.url : '';
   const items = visibleNewsItems();
   const index = items.findIndex(item => item.url === url);
-  newsPage = index >= 0 ? Math.floor(index / NEWS_PAGE_SIZE) : 0;
+  newsPage = index >= 0 ? Math.floor(index / newsPageSize()) : 0;
   setHomeView('news');
   setFilterPopover(false);
   renderFilters();

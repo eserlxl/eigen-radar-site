@@ -17,6 +17,10 @@ footer{border-top:1px solid var(--line);margin-top:2.5rem;padding:1.875rem 0;col
 :root{--text-zoom:1}:root[data-text-scale="1.125"]{--text-zoom:1.125}:root[data-text-scale="1.25"]{--text-zoom:1.25}
 @media(min-width:1440px){html{font-size:106.25%}:root{--max:76rem}}
 @media(min-width:1920px){html{font-size:112.5%}:root{--max:84rem}}
+/* Operator 2026-10-01: the archive is a listing page and widens with the home and markets pages; reading pages keep the narrower measure above. */
+@media(min-width:1440px){:root:has(.archive[data-archive]){--max:80rem}}
+@media(min-width:1680px){:root:has(.archive[data-archive]){--max:88rem}}
+@media(min-width:1920px){:root:has(.archive[data-archive]){--max:94rem}}
 @media(min-width:2560px){html{font-size:125%}:root{--max:90rem}}
 @media(max-width:900px){.header-meta{display:none}.article-layout{grid-template-columns:1fr}}
 @media(max-width:640px){.mast{position:static;backdrop-filter:none}.mast-inner,.wrap{padding-inline:1rem}.mast-inner{align-items:center;padding-block:.625rem;gap:.5rem}.brand{font-size:1.05rem}.mark{width:2rem;height:2rem}.desk-badge{display:none}.header-right{margin-left:auto;gap:.45rem}.topics{order:3;width:100%;margin:0;display:grid;align-items:start;grid-template-columns:repeat(4,minmax(0,1fr));gap:.125rem;padding:0;border:0;background:transparent}.topics a{min-width:0;min-height:0;justify-content:center;padding:.1875rem .125rem .3125rem}.topic-label{font-size:clamp(.76rem,3.2vw,.84rem);line-height:1;letter-spacing:-.015em}.section-head{align-items:start;flex-direction:column}}
