@@ -892,11 +892,13 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .radar-mark.radar-logo{width:16px;height:16px;border-radius:3px;object-fit:contain}
   .radar-entity{flex:0 0 auto;font-weight:700;color:var(--text)}
   .radar-title{min-width:0;overflow:hidden;text-overflow:ellipsis}
-  /* Operator 2026-10-01: the Radar headline leaves half of the desktop row empty, so that half
-     shows market prices a group at a time: as many items as fit, every 10 s. Phones and narrow
-     screens never show it. */
+  /* Operator 2026-10-01: the desktop Radar row is split in two -- the headline on the left
+     half, market prices on the right half, a group at a time (as many items as fit, every
+     10 s). The items spread across the whole half, starting at the middle of the row, so no
+     empty run opens between the headline and the prices. Phones and narrow screens never
+     show it. */
   .market-strip{
-    flex:0 0 50%;min-width:0;display:flex;justify-content:flex-end;gap:18px;overflow:hidden;
+    flex:0 0 50%;min-width:0;display:flex;justify-content:space-between;gap:8px;overflow:hidden;
     height:var(--radar-row);transition:opacity .3s ease;
   }
   .market-strip[hidden]{display:none}
@@ -5649,12 +5651,20 @@ const MARKET_TICKER_URL = 'https://media.eigenradar.com/markets/ticker.json';
 const MARKET_REFRESH_MS = 5 * 60 * 1000;
 const MARKET_DWELL_MS = 10000;
 const MARKET_FADE_MS = 300;
+// Items sit MARKET_GAP apart. Operator 2026-10-01: when the room left over reaches half of
+// what one more item needs, close the gaps (never below MARKET_MIN_GAP) and fit it; with
+// less than half, the count stays and the gaps grow. The CSS gap is the minimum; the
+// strip's space-between spreads whatever is left.
+const MARKET_GAP = 18;
+const MARKET_MIN_GAP = 8;
 // Older data hides the strip instead of passing an old price off as current.
 const MARKET_STALE_MS = 30 * 60 * 1000;
 const MARKET_DESKTOP = matchMedia('(min-width: 1024px)');
 const MARKET_SYMBOLS = [
   ['XAUUSDT', 'xau', {tr: 'Altın', en: 'Gold'}],
   ['XAGUSDT', 'xag', {tr: 'Gümüş', en: 'Silver'}],
+  ['PAXGUSDT', 'paxg', {tr: 'PAX Gold', en: 'PAX Gold'}],
+  ['XAUTUSDT', 'xaut', {tr: 'Tether Gold', en: 'Tether Gold'}],
   ['BZUSDT', 'bz', {tr: 'Brent', en: 'Brent'}],
   ['CLUSDT', 'cl', {tr: 'WTI', en: 'WTI'}],
   ['BTCUSDT', 'btc', {tr: 'Bitcoin', en: 'Bitcoin'}],
@@ -5662,8 +5672,8 @@ const MARKET_SYMBOLS = [
   ['XRPUSDT', 'xrp', {tr: 'XRP', en: 'XRP'}],
 ];
 let marketQuotes = [];
-let marketGroups = [];
-let marketGroupIndex = 0;
+let marketGroupSize = 0;
+let marketGroupStart = 0;
 let marketTimer = 0;
 let marketPaused = false;
 let marketLoaded = false;
@@ -5699,19 +5709,25 @@ function stopMarketTimer(){
     marketTimer = 0;
   }
 }
+// The list is read as a ring: each step moves on by one group, and a group that reaches the
+// end continues from the start, so no group is ever shorter than the rest (operator
+// 2026-10-01: a lone XRP at the end looked odd).
+function marketGroup(start){
+  return Array.from({length: marketGroupSize}, (_, i) => marketQuotes[(start + i) % marketQuotes.length]);
+}
 function paintMarketGroup(){
   const strip = $('marketStrip');
   if (!strip) return;
-  strip.innerHTML = (marketGroups[marketGroupIndex] || []).map(marketItemHTML).join('');
+  strip.innerHTML = marketGroup(marketGroupStart).map(marketItemHTML).join('');
 }
 function scheduleMarketAdvance(){
   stopMarketTimer();
-  if (marketGroups.length < 2 || marketPaused || document.hidden) return;
+  if (marketGroupSize >= marketQuotes.length || marketPaused || document.hidden) return;
   marketTimer = setTimeout(() => {
     const strip = $('marketStrip');
     const advance = () => {
       marketTimer = 0;
-      marketGroupIndex = (marketGroupIndex + 1) % marketGroups.length;
+      marketGroupStart = (marketGroupStart + marketGroupSize) % marketQuotes.length;
       paintMarketGroup();
       if (strip) strip.classList.remove('is-fading');
       scheduleMarketAdvance();
@@ -5723,6 +5739,13 @@ function scheduleMarketAdvance(){
     strip.classList.add('is-fading');
     marketTimer = setTimeout(advance, MARKET_FADE_MS);
   }, MARKET_DWELL_MS);
+}
+function marketFit(room, widest, count){
+  let size = Math.floor((room + MARKET_GAP) / (widest + MARKET_GAP));
+  const left = room - (size * widest + Math.max(0, size - 1) * MARKET_GAP);
+  if (size >= 1 && size < count && left >= (widest + MARKET_GAP) / 2
+      && (room - (size + 1) * widest) / size >= MARKET_MIN_GAP) size += 1;
+  return Math.min(count, size);
 }
 function layoutMarketStrip(){
   const strip = $('marketStrip');
@@ -5738,8 +5761,7 @@ function layoutMarketStrip(){
   strip.style.removeProperty('--market-item');
   strip.innerHTML = marketQuotes.map(marketItemHTML).join('');
   const widest = Math.ceil(Math.max(...[...strip.children].map(el => el.getBoundingClientRect().width)));
-  const gap = parseFloat(getComputedStyle(strip).columnGap) || 0;
-  const size = Math.min(marketQuotes.length, Math.floor((strip.clientWidth + gap) / (widest + gap)));
+  const size = marketFit(strip.clientWidth, widest, marketQuotes.length);
   strip.dataset.groupSize = String(size);
   if (size < 1){
     strip.innerHTML = '';
@@ -5747,9 +5769,8 @@ function layoutMarketStrip(){
     return;
   }
   strip.style.setProperty('--market-item', `${widest}px`);
-  marketGroups = [];
-  for (let i = 0; i < marketQuotes.length; i += size) marketGroups.push(marketQuotes.slice(i, i + size));
-  marketGroupIndex = Math.min(marketGroupIndex, marketGroups.length - 1);
+  marketGroupSize = size;
+  marketGroupStart %= marketQuotes.length;
   paintMarketGroup();
   scheduleMarketAdvance();
 }
