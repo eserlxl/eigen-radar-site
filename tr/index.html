@@ -87,6 +87,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --accent:#5ee3d7;
     --accent-soft:rgba(94,227,215,.08);
     --amber:#d6c08c;
+    --market-up:#4ade80;
+    --market-down:#f87171;
     --scheme:dark;
     --focus:#fff;
     --on-accent:#040711;
@@ -122,6 +124,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --accent:#005f5a;
     --accent-soft:rgba(0,95,90,.12);
     --amber:#854100;
+    --market-up:#0d5c26;
+    --market-down:#a11616;
     --scheme:light;
     --focus:#0f172a;
     --on-accent:#fff;
@@ -888,6 +892,27 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .radar-mark.radar-logo{width:16px;height:16px;border-radius:3px;object-fit:contain}
   .radar-entity{flex:0 0 auto;font-weight:700;color:var(--text)}
   .radar-title{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  /* Operator 2026-10-01: the Radar headline leaves half of the desktop row empty, so that half
+     shows market prices a group at a time: as many items as fit, every 10 s. Phones and narrow
+     screens never show it. */
+  .market-strip{
+    flex:0 0 50%;min-width:0;display:flex;justify-content:flex-end;gap:18px;overflow:hidden;
+    height:var(--radar-row);transition:opacity .3s ease;
+  }
+  .market-strip[hidden]{display:none}
+  .market-strip.is-fading{opacity:0}
+  @media(max-width:1023px){.market-strip{display:none!important}}
+  @media(prefers-reduced-motion:reduce){.market-strip{transition:none}}
+  .market-item{
+    flex:0 0 auto;display:flex;align-items:center;gap:6px;width:var(--market-item,auto);
+    color:var(--muted);text-decoration:none;white-space:nowrap;font-variant-numeric:tabular-nums;
+  }
+  .market-item:hover .market-name,.market-item:focus-visible .market-name{color:var(--text)}
+  .market-item:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+  .market-item img{flex:0 0 auto;width:14px;height:14px}
+  .market-name,.market-price,.market-change{font-weight:700}
+  .market-item.is-up .market-price,.market-item.is-up .market-change{color:var(--market-up)}
+  .market-item.is-down .market-price,.market-item.is-down .market-change{color:var(--market-down)}
   .writer-carousel-arrow{
     position:absolute;z-index:3;top:50%;transform:translateY(-50%);
     display:grid;place-items:center;width:44px;height:44px;padding:0;
@@ -908,7 +933,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(min-width:960px){.writers-grid.brief-writers{grid-template-columns:repeat(3,minmax(0,1fr))}}
   .wcard{
     background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    display:block;height:19rem;overflow:hidden;padding:22px;cursor:pointer;transition:.15s;font-family:inherit;
+    /* Operator 2026-10-01: the fixed 19rem left empty space under short cards. The card now
+       ends with its content; the grid still evens out the cards of one row. */
+    display:block;overflow:hidden;padding:22px;cursor:pointer;transition:.15s;font-family:inherit;
     color:var(--text);text-align:left;text-decoration:none;
   }
   .wcard:hover{transform:translateY(-3px);border-color:var(--accent)}
@@ -918,7 +945,6 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     overflow:hidden;font-size:.85rem;color:var(--muted)}
   .radar-stamp{display:block;margin-top:5px;color:var(--muted);font-size:.64rem;
     line-height:1.25;letter-spacing:.02em}
-  .read-more{font-size:.8rem;font-weight:600;color:var(--accent);margin-top:12px;display:inline-block}
   .date-select{
     margin-left:auto;background:var(--bg-soft);border:1px solid var(--line);color:var(--text);
     border-radius:8px;padding:6px 12px;min-height:44px;font-family:inherit;font-size:.8rem;
@@ -1377,6 +1403,7 @@ twq('config','re3b4');
     <div class="radar-viewport" id="radarViewport">
       <div class="radar-track" id="radarTrack"></div>
     </div>
+    <div class="market-strip" id="marketStrip" role="group" hidden></div>
   </div>
   <div class="section-title">
     <h2 class="visually-hidden" id="featTitle">Gündem</h2>
@@ -1783,7 +1810,6 @@ const UI = {
     writersView:"Yazarlar",
     writersTitle:"Köşe Yazıları",
     writersBtn:"Yazarlar",
-    readMore:"Yazının tamamı →",
     back:"← Geri Dön",
     emptyDesk:"Bu masa için henüz bir baskı yok.",
     videoPlay:"Videoyu oynat",
@@ -1795,6 +1821,7 @@ const UI = {
     briefNewer:"Daha yeni baskı",
     archive:"Arşiv",
     markets:"Piyasalar",
+    marketDaily:"günlük",
     newsPages:"Haber sayfaları",
     prevNews:"Önceki haber sayfası",
     nextNews:"Sonraki haber sayfası",
@@ -1863,7 +1890,6 @@ const UI = {
     writersView:"Columnists",
     writersTitle:"Columns",
     writersBtn:"Columnists",
-    readMore:"Read the full piece →",
     back:"← Back to the edition",
     emptyDesk:"No edition for this desk yet.",
     videoPlay:"Play video",
@@ -1875,6 +1901,7 @@ const UI = {
     briefNewer:"Newer edition",
     archive:"Archive",
     markets:"Markets",
+    marketDaily:"24h",
     newsPages:"News pages",
     prevNews:"Previous news page",
     nextNews:"Next news page",
@@ -2655,9 +2682,22 @@ function setPodcastPopover(open,returnFocus=false){
   if (!visible && returnFocus && compact && !trigger.hidden) trigger.focus();
 }
 
-function dailyPodcastSource(podcasts,topic,date,lang){
+function dailyPodcastSource(podcasts,topic,date,lang,n){
   const dateEntry = ((podcasts || {})[topic] || {})[date];
-  const entry = dateEntry && dateEntry.editions && dateEntry.editions['1'];
+  const editions = dateEntry && dateEntry.editions;
+  if (!editions) return null;
+  let entry = editions[n];
+  if (!entry || !entry.files || !entry.files[lang]) {
+    let fallback_n = null;
+    for (let i = n - 1; i >= 1; i--) {
+      if (editions[i] && editions[i].files && editions[i].files[lang]) {
+        fallback_n = i;
+        break;
+      }
+    }
+    if (!fallback_n) fallback_n = 1;
+    entry = editions[fallback_n];
+  }
   const file = entry && entry.files && entry.files[lang];
   return file && file.url;
 }
@@ -2669,8 +2709,8 @@ function dailyPodcastSource(podcasts,topic,date,lang){
 function renderPodcast(){
   const bar = $('podcastBar');
   const trigger = $('podcastTrigger');
-  const {date} = briefEditionParts(selectedBriefDate);
-  const src = dailyPodcastSource(DATA.podcasts,TOPIC,date,LANG);
+  const {date, n} = briefEditionParts(selectedBriefDate);
+  const src = dailyPodcastSource(DATA.podcasts,TOPIC,date,LANG,n);
   const previousAudio = bar.querySelector('audio');
   if (!src){
     if (previousAudio) savePodcastProgress(previousAudio,bar.dataset.src);
@@ -4671,8 +4711,7 @@ function writerCard(w, a){
       </div>
       ${a ? `<h3 class="wtitle">${escapeHTML(localized(a.title))}</h3>
       <p class="wexcerpt">${escapeHTML(localized(a.excerpt))}</p>
-      ${radarStampHTML(a,true)}
-      <span class="read-more">${u.readMore}</span>` : ''}
+      ${radarStampHTML(a,true)}` : ''}
     `;
     return card;
 }
@@ -5602,6 +5641,160 @@ function bindRadarChrome(){
 }
 bindRadarChrome();
 bindRadarSearch();
+
+// Operator 2026-10-01: market prices in the empty half of the desktop Radar row. The data is
+// markets/ticker.json, a ~1 KB file scripts/export-markets.sh derives from markets.json every
+// 5 minutes; each item links to its chart on the markets page.
+const MARKET_TICKER_URL = 'https://media.eigenradar.com/markets/ticker.json';
+const MARKET_REFRESH_MS = 5 * 60 * 1000;
+const MARKET_DWELL_MS = 10000;
+const MARKET_FADE_MS = 300;
+// Older data hides the strip instead of passing an old price off as current.
+const MARKET_STALE_MS = 30 * 60 * 1000;
+const MARKET_DESKTOP = matchMedia('(min-width: 1024px)');
+const MARKET_SYMBOLS = [
+  ['XAUUSDT', 'xau', {tr: 'Altın', en: 'Gold'}],
+  ['XAGUSDT', 'xag', {tr: 'Gümüş', en: 'Silver'}],
+  ['BZUSDT', 'bz', {tr: 'Brent', en: 'Brent'}],
+  ['CLUSDT', 'cl', {tr: 'WTI', en: 'WTI'}],
+  ['BTCUSDT', 'btc', {tr: 'Bitcoin', en: 'Bitcoin'}],
+  ['ETHUSDT', 'eth', {tr: 'Ethereum', en: 'Ethereum'}],
+  ['XRPUSDT', 'xrp', {tr: 'XRP', en: 'XRP'}],
+];
+let marketQuotes = [];
+let marketGroups = [];
+let marketGroupIndex = 0;
+let marketTimer = 0;
+let marketPaused = false;
+let marketLoaded = false;
+
+function marketQuotesFrom(payload, now = Date.now()){
+  const bySymbol = new Map(((payload && payload.symbols) || []).map(item => [item.symbol, item]));
+  return MARKET_SYMBOLS.flatMap(([symbol, icon, names]) => {
+    const item = bySymbol.get(symbol);
+    if (!item || !Number.isFinite(item.last) || !Number.isFinite(item.change24h)
+        || !(now - item.lastMs <= MARKET_STALE_MS)) return [];
+    return [{symbol, icon, name: names[LANG] || names.en, last: item.last, change: item.change24h}];
+  });
+}
+function marketItemHTML(quote){
+  const u = UI[LANG];
+  const locale = LANG === 'tr' ? 'tr-TR' : 'en-US';
+  const digits = quote.last >= 1000 ? 0 : quote.last >= 10 ? 2 : 4;
+  const price = new Intl.NumberFormat(locale,
+    {minimumFractionDigits: digits, maximumFractionDigits: digits}).format(quote.last);
+  const change = new Intl.NumberFormat(locale, {style: 'percent', signDisplay: 'exceptZero',
+    minimumFractionDigits: 2, maximumFractionDigits: 2}).format(quote.change / 100);
+  const up = quote.change >= 0;
+  const label = `${quote.name} ${price} USDT, ${u.marketDaily} ${change}`;
+  return `<a class="market-item ${up ? 'is-up' : 'is-down'}" href="/markets#${escapeHTML(quote.symbol)}" aria-label="${escapeHTML(label)}">`
+    + `<img src="/assets/markets/${escapeHTML(quote.icon)}.svg" alt="" width="14" height="14">`
+    + `<span class="market-name">${escapeHTML(quote.name)}</span>`
+    + `<span class="market-price">${escapeHTML(price)}</span>`
+    + `<span class="market-change"><span aria-hidden="true">${up ? '▲' : '▼'}</span> ${escapeHTML(change)}</span></a>`;
+}
+function stopMarketTimer(){
+  if (marketTimer){
+    clearTimeout(marketTimer);
+    marketTimer = 0;
+  }
+}
+function paintMarketGroup(){
+  const strip = $('marketStrip');
+  if (!strip) return;
+  strip.innerHTML = (marketGroups[marketGroupIndex] || []).map(marketItemHTML).join('');
+}
+function scheduleMarketAdvance(){
+  stopMarketTimer();
+  if (marketGroups.length < 2 || marketPaused || document.hidden) return;
+  marketTimer = setTimeout(() => {
+    const strip = $('marketStrip');
+    const advance = () => {
+      marketTimer = 0;
+      marketGroupIndex = (marketGroupIndex + 1) % marketGroups.length;
+      paintMarketGroup();
+      if (strip) strip.classList.remove('is-fading');
+      scheduleMarketAdvance();
+    };
+    if (!strip || RADAR_REDUCED_MOTION.matches){
+      advance();
+      return;
+    }
+    strip.classList.add('is-fading');
+    marketTimer = setTimeout(advance, MARKET_FADE_MS);
+  }, MARKET_DWELL_MS);
+}
+function layoutMarketStrip(){
+  const strip = $('marketStrip');
+  if (!strip) return;
+  stopMarketTimer();
+  strip.classList.remove('is-fading');
+  if (!MARKET_DESKTOP.matches || !marketQuotes.length){
+    strip.hidden = true;
+    return;
+  }
+  // Every item takes the widest item's width so the groups line up as they change.
+  strip.hidden = false;
+  strip.style.removeProperty('--market-item');
+  strip.innerHTML = marketQuotes.map(marketItemHTML).join('');
+  const widest = Math.ceil(Math.max(...[...strip.children].map(el => el.getBoundingClientRect().width)));
+  const gap = parseFloat(getComputedStyle(strip).columnGap) || 0;
+  const size = Math.min(marketQuotes.length, Math.floor((strip.clientWidth + gap) / (widest + gap)));
+  strip.dataset.groupSize = String(size);
+  if (size < 1){
+    strip.innerHTML = '';
+    strip.hidden = true;
+    return;
+  }
+  strip.style.setProperty('--market-item', `${widest}px`);
+  marketGroups = [];
+  for (let i = 0; i < marketQuotes.length; i += size) marketGroups.push(marketQuotes.slice(i, i + size));
+  marketGroupIndex = Math.min(marketGroupIndex, marketGroups.length - 1);
+  paintMarketGroup();
+  scheduleMarketAdvance();
+}
+async function loadMarketTicker(){
+  if (!MARKET_DESKTOP.matches || document.hidden) return;
+  marketLoaded = true;
+  try {
+    const res = await fetch(`${MARKET_TICKER_URL}?t=${Math.floor(Date.now() / MARKET_REFRESH_MS)}`,
+      {cache: 'no-store', credentials: 'omit'});
+    marketQuotes = res.ok ? marketQuotesFrom(await res.json()) : [];
+  } catch (err) {
+    marketQuotes = [];
+  }
+  layoutMarketStrip();
+}
+function bindMarketStrip(){
+  const strip = $('marketStrip');
+  const ticker = $('radarTicker');
+  if (!strip || !ticker) return;
+  strip.setAttribute('aria-label', UI[LANG].markets);
+  const pause = () => { marketPaused = true; stopMarketTimer(); };
+  const resume = () => { marketPaused = false; scheduleMarketAdvance(); };
+  strip.addEventListener('mouseenter', pause);
+  strip.addEventListener('mouseleave', resume);
+  strip.addEventListener('focusin', pause);
+  strip.addEventListener('focusout', event => { if (!strip.contains(event.relatedTarget)) resume(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopMarketTimer();
+    else if (!marketLoaded) loadMarketTicker();
+    else scheduleMarketAdvance();
+  });
+  const onDesktopChange = () => { if (marketLoaded) layoutMarketStrip(); else loadMarketTicker(); };
+  if (typeof MARKET_DESKTOP.addEventListener === 'function') MARKET_DESKTOP.addEventListener('change', onDesktopChange);
+  else if (typeof MARKET_DESKTOP.addListener === 'function') MARKET_DESKTOP.addListener(onDesktopChange);
+  let lastWidth = 0;
+  new ResizeObserver(entries => {
+    const width = Math.round(entries[0].contentRect.width);
+    if (width === lastWidth) return;
+    lastWidth = width;
+    if (marketQuotes.length) layoutMarketStrip();
+  }).observe(ticker);
+  setInterval(() => { if (marketLoaded && !document.hidden) loadMarketTicker(); }, MARKET_REFRESH_MS);
+  loadMarketTicker();
+}
+bindMarketStrip();
 
 function renderAll(){
   renderChrome();
