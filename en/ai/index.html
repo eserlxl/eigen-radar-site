@@ -942,6 +942,26 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     color:var(--text);text-align:left;text-decoration:none;
   }
   .wcard:hover{transform:translateY(-3px);border-color:var(--accent)}
+  /* Operator 2026-10-02: grow one writer across its row, keeping the link and order. */
+  .wcard.wfeature{grid-column:1/-1;position:relative;min-width:0;cursor:default}
+  .wcard.wfeature:hover{transform:none}
+  .writer-card-link{display:block;color:inherit;text-decoration:none;padding-right:44px}
+  .wfeature .wtitle{-webkit-line-clamp:unset;font-size:1.4rem}
+  .wfeature .wexcerpt{-webkit-line-clamp:unset;font-size:1rem}
+  .writer-preview{margin-top:12px;color:var(--muted);line-height:1.65}
+  .writer-close{position:absolute;top:10px;right:10px;width:44px;height:44px;
+    border:0;background:transparent;color:var(--text);font-size:1.5rem;cursor:pointer}
+  .wfull-link{display:block;width:fit-content;margin-top:16px;color:var(--accent);font-weight:600}
+  .writer-reading{max-height:65vh;overflow-y:auto;overscroll-behavior:contain;
+    margin-top:16px;padding:4px 16px 4px 4px}
+  .writer-reading .body{max-width:72ch;margin-inline:auto;font-size:calc(1rem * var(--text-zoom));
+    line-height:1.75;color:var(--body-copy)}
+  .writer-reading .body p{margin-bottom:17px}
+  .writer-reading .body h2{margin:30px 0 10px;font-size:calc(1.15rem * var(--text-zoom));color:var(--text)}
+  .writer-reading .body .references h2{margin-top:0}
+  .wfeature.is-writer-reading .writer-preview{display:none}
+  .wfeature:focus-visible,.writer-card-link:focus-visible,.writer-reading:focus-visible{
+    outline:2px solid var(--accent);outline-offset:3px}
   .wtitle{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
     overflow:hidden;font-size:1rem;line-height:1.4;margin-bottom:6px;letter-spacing:-.01em}
   .wexcerpt{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
@@ -1608,6 +1628,10 @@ const UI = {
     pageStatus:"{current} / {total}",
     briefFullPage:"Kaynaklar ve tam sayfa →",
     briefFullPageShort:"Tam sayfa →",
+    writerClose:"Kapat",
+    writerFullPage:"Yazıyı tam sayfada oku →",
+    writerLoading:"Yazı yükleniyor…",
+    writerLoadFailed:"Yazı yüklenemedi. Tam sayfa bağlantısını kullanabilirsiniz.",
     briefSourcesHead:"Kaynakça",
     briefTextSize:"Yazı boyutu",
     briefListen:"Sesli dinle",
@@ -1688,6 +1712,10 @@ const UI = {
     pageStatus:"{current} / {total}",
     briefFullPage:"Sources and full page →",
     briefFullPageShort:"Full page →",
+    writerClose:"Close",
+    writerFullPage:"Read on the full page →",
+    writerLoading:"Loading column…",
+    writerLoadFailed:"The column could not load. Use the full page link.",
     briefSourcesHead:"Sources",
     briefTextSize:"Text size",
     briefListen:"Listen",
@@ -3468,6 +3496,52 @@ function openBriefReading(card){
     briefReadingState?.scrollContainer?.focus({preventScroll:true});
   });
 }
+
+document.addEventListener('click', event=>{
+  const card = event.target.closest('.wcard');
+  if (!card || !BRIEF_REVEAL_MEDIA.matches || !isPlainClick(event)) return;
+  const state = writerCardState;
+  if (event.target.closest('.wfull-link')) return;
+  if (event.target.closest('.writer-close')){
+    event.preventDefault();
+    changeWriterCard(()=>closeWriterCard());
+    return;
+  }
+  const citation = event.target.closest('a[data-reader-target]');
+  if (citation && state?.card===card){
+    const target = [...card.querySelectorAll('[id]')].find(node=>node.id===citation.dataset.readerTarget);
+    if (target){
+      event.preventDefault();
+      target.scrollIntoView({block:'nearest'});
+      target.focus({preventScroll:true});
+    }
+    return;
+  }
+  if (event.target.closest('.writer-reading')) return;
+  if (state?.card===card){
+    event.preventDefault();
+    if (!state.reading) changeWriterCard(()=>readWriterCard(state));
+    return;
+  }
+  const article = matchingWriterArticle(personaOf(card.dataset.writerId));
+  if (!article) return;
+  event.preventDefault();
+  changeWriterCard(()=>growWriterCard(card, article));
+});
+
+document.addEventListener('keydown', event=>{
+  const state = writerCardState;
+  if (!state) return;
+  if ((event.key==='Enter' || event.key===' ') && event.target===state.card && !state.reading){
+    event.preventDefault();
+    changeWriterCard(()=>readWriterCard(state));
+    return;
+  }
+  if (event.key!=='Escape') return;
+  event.preventDefault();
+  changeWriterCard(()=>closeWriterCard());
+});
+
 $('featured').addEventListener('click', event=>{
   const choice = event.target.closest('.brief-rail-card[data-brief-select]');
   if (choice && !BRIEF_STACK_MEDIA.matches){
@@ -4477,27 +4551,167 @@ function syncBriefEditionFromScroll(){
 }
 
 function writerCard(w, a){
-    const u = UI[LANG];
-    const card = document.createElement('a');
-    card.className = 'wcard';
-    // The card opens the column itself; the writer's index page is one click further.
-    card.href = a ? articleRoute(a, LANG) : `/${LANG}/${TOPIC}/${w.id}/`;
-    card.innerHTML = `
-      <div class="wtop">
-        <div class="avatar">${avatarOf(w)}</div>
-        <div>
-          <div class="wname">${escapeHTML(w.name)}<span class="ai-badge">${escapeHTML(badgeOf(w))}</span></div>
-          <div class="wrole">${escapeHTML(writerFocus(w.role))} · ${u.aiPersona}</div>
-        </div>
+  const u = UI[LANG];
+  const card = document.createElement('a');
+  card.className = 'wcard';
+  card.dataset.writerId = w.id;
+  card.href = a ? articleRoute(a, LANG) : `/${LANG}/${TOPIC}/${w.id}/`;
+  card.innerHTML = `
+    <div class="wtop">
+      <div class="avatar">${avatarOf(w)}</div>
+      <div>
+        <div class="wname">${escapeHTML(w.name)}<span class="ai-badge">${escapeHTML(badgeOf(w))}</span></div>
+        <div class="wrole">${escapeHTML(writerFocus(w.role))} · ${u.aiPersona}</div>
       </div>
-      ${a ? `<h3 class="wtitle">${escapeHTML(localized(a.title))}</h3>
-      <p class="wexcerpt">${escapeHTML(localized(a.excerpt))}</p>
-      ${radarStampHTML(a,true)}` : ''}
-    `;
-    return card;
+    </div>
+    ${a ? `<h3 class="wtitle">${escapeHTML(localized(a.title))}</h3>
+    <p class="wexcerpt">${escapeHTML(localized(a.excerpt))}</p>
+    ${radarStampHTML(a,true)}` : ''}
+  `;
+  return card;
 }
+
+const writerArticleCache = new Map();
+function fetchWriterArticle(a){
+  const full = ARTICLES.find(article=>articleId(article)===articleId(a));
+  if (Array.isArray(full?.sections) && full.sections.length) return Promise.resolve(full);
+  const lang = LANG, href = articleRoute(a, lang);
+  if (writerArticleCache.has(href)) return writerArticleCache.get(href);
+  // Latest-writer cards omit sections; older columns live only on their permanent page.
+  const pending = fetch(location.protocol==='file:' ? assetURL(href + 'index.html') : href).then(async response=>{
+    if (!response.ok) throw new Error('column fetch failed');
+    const doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+    const content = doc.querySelector('.writer-content');
+    const body = content?.querySelector('.article-body');
+    if (!body) throw new Error('column body missing');
+    const sources = [...content.querySelectorAll('.reference-list > li')].map((item, index)=>{
+      const link = item.querySelector('a.external, a[href^="https://"]');
+      const external = link?.classList.contains('external');
+      const title = item.querySelector('cite')?.cloneNode(true);
+      title?.querySelectorAll('.retrospective-marker,.visually-hidden').forEach(mark=>mark.remove());
+      const url = link?.getAttribute('href') || '';
+      return {
+        key:`source-${index + 1}`, kind:external ? 'news' : 'article',
+        url:external ? url : url.replace(/^https:\/\/eigenradar\.com\/en\//,'https://eigenradar.com/tr/'),
+        name:item.querySelector('strong')?.textContent || '',
+        title:{[lang]:title?.textContent || ''},
+        publishedDate:item.querySelector('time')?.getAttribute('datetime') || '',
+        retrospective:Boolean(item.querySelector('.retrospective-marker')),
+      };
+    });
+    const sections = [];
+    body.querySelectorAll('h2,p').forEach(node=>{
+      if (node.tagName==='H2') sections.push({h:{[lang]:node.textContent},ps:[]});
+      else {
+        if (!sections.length) sections.push({h:{},ps:[]});
+        const refs = [...node.querySelectorAll('.citation a')].map(link=>`source-${Number(link.textContent.replace(/\D/g,''))}`);
+        const paragraph = node.cloneNode(true);
+        paragraph.querySelectorAll('.citation').forEach(mark=>mark.remove());
+        sections[sections.length - 1].ps.push({[lang]:paragraph.textContent,refs});
+      }
+    });
+    if (!sections.some(section=>section.ps.length)) throw new Error('column text missing');
+    return {...a,excerpt:{[lang]:content.querySelector('.deck')?.textContent || a.excerpt?.[lang] || ''},sections,sources};
+  }).catch(()=>{
+    writerArticleCache.delete(href);
+    return null;
+  });
+  writerArticleCache.set(href, pending);
+  return pending;
+}
+
+function changeWriterCard(mutate){
+  // Operator 2026-10-02: use the Brief promotion fade, including reduced-motion bypass.
+  if (document.startViewTransition && !BRIEF_REDUCED_MOTION.matches){
+    document.startViewTransition(mutate).finished.catch(()=>{});
+  } else mutate();
+}
+function resetWriterCard(){
+  const state = writerCardState;
+  if (!state) return;
+  state.link.className = 'wcard';
+  state.link.querySelector('.wexcerpt').textContent = state.excerpt;
+  state.card.replaceWith(state.link);
+  writerCardState = null;
+}
+function growWriterCard(link, article){
+  resetWriterCard();
+  const u = UI[LANG], grid = link.parentElement;
+  const card = document.createElement('article');
+  card.className = 'wcard wfeature';
+  card.dataset.writerId = link.dataset.writerId;
+  card.tabIndex = -1;
+  link.replaceWith(card);
+  link.className = 'writer-card-link';
+  card.appendChild(link);
+  const preview = document.createElement('p');
+  preview.className = 'writer-preview';
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'writer-close';
+  close.textContent = '×';
+  close.setAttribute('aria-label', u.writerClose);
+  const fullLink = document.createElement('a');
+  fullLink.className = 'wfull-link';
+  fullLink.setAttribute('href', link.getAttribute('href'));
+  fullLink.textContent = u.writerFullPage;
+  card.append(preview, close, fullLink);
+  const state = {card,link,grid,article,preview,reading:false,excerpt:link.querySelector('.wexcerpt').textContent};
+  writerCardState = state;
+  state.pending = fetchWriterArticle(article).then(full=>{
+    if (writerCardState!==state || !card.isConnected) return full;
+    if (full){
+      link.querySelector('.wexcerpt').textContent = localized(full.excerpt) || state.excerpt;
+      preview.textContent = localized(full.sections?.[0]?.ps?.[0]).slice(0,700);
+    }
+    return full;
+  });
+  card.focus({preventScroll:true});
+  card.scrollIntoView({block:'nearest'});
+}
+function readWriterCard(state){
+  const u = UI[LANG];
+  state.reading = true;
+  state.card.classList.add('is-writer-reading');
+  const pane = document.createElement('div');
+  pane.className = 'writer-reading';
+  pane.tabIndex = 0;
+  pane.setAttribute('role', 'region');
+  pane.setAttribute('aria-label', localized(state.article.title));
+  pane.innerHTML = `<div class="body"><p role="status">${escapeHTML(u.writerLoading)}</p></div>`;
+  state.card.querySelector('.wfull-link').before(pane);
+  state.pane = pane;
+  state.pending.then(full=>{
+    if (writerCardState!==state || !state.reading || state.pane!==pane) return;
+    const body = pane.querySelector('.body');
+    body.innerHTML = full ? articleHTML(full) : `<p role="status">${escapeHTML(u.writerLoadFailed)}</p>`;
+    // The hidden page reader may already hold citations with these ids.
+    body.querySelectorAll('[id]').forEach(node=>{ node.id = `writer-${node.id}`; });
+    body.querySelectorAll('[data-reader-target]').forEach(node=>{
+      node.dataset.readerTarget = `writer-${node.dataset.readerTarget}`;
+    });
+    const disclaimer = disclaimerHTML(topicOf(state.article));
+    if (disclaimer) body.insertAdjacentHTML('beforeend', `<div class="disclaimer" role="note">${disclaimer}</div>`);
+  });
+  pane.focus({preventScroll:true});
+}
+function closeWriterCard(){
+  const state = writerCardState;
+  if (!state) return;
+  if (state.reading){
+    state.reading = false;
+    state.card.classList.remove('is-writer-reading');
+    state.pane.remove();
+    state.card.focus({preventScroll:true});
+  } else {
+    resetWriterCard();
+    state.link.focus({preventScroll:true});
+  }
+}
+
 function renderWriters(){
-  const q = searchNeedle();
+  resetWriterCard();
+  const u = UI[LANG], q = searchNeedle();
   const grid = $('writersGrid');
   grid.innerHTML = '';
   const deskWriters = WRITERS.filter(w=>w.topic===TOPIC);
@@ -4511,12 +4725,13 @@ function renderWriters(){
   const strip = $('briefWriters');
   strip.innerHTML = '';
   if (!q) deskWriters.forEach(w=>strip.appendChild(writerCard(w, matchingWriterArticle(w))));
-  $('briefWritersTitle').textContent = UI[LANG].writersView;
+  $('briefWritersTitle').textContent = u.writersView;
   $('briefWritersSection').hidden = !strip.children.length;
 }
 
 /* ---------- filter state ---------- */
 let activeFilter = 'all';
+let writerCardState = null;
 let searchQuery = '';
 /* Fold both Turkish i pairs into one search form, then normalize combining marks. */
 function searchFold(value){
@@ -4940,7 +5155,7 @@ function homeDateWheelKey(dir){
   return at >= 0 ? keys[at + dir] : null;
 }
 function homeCardDateWheel(event){
-  if (!event.target.closest?.('.card,.wcard')) return;
+  if (!event.target.closest?.('.card,.wcard') || event.target.closest('.is-writer-reading')) return;
   handleDateWheel(event,homeDateWheelKey,(_dir,key)=>{
     adoptBriefEdition(key);
     scrollBriefTrack(false);
@@ -4955,6 +5170,7 @@ $('featured').addEventListener('scroll', ()=>{
   briefScrollSettle = setTimeout(syncBriefEditionFromScroll, 120);
 }, {passive:true});
 window.addEventListener('resize', ()=>{
+  if (!BRIEF_REVEAL_MEDIA.matches) resetWriterCard();
   scrollBriefTrack(false);
   if (!COMPACT_EDITION_MEDIA.matches) setPodcastPopover(false);
   if (briefReadingState){
