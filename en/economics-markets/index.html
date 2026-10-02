@@ -2473,8 +2473,9 @@ function dailyPodcastSource(podcasts,topic,date,lang,n){
   return file && file.url;
 }
 
-/* One daily audio brief per desk, date and language. Every intraday view for that date
-   uses edition 1; an unapproved/unsynthesized script never borrows another date.
+/* One audio brief per desk, edition and language (every edition from 2026-10-02, n=1
+   before). A view plays its edition's episode, else the newest earlier one of that date;
+   an unapproved/unsynthesized script never borrows another date.
    Mobile and light-desktop custom controls provide seeking;
    partial positions are restored per episode. */
 function renderPodcast(){
@@ -5442,6 +5443,9 @@ const MARKET_SYMBOLS = [
   ['BTCUSDT', 'btc', {tr: 'Bitcoin', en: 'Bitcoin'}],
   ['ETHUSDT', 'eth', {tr: 'Ethereum', en: 'Ethereum'}],
   ['XRPUSDT', 'xrp', {tr: 'XRP', en: 'XRP'}],
+  ['BNBUSDT', 'bnb', {tr: 'BNB', en: 'BNB'}],
+  ['SOLUSDT', 'sol', {tr: 'Solana', en: 'Solana'}],
+  ['DOGEUSDT', 'doge', {tr: 'Dogecoin', en: 'Dogecoin'}],
 ];
 let marketQuotes = [];
 let marketWidths = [];
