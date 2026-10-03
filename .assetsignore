@@ -14,3 +14,7 @@ package.json
 package-lock.json
 worker/
 wrangler.jsonc
+
+# Wrangler scratch from the publisher's own deploy (scripts/deploy-site.sh).
+.wrangler
+.wrangler/**
