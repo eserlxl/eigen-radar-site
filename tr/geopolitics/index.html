@@ -1331,6 +1331,27 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .theme-switch{width:38px}
     :root[data-theme="light"] .theme-switch-thumb{transform:translateX(14px)}
   }
+  .edition-refresh-bar{
+    position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:90;
+    display:inline-flex;align-items:center;gap:10px;
+    max-width:calc(100vw - 24px);padding:8px 10px 8px 16px;
+    background:var(--card);color:var(--text);
+    border:1px solid var(--accent);border-radius:999px;
+    box-shadow:0 8px 24px var(--drawer-shadow);
+    font-size:.82rem;line-height:1.25;white-space:nowrap;
+  }
+  .edition-refresh-bar[hidden]{display:none}
+  .edition-refresh-btn{
+    flex:0 0 auto;min-height:30px;padding:5px 12px;
+    border:1px solid transparent;border-radius:999px;
+    background:var(--accent);color:var(--on-accent);
+    font:inherit;font-size:.78rem;font-weight:700;cursor:pointer;
+  }
+  .edition-refresh-btn:hover{filter:brightness(1.06)}
+  @media(max-width:640px){
+    .edition-refresh-bar{bottom:12px;gap:8px;padding:7px 9px 7px 13px;font-size:.78rem}
+    .edition-refresh-btn{min-height:28px;padding:4px 10px;font-size:.74rem}
+  }
   /* Motion-sensitive readers: kill every transition/animation when the OS asks. */
   @media (prefers-reduced-motion: reduce){
     *,::before,::after{transition:none !important;animation:none !important;
@@ -1343,7 +1364,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .skip,.theme-switch,.topics,.languages,.utility-switches,.reader-nav,.reader-actions,
     .reader-share,.listen-row,.text-scale-switch,.brief-listen,.brief-share-button,.brief-date-control,
     .archive-controls,.related,.related-all,.footer-links,
-    footer nav,.news-pager,.lang-btn,.radar-ticker{display:none!important}
+    footer nav,.news-pager,.lang-btn,.radar-ticker,.edition-refresh-bar{display:none!important}
     body{background:#fff;color:#000}
     main a{color:inherit}
     .writer-content{box-shadow:none}
@@ -1418,6 +1439,11 @@ twq('config','re3b4');
     </div>
   </div>
 </header>
+
+<div class="edition-refresh-bar" id="editionRefreshBar" role="status" aria-live="polite" hidden>
+  <span class="edition-refresh-text" id="editionRefreshText"></span>
+  <button type="button" class="edition-refresh-btn" id="editionRefreshBtn"></button>
+</div>
 
 <main id="mainContent" tabindex="-1">
 <!-- Keep a real, localized document heading without reserving visual masthead space. -->
@@ -1677,6 +1703,8 @@ const UI = {
     dateUnavailable:"Yayın tarihi belirtilmemiş",
     retrospectiveNote:"† İşaretli kaynaklar arşiv yayımından sonra kaynakçaya eklendi ve geriye dönük olarak doğrulandı.",
     retrospectiveLabel:"Geriye dönük doğrulandı",
+    newEditionNotice:"Yeni yayın var",
+    newEditionRefresh:"Yenile",
     footer:`<p><strong>Eigen Radar</strong> — kaynak haberciliğini dört masada seçen, yapılandıran ve yapay zekâ ile sentezleyen bağımsız bir editoryal derlemedir; haber ajansı değildir ve özgün saha haberciliği yapmaz. Ayrıca 24 köşe yazarının analiz ve yorumlarını sunar.</p>
       <p>Taranan kaynaklar: TechCrunch, The Verge, Wired, Ars Technica, VentureBeat, MIT Technology Review, CNBC, Al Jazeera ve diğerleri. Tüm haber hakları asıl kaynaklara aittir; özetler kaynağa yönlendirme amaçlıdır.</p>
       <p><strong>Yapay zekâ içerik bildirimi:</strong> Bu sitedeki köşe yazıları ve Gündem analizleri bir yapay zekâ modelinin ürettiği çıktılardır; köşe yazarları yapay zekâ karakterleridir. İçerikler yalnızca bilgilendirme amaçlıdır; finansal, hukuki, tıbbi veya başka bir profesyonel tavsiye niteliği taşımaz. Doğruluğu sürekli iyileştirmeye çalışsak da yapay zekâ modelleri hatalı veya uydurma ("halüsinasyon") bilgiler üretebilir. Site sahibi, bu içeriklere dayanılarak alınan kararlardan doğabilecek herhangi bir zarar veya kayıptan sorumlu tutulamaz; önemli bilgileri lütfen asıl kaynaklardan doğrulayın.</p>
@@ -1761,6 +1789,8 @@ const UI = {
     dateUnavailable:"Publication date unavailable",
     retrospectiveNote:"† Marked sources were added to the bibliography after archival publication and verified retrospectively.",
     retrospectiveLabel:"Verified retrospectively",
+    newEditionNotice:"A new edition is out",
+    newEditionRefresh:"Refresh",
     footer:`<p><strong>Eigen Radar</strong> — an independent four-desk digest covering artificial intelligence, geopolitics, economics and markets, and science. It selects, structures and synthesizes source reporting with AI; it is not a news agency and does not conduct firsthand reporting. It also publishes analysis from 24 columnists.</p>
       <p>Sources scanned: TechCrunch, The Verge, Wired, Ars Technica, VentureBeat, MIT Technology Review, CNBC, Al Jazeera and others. All rights to the original stories belong to their publishers; summaries are meant to send you to the source.</p>
       <p><strong>AI-generated content notice:</strong> The columns and Briefs analyses on this site are outputs of an artificial intelligence model; the columnists are AI personas. Content is provided for informational purposes only and does not constitute financial, legal, medical, or other professional advice. While we work continuously to improve accuracy, AI models can produce errors or fabricated information ("hallucinations"). The site owner accepts no responsibility or liability for any damage or loss arising from reliance on this content; please verify important information with the original sources.</p>
@@ -1835,8 +1865,15 @@ document.addEventListener('error', event=>{
   }
 }, true);
 
-const ROUTE_DATA_URL = "/assets/data/app-a706a744.json";
+const ROUTE_DATA_URL = "/assets/data/app-8dd258ae.json";
 const FILE_ASSET_PREFIX = "../../";
+const PAGE_EDITION = {"date": "2026-10-17", "n": 1};
+let ownEdition = PAGE_EDITION && typeof PAGE_EDITION.date === 'string' && Number.isInteger(PAGE_EDITION.n)
+  ? {date: PAGE_EDITION.date, n: PAGE_EDITION.n}
+  : null;
+let editionStale = false;
+let editionPollTimer = 0;
+const EDITION_CHECK_MS = 5 * 60 * 1000;
 let DATA = null;
 let WRITERS = [];
 let LATEST_WRITER_ARTICLES = [];
@@ -1857,6 +1894,9 @@ let radarSliding = false;
 
 function bootstrapData(data) {
   DATA = data;
+  if (!ownEdition && DATA && DATA.edition && typeof DATA.edition.date === 'string' && Number.isInteger(DATA.edition.n)) {
+    ownEdition = {date: DATA.edition.date, n: DATA.edition.n};
+  }
   WRITERS = DATA.writers || [];
   LATEST_WRITER_ARTICLES = Array.isArray(DATA.latestWriterArticles) ? DATA.latestWriterArticles : [];
   TAG_LABELS = DATA.tags || {};
@@ -2204,6 +2244,8 @@ function renderChrome(){
   $('briefDateSel').setAttribute('aria-label', u.briefArchiveDate);
   $('briefsPrev').setAttribute('aria-label', u.briefOlder);
   $('briefsNext').setAttribute('aria-label', u.briefNewer);
+  if ($('editionRefreshText')) $('editionRefreshText').textContent = u.newEditionNotice;
+  if ($('editionRefreshBtn')) $('editionRefreshBtn').textContent = u.newEditionRefresh;
 }
 
 function renderFilters(){
@@ -3544,6 +3586,11 @@ document.addEventListener('click', event=>{
   }
   const citation = event.target.closest('a[data-reader-target]');
   if (citation && state?.card===card){
+    if (editionStale && citation.href){
+      event.preventDefault();
+      navigateFresh(citation.href);
+      return;
+    }
     const target = [...card.querySelectorAll('[id]')].find(node=>node.id===citation.dataset.readerTarget);
     if (target){
       event.preventDefault();
@@ -3553,6 +3600,17 @@ document.addEventListener('click', event=>{
     return;
   }
   if (event.target.closest('.writer-reading')) return;
+  if (editionStale){
+    const fullHref = card.querySelector('.wfull-link')?.href
+      || (matchingWriterArticle(personaOf(card.dataset.writerId))
+        ? articleRoute(matchingWriterArticle(personaOf(card.dataset.writerId)), LANG)
+        : '');
+    if (fullHref){
+      event.preventDefault();
+      navigateFresh(fullHref);
+      return;
+    }
+  }
   if (state?.card===card){
     event.preventDefault();
     if (!state.reading) changeWriterCard(()=>readWriterCard(state));
@@ -3581,6 +3639,11 @@ $('featured').addEventListener('click', event=>{
   const choice = event.target.closest('.brief-rail-card[data-brief-select]');
   if (choice && !BRIEF_STACK_MEDIA.matches){
     event.preventDefault();
+    if (editionStale){
+      const choiceLink = choice.querySelector('.brief-detail-link, .brief-media-link');
+      navigateFresh(choiceLink?.href || `${location.pathname}${location.search}#view=briefs`);
+      return;
+    }
     const key = choice.closest('.brief-page')?.dataset.editionKey;
     if (key && key===selectedBriefDate){
       selectedBriefIds.set(`${TOPIC}|${key}`, choice.dataset.briefSelect);
@@ -3611,6 +3674,10 @@ $('featured').addEventListener('click', event=>{
   const card = link.closest('.brief-card');
   if (!card) return;
   event.preventDefault();
+  if (editionStale && link.href){
+    navigateFresh(link.href);
+    return;
+  }
   openBriefReading(card);
 });
 
@@ -4239,6 +4306,10 @@ function renderReader(a){
 /* Show an article in the reading pane. fromNav=true when we're reacting to a hash change
    (deep link / back-forward) — the hash is already correct, so we don't rewrite it. */
 function showArticle(a, fromNav){
+  if (editionStale){
+    navigateFresh(a ? articleRoute(a, LANG) : `${location.pathname}${location.search}`);
+    return;
+  }
   currentArticle = a;
   // A deep link may land on a different desk/day than what's rendered behind the reader.
   const t = topicOf(a);
@@ -4264,6 +4335,11 @@ function showArticle(a, fromNav){
 function openArticle(a){ showArticle(a, false); }
 
 function closeArticle(){
+  if (editionStale){
+    const keep = searchQuery.trim() ? `#q=${encodeURIComponent(searchQuery.trim())}` : '';
+    navigateFresh(location.pathname + location.search + keep);
+    return;
+  }
   if (!currentArticle) return;
   stopReadAloud();
   currentArticle = null;
@@ -4282,6 +4358,11 @@ function closeArticle(){
 $('readerContent').addEventListener('click', event=>{
   const link = event.target.closest('a[data-reader-target]');
   if(!link || !currentArticle || !isPlainClick(event)) return;
+  if(editionStale){
+    event.preventDefault();
+    navigateFresh(link.href || articleRoute(currentArticle, LANG));
+    return;
+  }
   const target = document.getElementById(link.dataset.readerTarget);
   if(!target) return;
   event.preventDefault();
@@ -4292,6 +4373,13 @@ $('readerContent').addEventListener('click', event=>{
 /* Single source of truth for the reader: the URL hash. Handles deep links on load and
    the browser back/forward buttons. openArticle sets the hash, which lands back here. */
 function syncFromHash(){
+  if (editionStale){
+    const id = hashId();
+    const a = id && ARTICLES.find(x => articleId(x) === id);
+    if (a) navigateFresh(articleRoute(a, LANG));
+    else location.reload();
+    return;
+  }
   // #view=<tab> preserves the active home view across language/desk navigation.
   // #q= carries the radar search; #view=news&q=openai is the language-switch form.
   const home = homeHashParts();
@@ -4342,6 +4430,10 @@ $('homeLink').addEventListener('click', e => {
   const next = nextTopic();
   if (next.id === 'markets') return;
   e.preventDefault();
+  if (editionStale){
+    navigateFresh($('homeLink').href || topicRoute(next.id, LANG));
+    return;
+  }
   setTopic(next.id);
   window.scrollTo(0, 0);
 });
@@ -5025,9 +5117,20 @@ $('podcastTrigger').addEventListener('click',()=>{
 });
 
 let activeHomeView = 'briefs';
+function homeViewUrl(view){
+  const bits = [];
+  if (view && view !== 'briefs') bits.push(`view=${view}`);
+  const q = searchQuery.trim();
+  if (q) bits.push(`q=${encodeURIComponent(q)}`);
+  return location.pathname + location.search + (bits.length ? '#' + bits.join('&') : '');
+}
 function setHomeView(view){
   if (!['briefs','news','writers','videos'].includes(view)) return;
   if (view === 'videos' && !deskVideos().length) return;
+  if (editionStale){
+    navigateFresh(homeViewUrl(view));
+    return;
+  }
   activeHomeView = view;
   const panels = {
     briefs:'briefsPanel',
@@ -5051,7 +5154,7 @@ $('homeViewNav').addEventListener('click', event=>{
   const button = event.target.closest('[data-home-view]');
   if (!button) return;
   setHomeView(button.dataset.homeView);
-  setFilterPopover(button.dataset.homeView === 'news');
+  if (!editionStale) setFilterPopover(button.dataset.homeView === 'news');
 });
 
 /* ---------- language switch ---------- */
@@ -5074,6 +5177,12 @@ function chooseLanguage(e, lang){
   }
   const btn = lang === 'tr' ? $('btnTr') : $('btnEn');
   if (btn && dest) btn.href = dest;
+  if (editionStale){
+    try { localStorage.setItem('lang', lang); } catch {}
+    e.preventDefault();
+    navigateFresh(dest || btn?.href || homeLanguageRoute(lang));
+    return;
+  }
   if (ROUTE_LANG) {
     // Keep URL, canonical metadata and visible language aligned on localized routes.
     // Default navigation follows the (possibly just-updated) href — no hop via home.
@@ -5113,7 +5222,13 @@ function renderTopics(){
   });
 }
 function setTopic(id){
-  if (!TOPIC_IDS.has(id) || id===TOPIC) return;
+  if (!TOPIC_IDS.has(id)) return;
+  if (editionStale){
+    try { localStorage.setItem('topic', id); } catch {}
+    navigateFresh(topicRoute(id, LANG));
+    return;
+  }
+  if (id===TOPIC) return;
   closeArticle();  // the current article belongs to the desk we're leaving
   try { localStorage.setItem('topic', id); } catch {}
   TOPIC = id;
@@ -5135,6 +5250,12 @@ function setTopic(id){
 $('topicSwitch').addEventListener('click', e=>{
   const b = e.target.closest('.topic-btn');
   if (!b || !isPlainClick(e)) return;
+  if (editionStale){
+    try { localStorage.setItem('topic', b.dataset.topic); } catch {}
+    e.preventDefault();
+    navigateFresh(b.href || topicRoute(b.dataset.topic, LANG));
+    return;
+  }
   if (TOPIC_IDS.has(ROUTE_TOPIC)){
     try { localStorage.setItem('topic', b.dataset.topic); } catch {}
     return;
@@ -5626,6 +5747,11 @@ function openRadarNews(n){
 function openRadarTarget(n){
   if (!n) return;
   const brief = radarRelatedBrief(n);
+  if (editionStale){
+    const href = brief ? (briefPath(brief) || homeViewUrl('briefs')) : homeViewUrl('news');
+    navigateFresh(href);
+    return;
+  }
   if (brief && openRadarBrief(brief)) return;
   openRadarNews(n);
 }
@@ -5664,6 +5790,11 @@ function bindRadarChrome(){
     const row = event.target.closest('a.radar-row');
     if (!row || !ticker.contains(row) || !isPlainClick(event)) return;
     event.preventDefault();
+    if (editionStale){
+      const rawHref = row.getAttribute('href') || '';
+      navigateFresh(rawHref.startsWith('#') ? `${location.pathname}${location.search}${rawHref}` : (row.href || homeViewUrl('news')));
+      return;
+    }
     const url = row.dataset.newsUrl;
     const item = radarItems.find(n => n.url === url)
       || LATEST_NEWS.find(n => n.url === url)
@@ -5683,6 +5814,82 @@ function bindRadarChrome(){
 }
 bindRadarChrome();
 bindRadarSearch();
+
+function navigateFresh(url){
+  const target = new URL(url, location.href);
+  if (target.pathname === location.pathname && target.search === location.search){
+    history.replaceState(null, '', target.href);
+    location.reload();
+  } else {
+    location.assign(target.href);
+  }
+}
+function stopEditionPolling(){
+  if (editionPollTimer){
+    clearInterval(editionPollTimer);
+    editionPollTimer = 0;
+  }
+}
+function showEditionRefreshBar(){
+  const bar = $('editionRefreshBar');
+  if (!bar) return;
+  const u = UI[LANG];
+  if ($('editionRefreshText')) $('editionRefreshText').textContent = u.newEditionNotice;
+  if ($('editionRefreshBtn')) $('editionRefreshBtn').textContent = u.newEditionRefresh;
+  bar.hidden = false;
+}
+async function checkEditionFreshness(){
+  if (editionStale || document.visibilityState === 'hidden' || document.hidden || location.protocol === 'file:') return;
+  if (!ownEdition || typeof ownEdition.date !== 'string' || !Number.isInteger(ownEdition.n)) return;
+  try {
+    const res = await fetch('/edition.json', {cache: 'no-store'});
+    if (!res.ok) return;
+    const fetched = await res.json();
+    if (!fetched || typeof fetched.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(fetched.date)) return;
+    const fetchedN = Number(fetched.n);
+    if (!Number.isInteger(fetchedN) || fetchedN < 1) return;
+    if (fetched.date !== ownEdition.date || fetchedN !== ownEdition.n){
+      editionStale = true;
+      stopEditionPolling();
+      showEditionRefreshBar();
+    }
+  } catch {}
+}
+function startEditionPolling(){
+  stopEditionPolling();
+  if (editionStale || document.visibilityState === 'hidden' || document.hidden) return;
+  editionPollTimer = setInterval(() => {
+    if (editionStale || document.visibilityState === 'hidden' || document.hidden){
+      stopEditionPolling();
+      return;
+    }
+    checkEditionFreshness();
+  }, EDITION_CHECK_MS);
+}
+function bindEditionRefresh(){
+  const btn = $('editionRefreshBtn');
+  if (btn){
+    btn.addEventListener('click', () => {
+      location.reload();
+    });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !document.hidden){
+      checkEditionFreshness();
+      startEditionPolling();
+    } else {
+      stopEditionPolling();
+    }
+  });
+  window.addEventListener('pageshow', event => {
+    if (event.persisted){
+      checkEditionFreshness();
+      startEditionPolling();
+    }
+  });
+  startEditionPolling();
+}
+bindEditionRefresh();
 
 // Operator 2026-10-01: market prices in the empty half of the desktop Radar row. The data is
 // markets/ticker.json, a ~1 KB file scripts/export-markets.sh derives from markets.json every
