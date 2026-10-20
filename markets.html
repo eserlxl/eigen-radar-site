@@ -33,7 +33,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --amber:#d6c08c;--scheme:dark;--focus:#fff;--on-accent:#040711;
     --drawer-shadow:rgba(0,0,0,.35);--up:#5ee3d7;--down:#f07178;--band:rgba(176,184,198,.28);
     --desk-ai:#2aa79e;--desk-ai-hi:#5ee3d7;--desk-geo:#4b659f;--desk-geo-hi:#8aa0d4;
-    --desk-eco:#b8954a;--desk-eco-hi:#d6c08c;--desk-sci:#5b5fd6;--desk-sci-hi:#a5b4fc;
+    --desk-eco:#b8954a;--desk-eco-hi:#d6c08c;--desk-sci:#5b5fd6;--desk-sci-hi:#a5b4fc;--desk-spo:#dc2626;--desk-spo-hi:#f87171;
     --page-max:70rem;--radius:14px;
   }
   :root[data-theme="light"]{
@@ -42,7 +42,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --amber:#854100;--scheme:light;--focus:#0f172a;--on-accent:#fff;
     --drawer-shadow:rgba(15,23,42,.22);--up:#005f5a;--down:#b42318;--band:rgba(55,71,90,.18);
     --desk-ai:#005f5a;--desk-ai-hi:#0f766e;--desk-geo:#3f56ad;--desk-geo-hi:#4f6cc4;
-    --desk-eco:#854100;--desk-eco-hi:#a35200;--desk-sci:#4338ca;--desk-sci-hi:#4f46e5;
+    --desk-eco:#854100;--desk-eco-hi:#a35200;--desk-sci:#4338ca;--desk-sci-hi:#4f46e5;--desk-spo:#991b1b;--desk-spo-hi:#b91c1c;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{color-scheme:var(--scheme)}
@@ -239,6 +239,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .topic-btn[data-topic="geopolitics"]{--desk:var(--desk-geo-hi)}
   .topic-btn[data-topic="economics-markets"]{--desk:var(--desk-eco-hi)}
   .topic-btn[data-topic="science"]{--desk:var(--desk-sci-hi)}
+  .topic-btn[data-topic="sports"]{--desk:var(--desk-spo-hi)}
   /* The desk tint drives the underline only; the label follows the other topics and
      turns to --text when this page is the current one. */
   .markets-nav{--desk:var(--desk-eco-hi);margin-left:0}
@@ -257,16 +258,15 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   }
   @media(max-width:640px){
     .topic-switch{
-      order:3;width:100%;margin:0;display:grid;align-items:start;
-      grid-template-columns:repeat(5,minmax(0,1fr));
+      order:3;width:100%;margin:0;display:flex;align-items:start;
       gap:2px;padding:0;border:0;background:transparent;
     }
     .topic-btn,.markets-nav{
-      min-width:0;min-height:0;justify-content:center;
+      flex:1 1 auto;min-width:0;min-height:0;justify-content:center;
       padding:3px 2px 5px;box-shadow:none;margin:0;border:0;
     }
     .topic-label{
-      font-size:clamp(.76rem,3.2vw,.84rem);line-height:1;letter-spacing:-.015em;
+      font-size:clamp(.7rem,2.9vw,.78rem);line-height:1;letter-spacing:-.015em;
     }
   }
   /* A phone in landscape can be wider than the portrait breakpoint while still
@@ -333,6 +333,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       <a class="markets-nav active" id="navMarkets" href="/markets" aria-current="page"><span class="topic-label">Piyasalar</span></a>
       <a class="topic-btn" href="/tr/ai/" id="navAi" data-topic="ai"><span class="topic-label">Yapay Zekâ</span></a>
       <a class="topic-btn" href="/tr/science/" id="navSci" data-topic="science"><span class="topic-label">Bilim</span></a>
+      <a class="topic-btn" href="/tr/sports/" id="navSpo" data-topic="sports"><span class="topic-label">Spor</span></a>
     </nav>
     <div class="header-right">
       <nav class="header-links" id="headerLinks" aria-label="Site">
@@ -762,6 +763,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       geopolitics: { tr: 'Jeopolitik', en: 'Geopolitics' },
       eco: { tr: 'Ekonomi', en: 'Economics' },
       sci: { tr: 'Bilim', en: 'Science' },
+      spo: { tr: 'Spor', en: 'Sports' },
       markets: { tr: 'Piyasalar', en: 'Markets' }
     };
     $('homeLink').href = `/${lang}/ai/`;
@@ -777,6 +779,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       $('navEco').querySelector('.topic-label').textContent = deskLabels.eco[lang];
       $('navSci').href = `/${lang}/science/`;
       $('navSci').querySelector('.topic-label').textContent = deskLabels.sci[lang];
+      $('navSpo').href = `/${lang}/sports/`;
+      $('navSpo').querySelector('.topic-label').textContent = deskLabels.spo[lang];
       $('navMarkets').href = `/markets`;
       $('navMarkets').querySelector('.topic-label').textContent = deskLabels.markets[lang];
     }
