@@ -945,7 +945,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     color:var(--text);text-align:left;text-decoration:none;
   }
   .wcard:hover{transform:translateY(-3px);border-color:var(--accent)}
-  /* Operator 2026-10-02: grow one writer across its row, keeping the link and order. */
+  /* The open card spans the grid. growWriterCard moves it to the first row; close restores order. */
   .wcard.wfeature{grid-column:1/-1;position:relative;min-width:0;cursor:default}
   .wcard.wfeature:hover{transform:none}
   .writer-card-link{display:block;color:inherit;text-decoration:none;padding-right:44px}
@@ -4774,11 +4774,16 @@ function resetWriterCard(){
   state.link.className = 'wcard';
   state.link.querySelector('.wexcerpt').textContent = state.excerpt;
   state.card.replaceWith(state.link);
+  state.originalOrder.forEach(child=>state.grid.appendChild(child));
+  const tail = document.getElementById('writerScrollTail');
+  if (tail) tail.remove();
   writerCardState = null;
 }
 function growWriterCard(link, article){
   resetWriterCard();
   const u = UI[LANG], grid = link.parentElement;
+  // Anchors, before the feature article replaces the clicked card.
+  const originalOrder = [...grid.children];
   const card = document.createElement('article');
   card.className = 'wcard wfeature';
   card.dataset.writerId = link.dataset.writerId;
@@ -4786,6 +4791,7 @@ function growWriterCard(link, article){
   link.replaceWith(card);
   link.className = 'writer-card-link';
   card.appendChild(link);
+  if (card!==grid.firstElementChild) grid.insertBefore(card, grid.firstElementChild);
   const preview = document.createElement('p');
   preview.className = 'writer-preview';
   const close = document.createElement('button');
@@ -4798,7 +4804,7 @@ function growWriterCard(link, article){
   fullLink.setAttribute('href', link.getAttribute('href'));
   fullLink.textContent = u.writerFullPage;
   card.append(preview, close, fullLink);
-  const state = {card,link,grid,article,preview,reading:false,excerpt:link.querySelector('.wexcerpt').textContent};
+  const state = {card,link,grid,article,preview,reading:false,excerpt:link.querySelector('.wexcerpt').textContent,originalOrder};
   writerCardState = state;
   state.pending = fetchWriterArticle(article).then(full=>{
     if (writerCardState!==state || !card.isConnected) return full;
@@ -4809,7 +4815,28 @@ function growWriterCard(link, article){
     return full;
   });
   card.focus({preventScroll:true});
-  card.scrollIntoView({block:'nearest'});
+  // Brief reading stores no header offset. Clear whichever sticky header is on screen.
+  // The page sets scroll-behavior:smooth; this jump has to finish in the same turn.
+  // A short page cannot bring a low card up under the header, so extend it while open.
+  const header = document.querySelector('header');
+  const sticky = header && getComputedStyle(header).position==='sticky';
+  const offset = sticky ? header.getBoundingClientRect().height : 0;
+  card.style.scrollMarginTop = `${offset}px`;
+  const docTop = window.scrollY + card.getBoundingClientRect().top;
+  const room = document.documentElement.scrollHeight - window.innerHeight;
+  const shortfall = Math.ceil(docTop - offset - room);
+  if (shortfall > 0){
+    const tail = document.createElement('div');
+    tail.id = 'writerScrollTail';
+    tail.setAttribute('aria-hidden', 'true');
+    tail.style.height = `${shortfall}px`;
+    document.body.appendChild(tail);
+  }
+  const root = document.documentElement;
+  const priorScroll = root.style.scrollBehavior;
+  root.style.scrollBehavior = 'auto';
+  card.scrollIntoView({block:'start'});
+  root.style.scrollBehavior = priorScroll;
 }
 function readWriterCard(state){
   const u = UI[LANG];

@@ -1,5 +1,6 @@
 import {
   BASE_URL,
+  DESK_IDS,
   RENDERER_VERSION,
   articlePublicPath,
   briefPublicPath,
@@ -18,7 +19,7 @@ import {
 
 const R2_PREFIX = "content/v1/";
 const LANGS = new Set(["tr", "en"]);
-const DESKS = new Set(["ai", "geopolitics", "economics-markets", "science"]);
+const DESKS = new Set(DESK_IDS);
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const BRIEF_ID_RE = /^[a-z0-9][a-z0-9-]{0,79}$/;
 const WRITER_RE = /^[a-z0-9][a-z0-9._-]{0,79}$/;
