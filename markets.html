@@ -33,7 +33,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --amber:#d6c08c;--scheme:dark;--focus:#fff;--on-accent:#040711;
     --drawer-shadow:rgba(0,0,0,.35);--up:#5ee3d7;--down:#f07178;--band:rgba(176,184,198,.28);
     --desk-ai:#2aa79e;--desk-ai-hi:#5ee3d7;--desk-geo:#4b659f;--desk-geo-hi:#8aa0d4;
-    --desk-eco:#b8954a;--desk-eco-hi:#d6c08c;--desk-sci:#5b5fd6;--desk-sci-hi:#a5b4fc;--desk-spo:#dc2626;--desk-spo-hi:#f87171;
+    --desk-eco:#b8954a;--desk-eco-hi:#d6c08c;--desk-sci:#5b5fd6;--desk-sci-hi:#a5b4fc;--desk-spo:#dc2626;--desk-spo-hi:#f87171;--desk-art:#c026d3;--desk-art-hi:#f0abfc;
     --page-max:70rem;--radius:14px;
   }
   :root[data-theme="light"]{
@@ -42,7 +42,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     --amber:#854100;--scheme:light;--focus:#0f172a;--on-accent:#fff;
     --drawer-shadow:rgba(15,23,42,.22);--up:#005f5a;--down:#b42318;--band:rgba(55,71,90,.18);
     --desk-ai:#005f5a;--desk-ai-hi:#0f766e;--desk-geo:#3f56ad;--desk-geo-hi:#4f6cc4;
-    --desk-eco:#854100;--desk-eco-hi:#a35200;--desk-sci:#4338ca;--desk-sci-hi:#4f46e5;--desk-spo:#991b1b;--desk-spo-hi:#b91c1c;
+    --desk-eco:#854100;--desk-eco-hi:#a35200;--desk-sci:#4338ca;--desk-sci-hi:#4f46e5;--desk-spo:#991b1b;--desk-spo-hi:#b91c1c;--desk-art:#86198f;--desk-art-hi:#a21caf;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{color-scheme:var(--scheme)}
@@ -240,6 +240,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   .topic-btn[data-topic="economics-markets"]{--desk:var(--desk-eco-hi)}
   .topic-btn[data-topic="science"]{--desk:var(--desk-sci-hi)}
   .topic-btn[data-topic="sports"]{--desk:var(--desk-spo-hi)}
+  .topic-btn[data-topic="arts"]{--desk:var(--desk-art-hi)}
   /* The desk tint drives the underline only; the label follows the other topics and
      turns to --text when this page is the current one. */
   .markets-nav{--desk:var(--desk-eco-hi);margin-left:0}
@@ -266,7 +267,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       padding:3px 2px 5px;box-shadow:none;margin:0;border:0;
     }
     .topic-label{
-      font-size:clamp(.7rem,2.9vw,.78rem);line-height:1;letter-spacing:-.015em;
+      font-size:clamp(.66rem,2.6vw,.74rem);line-height:1;letter-spacing:-.015em;
     }
   }
   /* A phone in landscape can be wider than the portrait breakpoint while still
@@ -334,6 +335,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       <a class="topic-btn" href="/tr/ai/" id="navAi" data-topic="ai"><span class="topic-label">Yapay Zekâ</span></a>
       <a class="topic-btn" href="/tr/science/" id="navSci" data-topic="science"><span class="topic-label">Bilim</span></a>
       <a class="topic-btn" href="/tr/sports/" id="navSpo" data-topic="sports"><span class="topic-label">Spor</span></a>
+      <a class="topic-btn" href="/tr/arts/" id="navArt" data-topic="arts"><span class="topic-label">Sanat</span></a>
     </nav>
     <div class="header-right">
       <nav class="header-links" id="headerLinks" aria-label="Site">
@@ -764,6 +766,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       eco: { tr: 'Ekonomi', en: 'Economics' },
       sci: { tr: 'Bilim', en: 'Science' },
       spo: { tr: 'Spor', en: 'Sports' },
+      art: { tr: 'Sanat', en: 'Arts' },
       markets: { tr: 'Piyasalar', en: 'Markets' }
     };
     $('homeLink').href = `/${lang}/ai/`;
@@ -781,6 +784,8 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
       $('navSci').querySelector('.topic-label').textContent = deskLabels.sci[lang];
       $('navSpo').href = `/${lang}/sports/`;
       $('navSpo').querySelector('.topic-label').textContent = deskLabels.spo[lang];
+      $('navArt').href = `/${lang}/arts/`;
+      $('navArt').querySelector('.topic-label').textContent = deskLabels.art[lang];
       $('navMarkets').href = `/markets`;
       $('navMarkets').querySelector('.topic-label').textContent = deskLabels.markets[lang];
     }
