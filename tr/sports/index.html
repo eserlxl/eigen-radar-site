@@ -1417,7 +1417,7 @@ twq('config','re3b4');
       <span class="proto-badge" id="protoBadge">Spor</span>
     </a>
     <nav class="topic-switch" id="topicSwitch" aria-label="Konu masaları"><a class="topic-btn" data-topic="geopolitics" href="/tr/geopolitics/" title="Jeopolitik"><span class="topic-label">Jeopolitik</span></a><a class="topic-btn" data-topic="economics-markets" href="/tr/economics-markets/" title="Ekonomi"><span class="topic-label">Ekonomi</span></a><a class="markets-nav" href="/markets" title="Piyasalar" aria-label="Piyasalar"><span class="topic-label">Piyasalar</span></a><a class="topic-btn" data-topic="ai" href="/tr/ai/" title="Yapay Zekâ"><span class="topic-label">Yapay Zekâ</span></a><a class="topic-btn" data-topic="science" href="/tr/science/" title="Bilim"><span class="topic-label">Bilim</span></a><a class="topic-btn active" data-topic="sports" href="/tr/sports/" aria-current="page" title="Spor"><span class="topic-label">Spor</span></a></nav>
-    <script id="staticDeskPick">(function(){var r="sports",k=['ai','geopolitics','economics-markets','science'],t=r;try{if(k.indexOf(t)<0)t=localStorage.getItem('topic')}catch(e){}if(k.indexOf(t)<0)t='geopolitics';document.documentElement.classList.add('static-topic-'+t);var n=document.getElementById('topicSwitch');if(n){var a=n.querySelector('.topic-btn.active'),b=n.querySelector('.topic-btn[data-topic="'+t+'"]');if(a&&b&&a!==b){a.classList.remove('active');a.removeAttribute('aria-current');b.classList.add('active');b.setAttribute('aria-current','page')}}})();</script>
+    <script id="staticDeskPick">(function(){var r="sports",k=['ai','geopolitics','economics-markets','science','sports'],t=r;try{if(k.indexOf(t)<0)t=localStorage.getItem('topic')}catch(e){}if(k.indexOf(t)<0)t='geopolitics';document.documentElement.classList.add('static-topic-'+t);var n=document.getElementById('topicSwitch');if(n){var a=n.querySelector('.topic-btn.active'),b=n.querySelector('.topic-btn[data-topic="'+t+'"]');if(a&&b&&a!==b){a.classList.remove('active');a.removeAttribute('aria-current');b.classList.add('active');b.setAttribute('aria-current','page')}}})();</script>
     <div class="header-right">
       <a class="archive-link" id="archiveLink" href="/tr/archive/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h16v12H4z"/><path d="M3 4.5h18v3H3z"/><path d="M9 11.5h6"/></svg><span class="archive-label" id="archiveLabel">Arşiv</span></a>
       <div class="utility-switches">
@@ -1964,6 +1964,12 @@ const TOPICS = [
         +'advice. Please consult a healthcare professional for decisions about your '
         +'health.',
     }},
+  // Operator 2026-10-20: fifth desk, live from 2026-10-20 n=4.
+  {id:'sports', label:{tr:'Spor', en:'Sports'}, pageMeta:{
+    tr:{page:'Eigen Radar — Spor',
+        title:'Sahadan, pistten ve salondan.'},
+    en:{page:'Eigen Radar — Sports',
+        title:'From the pitch, the track and the court.'}}},
 ];
 const TOPIC_IDS = new Set(TOPICS.map(t=>t.id));
 const ROUTE_TOPIC = "sports";

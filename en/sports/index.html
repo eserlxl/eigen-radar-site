@@ -1417,7 +1417,7 @@ twq('config','re3b4');
       <span class="proto-badge" id="protoBadge">Sports</span>
     </a>
     <nav class="topic-switch" id="topicSwitch" aria-label="Topic desks"><a class="topic-btn" data-topic="geopolitics" href="/en/geopolitics/" title="Geopolitics"><span class="topic-label">Geopolitics</span></a><a class="topic-btn" data-topic="economics-markets" href="/en/economics-markets/" title="Economics"><span class="topic-label">Economics</span></a><a class="markets-nav" href="/markets" title="Markets" aria-label="Markets"><span class="topic-label">Markets</span></a><a class="topic-btn" data-topic="ai" href="/en/ai/" title="AI"><span class="topic-label">AI</span></a><a class="topic-btn" data-topic="science" href="/en/science/" title="Science"><span class="topic-label">Science</span></a><a class="topic-btn active" data-topic="sports" href="/en/sports/" aria-current="page" title="Sports"><span class="topic-label">Sports</span></a></nav>
-    <script id="staticDeskPick">(function(){var r="sports",k=['ai','geopolitics','economics-markets','science'],t=r;try{if(k.indexOf(t)<0)t=localStorage.getItem('topic')}catch(e){}if(k.indexOf(t)<0)t='geopolitics';document.documentElement.classList.add('static-topic-'+t);var n=document.getElementById('topicSwitch');if(n){var a=n.querySelector('.topic-btn.active'),b=n.querySelector('.topic-btn[data-topic="'+t+'"]');if(a&&b&&a!==b){a.classList.remove('active');a.removeAttribute('aria-current');b.classList.add('active');b.setAttribute('aria-current','page')}}})();</script>
+    <script id="staticDeskPick">(function(){var r="sports",k=['ai','geopolitics','economics-markets','science','sports'],t=r;try{if(k.indexOf(t)<0)t=localStorage.getItem('topic')}catch(e){}if(k.indexOf(t)<0)t='geopolitics';document.documentElement.classList.add('static-topic-'+t);var n=document.getElementById('topicSwitch');if(n){var a=n.querySelector('.topic-btn.active'),b=n.querySelector('.topic-btn[data-topic="'+t+'"]');if(a&&b&&a!==b){a.classList.remove('active');a.removeAttribute('aria-current');b.classList.add('active');b.setAttribute('aria-current','page')}}})();</script>
     <div class="header-right">
       <a class="archive-link" id="archiveLink" href="/en/archive/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7.5h16v12H4z"/><path d="M3 4.5h18v3H3z"/><path d="M9 11.5h6"/></svg><span class="archive-label" id="archiveLabel">Archive</span></a>
       <div class="utility-switches">
@@ -1950,6 +1950,12 @@ const TOPICS = [
         +'advice. Please consult a healthcare professional for decisions about your '
         +'health.',
     }},
+  // Operator 2026-10-20: fifth desk, live from 2026-10-20 n=4.
+  {id:'sports', label:{tr:'Spor', en:'Sports'}, pageMeta:{
+    tr:{page:'Eigen Radar — Spor',
+        title:'Sahadan, pistten ve salondan.'},
+    en:{page:'Eigen Radar — Sports',
+        title:'From the pitch, the track and the court.'}}},
 ];
 const TOPIC_IDS = new Set(TOPICS.map(t=>t.id));
 const ROUTE_TOPIC = "sports";
