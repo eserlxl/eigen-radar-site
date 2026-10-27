@@ -10,7 +10,7 @@ export const BRIEF_SHARE_SCRIPT = "\n<script>\n(()=>{document.querySelectorAll('
 export const ARCHIVE_ICON = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 7.5h16v12H4z\"/><path d=\"M3 4.5h18v3H3z\"/><path d=\"M9 11.5h6\"/></svg>";
 export const THEME_MOON_ICON = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20.4 15.1A8.5 8.5 0 0 1 8.9 3.6a8.5 8.5 0 1 0 11.5 11.5Z\"/></svg>";
 export const THEME_SUN_ICON = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"3.5\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/></svg>";
-export const UI = {"tr":{"skip":"Ana içeriğe geç","home":"Ana sayfa","topics":"Konu masaları","language":"Dil","theme_light":"Açık tema","theme_to_light":"Açık temaya geç","archive":"Arşiv","breadcrumb_label":"Sayfa yolu","archive_title":"Arşiv","archive_deck":"Tüm köşe yazıları ve Gündem analizleri.","archive_search":"Arşivde ara…","archive_type":"İçerik türü","archive_all_types":"Tümü","archive_columns":"Köşe Yazıları","archive_briefs":"Gündem","archive_topic":"Masa","archive_all_topics":"Tüm masalar","archive_clear":"Temizle","archive_results":"{count} sonuç","archive_result_one":"1 sonuç","archive_column":"Köşe Yazısı","archive_brief":"Gündem Analizi","archive_all_columns":"{topic} masasındaki tüm yazıları görüntüle →","archive_all_briefs":"{topic} masasındaki tüm Gündem analizlerini görüntüle →","archive_from":"Başlangıç","archive_to":"Bitiş","archive_newer":"Daha yeni","archive_older":"Daha eski","archive_page_of":"Sayfa {n} / {total}","archive_search_loading":"Aranıyor… {done}/{total} ay yüklendi","archive_search_partial":"Bazı aylar yüklenemedi; sonuçlar eksik olabilir.","brief_date":"Gündem analiz tarihi","podcast_title":"Sesli Özet","podcast_audio_label":"Sesli özeti oynat","podcast_play":"Sesli özeti oynat","podcast_pause":"Sesli özeti duraklat","podcast_seek":"Podcast konumu","podcast_mute":"Sesi kapat","podcast_unmute":"Sesi aç","overview_title":"Beş masada günün önemli gelişmeleri","overview_deck":"Eigen Radar; yapay zekâ, jeopolitik, ekonomi ve piyasalar, bilim ve spor gündemini Türkçe ve İngilizce izleyen bağımsız bir derlemedir.","latest":"Son Gelişmeler","agendas":"Gündem","writers_intro":"Yazarlarımız","writers_intro_prev":"Önceki yazarlar","writers_intro_next":"Sonraki yazarlar","writers_intro_status":"{total} yazardan {start}–{end} gösteriliyor","writers":"Yazarlar","reader_back":"← Baskıya dön","more_from_writer":"Yazarın diğer yazıları","text_scale":"Metin boyutu","print_label":"Yazdır","opml_title":"Tüm akışlara tek adımda abone ol","editions_today":"Bugünkü sürümler","edition_word":"Sürüm","updated_at":"Güncellendi","columns":"Köşe Yazıları","columns_hint":"Günlük analiz ve yorumlar","column_date":"Baskı tarihi","ai_persona":"YZ","read_more":"Yazının tamamı →","references":"Kaynakça","reference":"Kaynak","news_source":"Haber kaynağı","previous_article":"Önceki yazı","primary_paper":"Birincil makale","primary_preprint":"Birincil ön baskı","return_to_citation":"Atfa dön","date_unavailable":"Yayın tarihi belirtilmemiş","retrospective_note":"† İşaretli kaynaklar arşiv yayımından sonra kaynakçaya eklendi ve geriye dönük olarak doğrulandı.","retrospective_label":"Geriye dönük doğrulandı","brief_analysis":"Analiz","brief_editors_choice":"Editörün seçimi","brief_listen":"Sesli Dinle","brief_listen_stop":"Durdur","brief_listen_rate":"Okuma hızı","brief_share":"Paylaş","brief_share_copied":"Bağlantı kopyalandı ✓","brief_share_failed":"Bağlantı kopyalanamadı","brief_image_expand":"Görseli büyüt","brief_image_collapse":"Görseli küçült","related_columns":"İlgili köşe yazıları","related_columns_note":"Bu gündem hakkında daha fazla bilgi için ilgili köşe yazılarını okuyabilirsiniz.","more_briefs":"Aynı masadan diğer analizler","all_topic":"Tüm masa gündemi","source":"Asıl kaynak","no_news":"Bu masa için henüz yayımlanmış haber yok.","no_columns":"Bu masa için henüz yayımlanmış köşe yazısı yok.","ai_label":"Yapay zekâ üretimi analiz","more":"Aynı masadan diğer yazılar","about":"Hakkında, yöntem & düzeltmeler","privacy":"Gizlilik Politikası","rss":"RSS","footer_rights":"© 2026 Eigen Radar — Her hakkı saklıdır.","footer_x":"X hesabımız","footer_contact":"İletişim","footer_identity":"kaynak haberciliğini konu masalarında seçen, yapılandıran ve yapay zekâ ile sentezleyen bağımsız bir editoryal derlemedir; haber ajansı değildir ve özgün saha haberciliği yapmaz. Ayrıca her masada altı köşe yazarının analiz ve yorumlarını sunar.","footer_sources":"Taranan kaynaklar: TechCrunch, The Verge, Wired, Ars Technica, VentureBeat, MIT Technology Review, CNBC, Al Jazeera ve diğerleri. Tüm haber hakları asıl kaynaklara aittir; özetler kaynağa yönlendirme amaçlıdır.","footer_notice_label":"Yapay zekâ içerik bildirimi:","footer_notice":"Bu sitedeki köşe yazıları ve Gündem analizleri bir yapay zekâ modelinin ürettiği çıktılardır; köşe yazarları yapay zekâ karakterleridir. İçerikler yalnızca bilgilendirme amaçlıdır; finansal, hukuki, tıbbi veya başka bir profesyonel tavsiye niteliği taşımaz. Doğruluğu sürekli iyileştirmeye çalışsak da yapay zekâ modelleri hatalı veya uydurma (\"halüsinasyon\") bilgiler üretebilir. Site sahibi, bu içeriklere dayanılarak alınan kararlardan doğabilecek herhangi bir zarar veya kayıptan sorumlu tutulamaz; önemli bilgileri lütfen asıl kaynaklardan doğrulayın.","footer_voice_credit":"Türkçe sesler: wite-tech'in pocket-tts-turkish modeli (<a href=\"https://creativecommons.org/licenses/by/4.0/\" rel=\"license\">CC BY 4.0</a>), Kyutai Pocket TTS tabanlı.","not_found":"Sayfa bulunamadı","not_found_text":"Aradığınız adres yayımlanmamış, taşınmış veya hatalı olabilir.","hubs_title":"Konular","hubs_briefs":"Gündem","hubs_columns":"Köşe yazıları","hubs_archive":"Arşiv","videos_title":"Videolar","videos_intro":"Eigen Radar her gün her masada günün videolarını seçerek kısa bir listeye indirger. Bu sayfa, her masadaki seçilmiş videoları kanal adı ve yayın tarihiyle birlikte YouTube üzerinde açılan gizlilik dostu oynatma bağlantıları olarak sunar. İzleme site dışında gerçekleşir; burada yalnızca o günün editoryal seçkisi yer alır."},"en":{"skip":"Skip to main content","home":"Home","topics":"Topic desks","language":"Language","theme_light":"Light theme","theme_to_light":"Switch to light theme","archive":"Archive","breadcrumb_label":"Breadcrumb","archive_title":"Archive","archive_deck":"All columns and Brief analyses.","archive_search":"Search the archive…","archive_type":"Content type","archive_all_types":"All","archive_columns":"Columns","archive_briefs":"Briefs","archive_topic":"Desk","archive_all_topics":"All desks","archive_clear":"Clear","archive_results":"{count} results","archive_result_one":"1 result","archive_column":"Column","archive_brief":"Brief Analysis","archive_all_columns":"View all columns from the {topic} desk →","archive_all_briefs":"View all Brief analyses from the {topic} desk →","archive_from":"From","archive_to":"To","archive_newer":"Newer","archive_older":"Older","archive_page_of":"Page {n} of {total}","archive_search_loading":"Searching… {done}/{total} months loaded","archive_search_partial":"Some months failed to load; results may be incomplete.","brief_date":"Brief analysis date","podcast_title":"Audio Brief","podcast_audio_label":"Play the audio brief","podcast_play":"Play the audio brief","podcast_pause":"Pause the audio brief","podcast_seek":"Podcast position","podcast_mute":"Mute","podcast_unmute":"Unmute","overview_title":"The day's important developments across every desk","overview_deck":"Eigen Radar is an independent Turkish and English digest covering AI, geopolitics, economics and markets, science, and sports.","latest":"Latest Stories","agendas":"Briefs","writers_intro":"Our Writers","writers_intro_prev":"Previous writers","writers_intro_next":"Next writers","writers_intro_status":"Showing writers {start}–{end} of {total}","writers":"Columnists","reader_back":"← Back to the edition","more_from_writer":"More from this columnist","text_scale":"Text size","print_label":"Print","opml_title":"Subscribe to every feed in one step","editions_today":"Today's editions","edition_word":"Edition","updated_at":"Updated","columns":"Columns","columns_hint":"Daily analysis and commentary","column_date":"Edition date","ai_persona":"AI","read_more":"Read the full piece →","references":"References","reference":"Reference","news_source":"News source","previous_article":"Previous article","primary_paper":"Primary paper","primary_preprint":"Primary preprint","return_to_citation":"Return to citation","date_unavailable":"Publication date unavailable","retrospective_note":"† Marked sources were added to the bibliography after archival publication and verified retrospectively.","retrospective_label":"Verified retrospectively","brief_analysis":"Analysis","brief_editors_choice":"Editor's choice","brief_listen":"Listen","brief_listen_stop":"Stop","brief_listen_rate":"Reading speed","brief_share":"Share","brief_share_copied":"Link copied ✓","brief_share_failed":"Link could not be copied","brief_image_expand":"Enlarge image","brief_image_collapse":"Reduce image","related_columns":"Related columns","related_columns_note":"For more information on this topic, you can read the related columns.","more_briefs":"More analysis from this desk","all_topic":"View the full desk","source":"Original source","no_news":"No news has been published for this desk yet.","no_columns":"No columns have been published for this desk yet.","ai_label":"AI-generated analysis","more":"More from this desk","about":"About, methodology & corrections","privacy":"Privacy Policy","rss":"RSS","footer_rights":"© 2026 Eigen Radar — All rights reserved.","footer_x":"Our X account","footer_contact":"Contact","footer_identity":"an independent digest covering artificial intelligence, geopolitics, economics and markets, science, sports and the arts. It selects, structures and synthesizes source reporting with AI; it is not a news agency and does not conduct firsthand reporting. It also publishes analysis from six columnists on each desk.","footer_sources":"Sources scanned: TechCrunch, The Verge, Wired, Ars Technica, VentureBeat, MIT Technology Review, CNBC, Al Jazeera and others. All rights to the original stories belong to their publishers; summaries are meant to send you to the source.","footer_notice_label":"AI-generated content notice:","footer_notice":"The columns and Briefs analyses on this site are outputs of an artificial intelligence model; the columnists are AI personas. Content is provided for informational purposes only and does not constitute financial, legal, medical, or other professional advice. While we work continuously to improve accuracy, AI models can produce errors or fabricated information (\"hallucinations\"). The site owner accepts no responsibility or liability for any damage or loss arising from reliance on this content; please verify important information with the original sources.","footer_voice_credit":"Turkish voices: pocket-tts-turkish by wite-tech (<a href=\"https://creativecommons.org/licenses/by/4.0/\" rel=\"license\">CC BY 4.0</a>), based on Kyutai Pocket TTS.","not_found":"Page not found","not_found_text":"The address may be unpublished, moved, or incorrect.","hubs_title":"Topics","hubs_briefs":"Briefs","hubs_columns":"Columns","hubs_archive":"Archive","videos_title":"Videos","videos_intro":"Eigen Radar curates a daily shortlist of videos on every desk. This page lists each desk's picks with channel name and publication date as privacy-preserving playback links that open on YouTube. Viewing happens off-site — only the editorial selection for the day is listed here."}} ;
+export const UI = {"tr":{"skip":"Ana içeriğe geç","home":"Ana sayfa","topics":"Konu masaları","language":"Dil","theme_light":"Açık tema","theme_to_light":"Açık temaya geç","archive":"Arşiv","breadcrumb_label":"Sayfa yolu","archive_title":"Arşiv","archive_deck":"Tüm köşe yazıları ve Gündem analizleri.","archive_search":"Arşivde ara…","archive_type":"İçerik türü","archive_all_types":"Tümü","archive_columns":"Köşe Yazıları","archive_briefs":"Gündem","archive_topic":"Masa","archive_all_topics":"Tüm masalar","archive_clear":"Temizle","archive_results":"{count} sonuç","archive_result_one":"1 sonuç","archive_column":"Köşe Yazısı","archive_brief":"Gündem Analizi","archive_all_columns":"{topic} masasındaki tüm yazıları görüntüle →","archive_all_briefs":"{topic} masasındaki tüm Gündem analizlerini görüntüle →","archive_from":"Başlangıç","archive_to":"Bitiş","archive_newer":"Daha yeni","archive_older":"Daha eski","archive_page_of":"Sayfa {n} / {total}","archive_search_loading":"Aranıyor… {done}/{total} ay yüklendi","archive_search_partial":"Bazı aylar yüklenemedi; sonuçlar eksik olabilir.","brief_date":"Gündem analiz tarihi","podcast_title":"Sesli Özet","podcast_audio_label":"Sesli özeti oynat","podcast_play":"Sesli özeti oynat","podcast_pause":"Sesli özeti duraklat","podcast_seek":"Podcast konumu","podcast_mute":"Sesi kapat","podcast_unmute":"Sesi aç","overview_title":"Beş masada günün önemli gelişmeleri","overview_deck":"Eigen Radar; yapay zekâ, jeopolitik, ekonomi ve piyasalar, bilim ve spor gündemini Türkçe ve İngilizce izleyen bağımsız bir derlemedir.","latest":"Son Gelişmeler","agendas":"Gündem","writers_intro":"Yazarlarımız","writers_intro_prev":"Önceki yazarlar","writers_intro_next":"Sonraki yazarlar","writers_intro_status":"{total} yazardan {start}–{end} gösteriliyor","writers":"Yazarlar","reader_back":"← Baskıya dön","more_from_writer":"Yazarın diğer yazıları","text_scale":"Metin boyutu","print_label":"Yazdır","opml_title":"Tüm akışlara tek adımda abone ol","editions_today":"Bugünkü sürümler","edition_word":"Sürüm","updated_at":"Güncellendi","columns":"Köşe Yazıları","columns_hint":"Günlük analiz ve yorumlar","column_date":"Baskı tarihi","ai_persona":"YZ","read_more":"Yazının tamamı →","references":"Kaynakça","reference":"Kaynak","news_source":"Haber kaynağı","previous_article":"Önceki yazı","primary_paper":"Birincil makale","primary_preprint":"Birincil ön baskı","return_to_citation":"Atfa dön","date_unavailable":"Yayın tarihi belirtilmemiş","retrospective_note":"† İşaretli kaynaklar arşiv yayımından sonra kaynakçaya eklendi ve geriye dönük olarak doğrulandı.","retrospective_label":"Geriye dönük doğrulandı","brief_analysis":"Analiz","brief_editors_choice":"Editörün seçimi","brief_listen":"Sesli Dinle","brief_listen_stop":"Durdur","brief_listen_rate":"Okuma hızı","brief_share":"Paylaş","brief_share_copied":"Bağlantı kopyalandı ✓","brief_share_failed":"Bağlantı kopyalanamadı","brief_image_expand":"Görseli büyüt","brief_image_collapse":"Görseli küçült","related_columns":"İlgili köşe yazıları","related_columns_note":"Bu gündem hakkında daha fazla bilgi için ilgili köşe yazılarını okuyabilirsiniz.","more_briefs":"Aynı masadan diğer analizler","all_topic":"Tüm masa gündemi","source":"Asıl kaynak","also_reported_by":"Ayrıca bildiren:","no_news":"Bu masa için henüz yayımlanmış haber yok.","no_columns":"Bu masa için henüz yayımlanmış köşe yazısı yok.","ai_label":"Yapay zekâ üretimi analiz","more":"Aynı masadan diğer yazılar","about":"Hakkında, yöntem & düzeltmeler","privacy":"Gizlilik Politikası","rss":"RSS","footer_rights":"© 2026 Eigen Radar — Her hakkı saklıdır.","footer_x":"X hesabımız","footer_contact":"İletişim","footer_identity":"kaynak haberciliğini konu masalarında seçen, yapılandıran ve yapay zekâ ile sentezleyen bağımsız bir editoryal derlemedir; haber ajansı değildir ve özgün saha haberciliği yapmaz. Ayrıca her masada altı köşe yazarının analiz ve yorumlarını sunar.","footer_sources":"Taranan kaynaklar: TechCrunch, The Verge, Wired, Ars Technica, VentureBeat, MIT Technology Review, CNBC, Al Jazeera ve diğerleri. Tüm haber hakları asıl kaynaklara aittir; özetler kaynağa yönlendirme amaçlıdır.","footer_notice_label":"Yapay zekâ içerik bildirimi:","footer_notice":"Bu sitedeki köşe yazıları ve Gündem analizleri bir yapay zekâ modelinin ürettiği çıktılardır; köşe yazarları yapay zekâ karakterleridir. İçerikler yalnızca bilgilendirme amaçlıdır; finansal, hukuki, tıbbi veya başka bir profesyonel tavsiye niteliği taşımaz. Doğruluğu sürekli iyileştirmeye çalışsak da yapay zekâ modelleri hatalı veya uydurma (\"halüsinasyon\") bilgiler üretebilir. Site sahibi, bu içeriklere dayanılarak alınan kararlardan doğabilecek herhangi bir zarar veya kayıptan sorumlu tutulamaz; önemli bilgileri lütfen asıl kaynaklardan doğrulayın.","footer_voice_credit":"Türkçe sesler: wite-tech'in pocket-tts-turkish modeli (<a href=\"https://creativecommons.org/licenses/by/4.0/\" rel=\"license\">CC BY 4.0</a>), Kyutai Pocket TTS tabanlı.","not_found":"Sayfa bulunamadı","not_found_text":"Aradığınız adres yayımlanmamış, taşınmış veya hatalı olabilir.","hubs_title":"Konular","hubs_briefs":"Gündem","hubs_columns":"Köşe yazıları","hubs_archive":"Arşiv","videos_title":"Videolar","videos_intro":"Eigen Radar her gün her masada günün videolarını seçerek kısa bir listeye indirger. Bu sayfa, her masadaki seçilmiş videoları kanal adı ve yayın tarihiyle birlikte YouTube üzerinde açılan gizlilik dostu oynatma bağlantıları olarak sunar. İzleme site dışında gerçekleşir; burada yalnızca o günün editoryal seçkisi yer alır."},"en":{"skip":"Skip to main content","home":"Home","topics":"Topic desks","language":"Language","theme_light":"Light theme","theme_to_light":"Switch to light theme","archive":"Archive","breadcrumb_label":"Breadcrumb","archive_title":"Archive","archive_deck":"All columns and Brief analyses.","archive_search":"Search the archive…","archive_type":"Content type","archive_all_types":"All","archive_columns":"Columns","archive_briefs":"Briefs","archive_topic":"Desk","archive_all_topics":"All desks","archive_clear":"Clear","archive_results":"{count} results","archive_result_one":"1 result","archive_column":"Column","archive_brief":"Brief Analysis","archive_all_columns":"View all columns from the {topic} desk →","archive_all_briefs":"View all Brief analyses from the {topic} desk →","archive_from":"From","archive_to":"To","archive_newer":"Newer","archive_older":"Older","archive_page_of":"Page {n} of {total}","archive_search_loading":"Searching… {done}/{total} months loaded","archive_search_partial":"Some months failed to load; results may be incomplete.","brief_date":"Brief analysis date","podcast_title":"Audio Brief","podcast_audio_label":"Play the audio brief","podcast_play":"Play the audio brief","podcast_pause":"Pause the audio brief","podcast_seek":"Podcast position","podcast_mute":"Mute","podcast_unmute":"Unmute","overview_title":"The day's important developments across every desk","overview_deck":"Eigen Radar is an independent Turkish and English digest covering AI, geopolitics, economics and markets, science, and sports.","latest":"Latest Stories","agendas":"Briefs","writers_intro":"Our Writers","writers_intro_prev":"Previous writers","writers_intro_next":"Next writers","writers_intro_status":"Showing writers {start}–{end} of {total}","writers":"Columnists","reader_back":"← Back to the edition","more_from_writer":"More from this columnist","text_scale":"Text size","print_label":"Print","opml_title":"Subscribe to every feed in one step","editions_today":"Today's editions","edition_word":"Edition","updated_at":"Updated","columns":"Columns","columns_hint":"Daily analysis and commentary","column_date":"Edition date","ai_persona":"AI","read_more":"Read the full piece →","references":"References","reference":"Reference","news_source":"News source","previous_article":"Previous article","primary_paper":"Primary paper","primary_preprint":"Primary preprint","return_to_citation":"Return to citation","date_unavailable":"Publication date unavailable","retrospective_note":"† Marked sources were added to the bibliography after archival publication and verified retrospectively.","retrospective_label":"Verified retrospectively","brief_analysis":"Analysis","brief_editors_choice":"Editor's choice","brief_listen":"Listen","brief_listen_stop":"Stop","brief_listen_rate":"Reading speed","brief_share":"Share","brief_share_copied":"Link copied ✓","brief_share_failed":"Link could not be copied","brief_image_expand":"Enlarge image","brief_image_collapse":"Reduce image","related_columns":"Related columns","related_columns_note":"For more information on this topic, you can read the related columns.","more_briefs":"More analysis from this desk","all_topic":"View the full desk","source":"Original source","also_reported_by":"also reported by:","no_news":"No news has been published for this desk yet.","no_columns":"No columns have been published for this desk yet.","ai_label":"AI-generated analysis","more":"More from this desk","about":"About, methodology & corrections","privacy":"Privacy Policy","rss":"RSS","footer_rights":"© 2026 Eigen Radar — All rights reserved.","footer_x":"Our X account","footer_contact":"Contact","footer_identity":"an independent digest covering artificial intelligence, geopolitics, economics and markets, science, sports and the arts. It selects, structures and synthesizes source reporting with AI; it is not a news agency and does not conduct firsthand reporting. It also publishes analysis from six columnists on each desk.","footer_sources":"Sources scanned: TechCrunch, The Verge, Wired, Ars Technica, VentureBeat, MIT Technology Review, CNBC, Al Jazeera and others. All rights to the original stories belong to their publishers; summaries are meant to send you to the source.","footer_notice_label":"AI-generated content notice:","footer_notice":"The columns and Briefs analyses on this site are outputs of an artificial intelligence model; the columnists are AI personas. Content is provided for informational purposes only and does not constitute financial, legal, medical, or other professional advice. While we work continuously to improve accuracy, AI models can produce errors or fabricated information (\"hallucinations\"). The site owner accepts no responsibility or liability for any damage or loss arising from reliance on this content; please verify important information with the original sources.","footer_voice_credit":"Turkish voices: pocket-tts-turkish by wite-tech (<a href=\"https://creativecommons.org/licenses/by/4.0/\" rel=\"license\">CC BY 4.0</a>), based on Kyutai Pocket TTS.","not_found":"Page not found","not_found_text":"The address may be unpublished, moved, or incorrect.","hubs_title":"Topics","hubs_briefs":"Briefs","hubs_columns":"Columns","hubs_archive":"Archive","videos_title":"Videos","videos_intro":"Eigen Radar curates a daily shortlist of videos on every desk. This page lists each desk's picks with channel name and publication date as privacy-preserving playback links that open on YouTube. Viewing happens off-site — only the editorial selection for the day is listed here."}} ;
 export const TOPIC_NAV_LABELS = {"ai":{"tr":"Yapay Zekâ","en":"AI"},"geopolitics":{"tr":"Jeopolitik","en":"Geopolitics"},"economics-markets":{"tr":"Ekonomi","en":"Economics"},"science":{"tr":"Bilim","en":"Science"},"sports":{"tr":"Spor","en":"Sports"},"arts":{"tr":"Sanat","en":"Arts"}} ;
 export const TOPIC_COPY = {"ai":{"tr":["Yapay Zekâ","Modeller, şirketler, politika, yatırım ve güvenlik gelişmeleri."],"en":["Artificial Intelligence","Models, companies, policy, investment and safety developments."]},"geopolitics":{"tr":["Jeopolitik","Diplomasi, güvenlik, ticaret ve değişen güç dengeleri."],"en":["Geopolitics","Diplomacy, security, trade and shifting balances of power."]},"economics-markets":{"tr":["Ekonomi ve Piyasalar","Piyasalar, merkez bankaları, şirketler ve emtialar."],"en":["Economics & Markets","Markets, central banks, companies and commodities."]},"science":{"tr":["Bilim","Uzay, biyoloji, iklim, fizik ve bilimsel teknoloji."],"en":["Science","Space, biology, climate, physics and scientific technology."]},"sports":{"tr":["Spor","Futbol, basketbol, voleybol, halter, okçuluk ve motor sporları."],"en":["Sports","Football, basketball, volleyball, weightlifting, archery and motor sports."]},"arts":{"tr":["Sanat","Mimarlık, müzik, resim ve heykel, edebiyat, sinema ve sahne sanatları."],"en":["Arts","Architecture, music, painting and sculpture, literature, cinema and the performing arts."]}} ;
 export const DESK_IDS = ["ai","geopolitics","economics-markets","science","sports","arts"] ;
@@ -23,6 +23,8 @@ export const EN_MONTHS = ["","January","February","March","April","May","June","
 export const ORG_SAME_AS = ["https://x.com/eigenradar"] ;
 export const ORG_DESCRIPTION = {"tr":"Eigen Radar, yapay zekâ, jeopolitik, ekonomi ve piyasalar, bilim ve spor gündemini Türkçe ve İngilizce izleyen kaynak bağlantılı bağımsız bir derlemedir.","en":"Eigen Radar is an independent, source-linked Turkish and English digest covering AI, geopolitics, economics and markets, science, and sports."} ;
 export const ORG_FOUNDER_JOB_TITLE = {"tr":"Sorumlu Editör","en":"Editor of Record"} ;
+export const NEWS_CARD_STYLE = "\n.card{height:19rem;overflow:hidden}.card:has(.also-reported){height:auto;min-height:19rem}.card h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.card>p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.card .also-reported{margin-top:.35rem;color:var(--muted);font-size:.76rem;line-height:1.35}.card .also-reported a{display:inline;margin-top:0;font-size:inherit;font-weight:600}\n";
+export const TR_SOURCE_NAMES = {"Anadolu Agency":"Anadolu Ajansı","Anadolu Agency (AA)":"Anadolu Ajansı"} ;
 export const RENDERER_VERSION = "1";
 
 export const BASE_URL = "https://eigenradar.com";
@@ -62,6 +64,18 @@ export function localized(value, lang) {
     return typeof chosen === "string" ? chosen : "";
   }
   return "";
+}
+
+function localizedFallback(value, lang) {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    const other = lang === "tr" ? "en" : "tr";
+    return text(value[lang]) || text(value[other]);
+  }
+  return text(value);
+}
+
+export function displaySourceName(value, lang) {
+  return lang === "tr" ? (TR_SOURCE_NAMES[value] || value) : value;
 }
 
 export function validDate(value) {
@@ -228,18 +242,37 @@ export function safeWebUrl(value) {
   if (typeof value !== "string") {
     return "";
   }
+  const trimmed = value.replace(/^[\x00-\x20]+|[\x00-\x20]+$/g, "");
+  if (!trimmed || /[\t\r\n]/.test(trimmed)) {
+    return "";
+  }
+  const match = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/([^/?#]*)([^?#]*)(?:\?([^#]*))?(?:#.*)?$/.exec(
+    trimmed,
+  );
+  if (!match) {
+    return "";
+  }
+  const scheme = match[1].toLowerCase();
+  const netloc = match[2];
+  const path = match[3] || "";
+  const query = match[4] || "";
+  if ((scheme !== "http" && scheme !== "https") || !netloc || netloc.includes("@")) {
+    return "";
+  }
   try {
-    const url = new URL(value);
-    if (!["http:", "https:"].includes(url.protocol) || !url.hostname) {
+    const url = new URL(trimmed);
+    if (
+      !["http:", "https:"].includes(url.protocol) ||
+      !url.hostname ||
+      url.username ||
+      url.password
+    ) {
       return "";
     }
-    if (url.username || url.password) {
-      return "";
-    }
-    return `${url.protocol}//${url.host}${url.pathname}${url.search}`;
   } catch {
     return "";
   }
+  return `${scheme}://${netloc}${path}${query ? `?${query}` : ""}`;
 }
 
 export function internalArticleUrl(value) {
@@ -575,6 +608,375 @@ function radarStamp(record, lang, { includeDate = false, contextDate = null } = 
     `<small class="radar-stamp"><time datetime="${esc(raw, true)}">` +
     `${label}${datePrefix}${timeText} ${zone}</time></small>`
   );
+}
+
+function itemTags(item) {
+  const tags = [];
+  const seen = new Set();
+  const add = rawTag => {
+    const t = text(rawTag);
+    if (t && !seen.has(t)) {
+      seen.add(t);
+      tags.push(t);
+    }
+  };
+  if (item && typeof item === "object") {
+    add(item.tag);
+    if (Array.isArray(item.tags)) {
+      for (const t of item.tags) {
+        add(t);
+      }
+    }
+    if (Array.isArray(item.alsoReported)) {
+      for (const other of item.alsoReported) {
+        if (other && typeof other === "object") {
+          add(other.tag);
+          if (Array.isArray(other.tags)) {
+            for (const t of other.tags) {
+              add(t);
+            }
+          }
+        }
+      }
+    }
+  }
+  return tags;
+}
+
+function itemCorroborators(item) {
+  if (!item || typeof item !== "object" || !Array.isArray(item.alsoReported)) {
+    return [];
+  }
+  const out = [];
+  const seenUrls = new Set();
+  for (const entry of item.alsoReported) {
+    if (!entry || typeof entry !== "object") {
+      continue;
+    }
+    const url = safeWebUrl(entry.url);
+    if (!url || seenUrls.has(url)) {
+      continue;
+    }
+    seenUrls.add(url);
+    const normalized = {
+      src: text(entry.src),
+      url,
+      title: entry.title,
+      summary: entry.summary,
+    };
+    const entryTag = text(entry.tag);
+    if (entryTag) {
+      normalized.tag = entryTag;
+    }
+    out.push(normalized);
+  }
+  return out;
+}
+
+export function corroboratorFoldPlan(newsItems, latestBriefs){
+  const items = Array.isArray(newsItems) ? newsItems.filter(n => n && typeof n === 'object') : [];
+  const txt = v => (typeof v === 'string' ? v : '');
+  const refKeyRe = /^[a-z][a-z0-9-]{0,63}$/;
+  const safeWebUrl = value => {
+    if (typeof value !== 'string') return '';
+    const trimmed = value.replace(/^[\x00-\x20]+|[\x00-\x20]+$/g, '');
+    if (!trimmed || /[\t\r\n]/.test(trimmed)) return '';
+    const match = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/([^/?#]*)([^?#]*)(?:\?([^#]*))?(?:#.*)?$/.exec(trimmed);
+    if (!match) return '';
+    const scheme = match[1].toLowerCase();
+    const netloc = match[2];
+    const path = match[3] || '';
+    const query = match[4] || '';
+    if ((scheme !== 'http' && scheme !== 'https') || !netloc || netloc.includes('@')) return '';
+    try {
+      const url = new URL(trimmed);
+      if (!['http:', 'https:'].includes(url.protocol) || !url.hostname || url.username || url.password) return '';
+    } catch {
+      return '';
+    }
+    return `${scheme}://${netloc}${path}${query ? `?${query}` : ''}`;
+  };
+  const briefCorroborationPairs = brief => {
+    if (!brief || typeof brief !== 'object' || !Array.isArray(brief.sources) || brief.sources.length < 2) return [];
+    const byKey = new Map();
+    for (const source of brief.sources){
+      if (!source || typeof source !== 'object') continue;
+      if (source.kind !== 'news') continue;
+      const key = source.key;
+      if (typeof key !== 'string' || !refKeyRe.test(key) || byKey.has(key)) continue;
+      const url = safeWebUrl(source.url);
+      if (!url) continue;
+      byKey.set(key, {
+        source,
+        url,
+        name: txt(source.name),
+      });
+    }
+    if (byKey.size < 2) return [];
+    let paragraphRefSets = null;
+    if (Array.isArray(brief.sections)){
+      paragraphRefSets = [];
+      for (const section of brief.sections){
+        if (!section || typeof section !== 'object' || !Array.isArray(section.ps)) continue;
+        for (const paragraph of section.ps){
+          if (!paragraph || typeof paragraph !== 'object' || !Array.isArray(paragraph.refs)) continue;
+          paragraphRefSets.push(new Set(paragraph.refs.filter(ref => typeof ref === 'string')));
+        }
+      }
+    }
+    const pairs = [];
+    const seenPairs = new Set();
+    for (const source of brief.sources){
+      if (!source || typeof source !== 'object' || !('corroborates' in source)) continue;
+      const key = source.key;
+      const targetKey = source.corroborates;
+      if (
+        typeof key !== 'string' ||
+        typeof targetKey !== 'string' ||
+        !refKeyRe.test(key) ||
+        !refKeyRe.test(targetKey) ||
+        key === targetKey
+      ) continue;
+      const own = byKey.get(key);
+      const target = byKey.get(targetKey);
+      if (!own || !target) continue;
+      if ('corroborates' in target.source) continue;
+      const ownName = own.name.toLowerCase();
+      const targetName = target.name.toLowerCase();
+      if (ownName && targetName && ownName === targetName) continue;
+      if (
+        paragraphRefSets !== null &&
+        !paragraphRefSets.some(refSet => refSet.has(key) && refSet.has(targetKey))
+      ) continue;
+      const pairKey = `${target.url}\n${own.url}`;
+      if (target.url !== own.url && !seenPairs.has(pairKey)){
+        seenPairs.add(pairKey);
+        pairs.push([target.url, own.url]);
+      }
+    }
+    return pairs;
+  };
+  const markedPairs = [];
+  for (const brief of (Array.isArray(latestBriefs) ? latestBriefs : [])){
+    if (!brief || typeof brief !== 'object') continue;
+    const pairs = briefCorroborationPairs(brief);
+    if (!pairs.length) continue;
+    const briefTopic = txt(brief.topic) || 'ai';
+    const briefDate = txt(brief.editionDate || brief.date);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(briefDate) || briefDate.startsWith('0000') ||
+        !Number.isFinite(Date.parse(briefDate)) || new Date(briefDate).toISOString().slice(0, 10) !== briefDate) continue;
+    const pairUrls = new Set();
+    for (const [primaryUrl, corroboratorUrl] of pairs){
+      pairUrls.add(primaryUrl);
+      pairUrls.add(corroboratorUrl);
+    }
+    const matchedByUrl = new Map();
+    for (let idx = 0; idx < items.length; idx += 1){
+      const item = items[idx];
+      const itemTopic = txt(item.topic) || 'ai';
+      if (itemTopic !== briefTopic) continue;
+      const itemDate = txt(item.editionDate || item._edition_date);
+      if (itemDate !== briefDate) continue;
+      const itemUrl = safeWebUrl(item.url);
+      if (itemUrl && pairUrls.has(itemUrl) && !matchedByUrl.has(itemUrl)){
+        matchedByUrl.set(itemUrl, idx);
+      }
+    }
+    if (matchedByUrl.size < 2) continue;
+    for (const [primaryUrl, corroboratorUrl] of pairs){
+      const rawPrimaryIdx = matchedByUrl.get(primaryUrl);
+      const rawOtherIdx = matchedByUrl.get(corroboratorUrl);
+      if (rawPrimaryIdx === undefined || rawOtherIdx === undefined) continue;
+      const primarySrc = txt(items[rawPrimaryIdx].src).toLowerCase();
+      const otherSrc = txt(items[rawOtherIdx].src).toLowerCase();
+      if (primarySrc && otherSrc && primarySrc === otherSrc) continue;
+      markedPairs.push([rawPrimaryIdx, rawOtherIdx]);
+    }
+  }
+  markedPairs.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const key = item => [txt(item.topic) || 'ai', txt(item.editionDate || item._edition_date), safeWebUrl(item.url)];
+  const leader = items.map((_, idx) => idx);
+  const leaderOf = idx => {
+    while (leader[idx] !== idx){
+      leader[idx] = leader[leader[idx]];
+      idx = leader[idx];
+    }
+    return idx;
+  };
+  const plan = [];
+  for (const [rawA, rawB] of markedPairs){
+    const a = leaderOf(rawA), b = leaderOf(rawB);
+    if (a !== b){
+      plan.push([key(items[a]), key(items[b])]);
+      leader[b] = a;
+    }
+  }
+  return plan;
+}
+
+export function foldCorroboratingNews(newsItems, briefs = [], foldPlan = null) {
+  const items = Array.isArray(newsItems)
+    ? newsItems.filter(item => item && typeof item === "object")
+    : [];
+  if (items.length < 2) {
+    return [...items];
+  }
+  const foldedIndices = new Set();
+  const corroboratorsByPrimary = new Map();
+  const tagsByPrimary = new Map();
+  const plan = foldPlan === null ? corroboratorFoldPlan(items, briefs) : foldPlan;
+  const key = item => JSON.stringify([text(item.topic) || "ai", text(item.editionDate || item._edition_date), safeWebUrl(item.url)]);
+  const indices = new Map();
+  items.forEach((item, idx) => { if (!indices.has(key(item))) indices.set(key(item), idx); });
+  const markedPairs = plan.map(([a, b]) => [indices.get(JSON.stringify(a)), indices.get(JSON.stringify(b))])
+    .filter(([a, b]) => a !== undefined && b !== undefined);
+  for (const [primaryIdx, otherIdx] of markedPairs) {
+    const primaryItem = items[primaryIdx];
+    const otherItem = items[otherIdx];
+    if (!corroboratorsByPrimary.has(primaryIdx)) {
+      corroboratorsByPrimary.set(primaryIdx, itemCorroborators(primaryItem));
+    }
+    if (!tagsByPrimary.has(primaryIdx)) {
+      tagsByPrimary.set(primaryIdx, itemTags(primaryItem));
+    }
+    const bucket = corroboratorsByPrimary.get(primaryIdx);
+    const tagBucket = tagsByPrimary.get(primaryIdx);
+    const seenUrls = new Set(bucket.map(entry => entry.url));
+    const primaryCardUrl = safeWebUrl(primaryItem.url);
+    if (primaryCardUrl) {
+      seenUrls.add(primaryCardUrl);
+    }
+    foldedIndices.add(otherIdx);
+    const otherCardUrl = safeWebUrl(otherItem.url);
+    if (otherCardUrl && !seenUrls.has(otherCardUrl)) {
+      seenUrls.add(otherCardUrl);
+      const entry = {
+        src: text(otherItem.src),
+        url: otherCardUrl,
+        title: otherItem.title,
+        summary: otherItem.summary,
+      };
+      const otherTag = text(otherItem.tag);
+      if (otherTag) {
+        entry.tag = otherTag;
+      }
+      bucket.push(entry);
+    }
+    const otherCorroborators = corroboratorsByPrimary.has(otherIdx)
+      ? corroboratorsByPrimary.get(otherIdx)
+      : itemCorroborators(otherItem);
+    corroboratorsByPrimary.delete(otherIdx);
+    for (const sub of otherCorroborators) {
+      const subUrl = safeWebUrl(sub.url);
+      if (!subUrl || seenUrls.has(subUrl)) {
+        continue;
+      }
+      seenUrls.add(subUrl);
+      bucket.push(sub);
+    }
+    const otherTags = tagsByPrimary.has(otherIdx)
+      ? tagsByPrimary.get(otherIdx)
+      : itemTags(otherItem);
+    tagsByPrimary.delete(otherIdx);
+    for (const t of otherTags) {
+      if (t && !tagBucket.includes(t)) {
+        tagBucket.push(t);
+      }
+    }
+  }
+  if (foldedIndices.size === 0 && corroboratorsByPrimary.size === 0) {
+    return [...items];
+  }
+  const folded = [];
+  for (let idx = 0; idx < items.length; idx += 1) {
+    if (foldedIndices.has(idx)) {
+      continue;
+    }
+    const item = items[idx];
+    const corroborators = corroboratorsByPrimary.get(idx);
+    if (corroborators && corroborators.length > 0) {
+      const merged = {
+        ...item,
+        alsoReported: [...corroborators],
+      };
+      const mergedTags = tagsByPrimary.get(idx) || itemTags(merged);
+      if (mergedTags && mergedTags.length > 0) {
+        merged.tags = [...mergedTags];
+      }
+      folded.push(merged);
+    } else {
+      folded.push(item);
+    }
+  }
+  return folded;
+}
+
+export function renderNewsCard(item, lang, index = 0) {
+  const u = UI[lang];
+  const rawSource =
+    text(item?.src) || (lang === "tr" ? "Bilinmeyen kaynak" : "Unknown source");
+  const source = displaySourceName(rawSource, lang);
+  const url = safeWebUrl(item?.url);
+  const title = localizedFallback(item?.title, lang) || source;
+  const summary = localizedFallback(item?.summary, lang);
+  const displayDate = localizedFallback(item?.date, lang);
+  const editionDate = text(item?.editionDate || item?._edition_date);
+  let dateHtml = "";
+  if (displayDate) {
+    dateHtml = validDate(editionDate)
+      ? `<time datetime="${esc(editionDate, true)}">${esc(displayDate)}</time>`
+      : esc(displayDate);
+  }
+  const sourceHtml = url
+    ? `<a class="source external" href="${esc(url, true)}" target="_blank" rel="noopener noreferrer external">${esc(source)}</a>`
+    : esc(source);
+  const alsoReported = Array.isArray(item?.alsoReported) ? item.alsoReported : [];
+  const alsoLinks = [];
+  for (const other of alsoReported) {
+    if (!other || typeof other !== "object") {
+      continue;
+    }
+    const otherUrl = safeWebUrl(other.url);
+    const otherSrc =
+      text(other.src) || (lang === "tr" ? "Bilinmeyen kaynak" : "Unknown source");
+    const otherLabel = displaySourceName(otherSrc, lang);
+    if (otherUrl) {
+      alsoLinks.push(
+        `<a class="external" href="${esc(otherUrl, true)}" target="_blank" rel="noopener noreferrer external">${esc(otherLabel)}</a>`,
+      );
+    } else if (otherLabel) {
+      alsoLinks.push(esc(otherLabel));
+    }
+  }
+  const alsoHtml = alsoLinks.length
+    ? `\n<div class="also-reported"><span>${esc(u.also_reported_by)}</span> ${alsoLinks.join(", ")}</div>`
+    : "";
+  const stamp = radarStamp(item, lang, {
+    contextDate: validDate(editionDate) ? editionDate : null,
+  });
+  const sourceCta = url
+    ? `<a class="external" href="${esc(url, true)}" target="_blank" rel="noopener noreferrer external">${esc(u.source)}</a>`
+    : "";
+  return `<article class="card">
+<div class="meta">${sourceHtml}${dateHtml ? `<span>·</span>${dateHtml}` : ""}</div>
+<h3>${esc(title)}</h3><p>${esc(summary)}</p>${alsoHtml}${stamp}
+${sourceCta}
+</article>`;
+}
+
+export function renderNewsStream(newsItems, briefs, lang, { topic = null, foldPlan = null } = {}) {
+  const u = UI[lang];
+  let items = Array.isArray(newsItems)
+    ? newsItems.filter(item => item && typeof item === "object")
+    : [];
+  if (topic !== null && topic !== undefined) {
+    items = items.filter(item => (text(item.topic) || "ai") === topic);
+  }
+  const folded = foldCorroboratingNews(items, briefs, foldPlan);
+  if (folded.length === 0) {
+    return `<p class="empty">${esc(u.no_news)}</p>`;
+  }
+  return folded.map((item, idx) => renderNewsCard(item, lang, idx)).join("");
 }
 
 function renderArchiveLink(lang, { active = false } = {}) {
