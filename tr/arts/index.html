@@ -308,6 +308,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   }
   .podcast-bar[hidden]{display:none}  /* display:flex would otherwise defeat `hidden` */
   .podcast-trigger{display:none}
+  .video-trigger{display:inline-flex;align-items:center;gap:3px}
+  /* Keep only the play icon visible so the desktop podcast bar and date share one row
+     and phones fit Video, search and Podcast side by side; the label stays for screen readers. */
+  .video-trigger > span:first-child{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+  .video-trigger[aria-expanded="true"]{border-bottom-color:var(--accent);color:var(--accent)}
   #briefsSection > .section-title{position:relative;align-items:center;flex-wrap:wrap;margin-bottom:0}
   .home-view-nav{position:relative;display:flex;align-items:center;gap:3px;flex:0 0 auto;flex-wrap:nowrap;white-space:nowrap}
   .home-view-button{
@@ -716,6 +724,37 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     overflow:hidden;background:var(--media-bg);border:1px solid var(--line);
   }
   .video-player iframe{display:block;width:100%;height:100%;border:0}
+  .video-dialog{
+    padding:0;border:0;background:transparent;color:var(--text);
+    max-width:min(36rem,calc(100vw - 24px));width:min(36rem,calc(100vw - 24px));
+    overflow:visible;
+  }
+  .video-dialog::backdrop{background:rgba(4,7,13,.68);backdrop-filter:blur(2px)}
+  .video-dialog:modal{margin:auto}
+  .video-dialog:not(:modal){
+    position:absolute;z-index:35;top:calc(100% + 6px);left:0;right:auto;margin:0;
+    width:min(26rem,calc(100vw - 24px));max-width:calc(100vw - 24px);
+  }
+  .video-dialog-surface{
+    display:flex;flex-direction:column;gap:8px;padding:10px;
+    background:var(--card);color:var(--text);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:0 16px 36px var(--drawer-shadow);
+  }
+  .video-dialog-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;
+  }
+  .video-dialog-title{
+    font-size:.78rem;font-weight:700;color:var(--text);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .video-dialog-close{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:30px;min-height:30px;padding:4px 10px;
+    border:1px solid var(--line);border-radius:999px;
+    background:var(--bg-soft);color:var(--text);
+    font:inherit;font-size:.75rem;font-weight:600;line-height:1;cursor:pointer;
+  }
+  .video-dialog-close:hover{border-color:var(--hover-line);color:var(--accent)}
   .video-facade{display:block;width:100%;height:100%;padding:0;border:0;cursor:pointer;
     background:transparent;color:inherit;font:inherit;position:relative}
   .video-facade img{
@@ -1325,6 +1364,17 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-nav.is-search-open .radar-search{
       display:flex;flex:0 0 auto;width:0;min-width:100%;order:9;margin-inline:0;margin-top:2px;
     }
+    .video-dialog,.video-dialog:modal,.video-dialog:not(:modal){
+      width:100%;max-width:100%;left:0;right:0;margin:auto 0;box-sizing:border-box;
+    }
+    .video-dialog:not(:modal){
+      position:fixed;top:auto;bottom:0;
+    }
+    .video-dialog-surface{
+      width:100%;box-sizing:border-box;border-inline:0;border-radius:0;
+    }
+    .video-dialog-bar{order:2}
+    .video-dialog-close{min-width:44px;min-height:44px;margin-left:auto}
   }
   @media(max-width:360px){
     /* At 320px the nav and the date selector share one row with nothing to spare: the
@@ -1407,6 +1457,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   html.front-page #radarSearchForm{display:none !important}
   @media (prefers-reduced-motion: no-preference){
     html.js .brief-track .brief-card{animation:brief-card-in .35s ease both}
+    .video-dialog[open]{animation:brief-card-in .15s ease both}
   }
   @keyframes brief-card-in{from{opacity:0}to{opacity:1}}
 </style>
@@ -1502,10 +1553,25 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
           </svg>
         </span>
       </form>
+      <button class="home-view-button video-trigger" id="videoTrigger" type="button"
+        aria-haspopup="dialog" aria-controls="videoDialog" aria-expanded="false"
+        title="Son bülteni izle">
+        <span>Video</span> <span aria-hidden="true">▶</span>
+      </button>
       <button class="home-view-button podcast-trigger" id="podcastTrigger" type="button"
         aria-controls="podcastBar" aria-expanded="false" hidden>
         <span>Podcast</span> <span aria-hidden="true">🎧</span>
       </button>
+      <dialog class="video-dialog" id="videoDialog" aria-label="Son bülteni izle">
+        <div class="video-dialog-surface" id="videoDialogSurface">
+          <div class="video-dialog-bar">
+            <span class="video-dialog-title" id="videoDialogTitle">Son bülteni izle</span>
+            <button class="video-dialog-close" id="videoDialogClose" type="button"
+              aria-label="Kapat">Kapat</button>
+          </div>
+          <div class="video-player" id="videoDialogPlayer"></div>
+        </div>
+      </dialog>
     </nav>
     <div class="podcast-bar" id="podcastBar" role="group" hidden></div>
     <select class="date-select" id="briefDateSel" aria-controls="featured podcastBar news writersGrid"
@@ -1680,6 +1746,7 @@ const UI = {
     back:"← Geri Dön",
     emptyDesk:"Bu masa için henüz bir baskı yok.",
     videoPlay:"Videoyu oynat",
+    videoBulletinTitle:"Son bülteni izle",
     videosList:"Masa videoları",
     details:"Ayrıntılar",
     archiveDate:"Baskı tarihi",
@@ -1771,6 +1838,7 @@ const UI = {
     back:"← Back to the edition",
     emptyDesk:"No edition for this desk yet.",
     videoPlay:"Play video",
+    videoBulletinTitle:"Watch the latest bulletin",
     videosList:"Desk videos",
     details:"Details",
     archiveDate:"Edition date",
@@ -2353,6 +2421,17 @@ function renderChrome(){
   $('newsViewButton').textContent = u.newsView;
   const videosBtn = $('videosViewButton');
   if (videosBtn) videosBtn.textContent = u.videosView;
+  const videoTrig = $('videoTrigger');
+  if (videoTrig) videoTrig.title = u.videoBulletinTitle;
+  const videoDlg = $('videoDialog');
+  if (videoDlg) videoDlg.setAttribute('aria-label', u.videoBulletinTitle);
+  if ($('videoDialogTitle')) $('videoDialogTitle').textContent = u.videoBulletinTitle;
+  const videoClose = $('videoDialogClose');
+  if (videoClose){
+    videoClose.textContent = u.writerClose;
+    videoClose.setAttribute('aria-label', u.writerClose);
+  }
+  if (videoDlg && videoDlg.open && typeof injectVideoBulletin === 'function') injectVideoBulletin();
   $('writersViewButton').textContent = u.writersView;
   $('newsTitle').textContent = u.newsTitle;
   if ($('videosRail')) $('videosRail').setAttribute('aria-label', u.videosList);
@@ -5738,6 +5817,10 @@ document.addEventListener('pointerdown', event=>{
 });
 document.addEventListener('keydown', event=>{
   if (event.key !== 'Escape') return;
+  if ($('videoDialog') && $('videoDialog').open) {
+    closeVideoDialog(true);
+    return;
+  }
   if (!$('filters').hidden) {
     setFilterPopover(false);
     $('newsViewButton').focus();
@@ -5751,6 +5834,199 @@ document.addEventListener('keydown', event=>{
     clearRadarSearch();
     const input = $('radarSearch');
     if (input) input.blur();
+  }
+});
+
+const VIDEO_BULLETIN_PLAYLISTS = {tr:'PLPPI7qI_UA2I', en:'PLGM_nyh0VmyM'};
+const VIDEO_HOVER_OPEN_MS = 400;
+const VIDEO_HOVER_CLOSE_MS = 300;
+const VIDEO_FINE_HOVER_MEDIA = matchMedia('(hover:hover) and (pointer:fine)');
+let videoHoverOpenTimer = null;
+let videoHoverCloseTimer = null;
+let videoHoverInsideTrigger = false;
+let videoHoverInsideDialog = false;
+let videoDialogLatched = false;
+let videoDialogSwitching = false;
+
+function videoBulletinEmbedUrl(lang=LANG){
+  const listId = VIDEO_BULLETIN_PLAYLISTS[lang] || VIDEO_BULLETIN_PLAYLISTS.tr;
+  return `https://www.youtube-nocookie.com/embed/videoseries?list=${encodeURIComponent(listId)}`;
+}
+
+function injectVideoBulletin(){
+  const player = $('videoDialogPlayer');
+  if (!player) return false;
+  const u = UI[LANG] || UI.tr;
+  const src = videoBulletinEmbedUrl(LANG);
+  const existing = player.querySelector('iframe');
+  if (existing && existing.getAttribute('src') === src){
+    existing.title = u.videoBulletinTitle;
+    return true;
+  }
+  player.innerHTML =
+    `<iframe src="${escapeHTML(src)}"`
+    + ` allow="fullscreen" allowfullscreen`
+    + ` title="${escapeHTML(u.videoBulletinTitle)}"></iframe>`;
+  return true;
+}
+
+function positionVideoHoverDialog(){
+  const dialog = $('videoDialog');
+  const trigger = $('videoTrigger');
+  const nav = $('homeViewNav');
+  if (!dialog || !trigger || !nav) return;
+  if (matchMedia('(max-width:640px)').matches){
+    dialog.style.left = '';
+    dialog.style.right = '';
+    return;
+  }
+  const trigRect = trigger.getBoundingClientRect();
+  const navRect = nav.getBoundingClientRect();
+  const dialogWidth = Math.min(416, Math.max(0, window.innerWidth - 24));
+  const idealLeft = trigRect.left + trigRect.width / 2 - dialogWidth / 2;
+  const clampedLeft = Math.max(12, Math.min(idealLeft, window.innerWidth - 12 - dialogWidth));
+  dialog.style.left = `${Math.round(clampedLeft - navRect.left)}px`;
+  dialog.style.right = 'auto';
+}
+
+function openVideoDialog(mode='modal'){
+  const dialog = $('videoDialog');
+  const trigger = $('videoTrigger');
+  if (!dialog || !trigger) return;
+  clearTimeout(videoHoverOpenTimer);
+  videoHoverOpenTimer = null;
+  clearTimeout(videoHoverCloseTimer);
+  videoHoverCloseTimer = null;
+  if (mode === 'modal'){
+    videoDialogLatched = true;
+    dialog.style.left = '';
+    dialog.style.right = '';
+    if (dialog.open && !dialog.matches(':modal')){
+      videoDialogSwitching = true;
+      dialog.close();
+      videoDialogSwitching = false;
+    }
+    if (!dialog.open) dialog.showModal();
+  } else {
+    if (!dialog.open){
+      videoDialogLatched = false;
+      positionVideoHoverDialog();
+      dialog.show();
+    }
+  }
+  trigger.setAttribute('aria-expanded','true');
+  injectVideoBulletin();
+}
+
+function cleanupVideoDialogState(returnFocus=false){
+  clearTimeout(videoHoverOpenTimer);
+  videoHoverOpenTimer = null;
+  clearTimeout(videoHoverCloseTimer);
+  videoHoverCloseTimer = null;
+  videoHoverInsideTrigger = false;
+  videoHoverInsideDialog = false;
+  videoDialogLatched = false;
+  const dialog = $('videoDialog');
+  if (dialog){
+    dialog.style.left = '';
+    dialog.style.right = '';
+  }
+  const player = $('videoDialogPlayer');
+  if (player) player.innerHTML = '';
+  const trigger = $('videoTrigger');
+  if (trigger){
+    trigger.setAttribute('aria-expanded','false');
+    if (returnFocus) trigger.focus();
+  }
+}
+
+function closeVideoDialog(returnFocus=false){
+  const dialog = $('videoDialog');
+  if (dialog && dialog.open) dialog.close();
+  cleanupVideoDialogState(returnFocus);
+}
+
+function scheduleVideoHoverClose(){
+  clearTimeout(videoHoverCloseTimer);
+  videoHoverCloseTimer = null;
+  const dialog = $('videoDialog');
+  if (!dialog || !dialog.open || dialog.matches(':modal') || videoDialogLatched) return;
+  if (videoHoverInsideTrigger || videoHoverInsideDialog) return;
+  videoHoverCloseTimer = setTimeout(()=>{
+    videoHoverCloseTimer = null;
+    if (!videoHoverInsideTrigger && !videoHoverInsideDialog && !videoDialogLatched
+        && dialog.open && !dialog.matches(':modal')){
+      closeVideoDialog(false);
+    }
+  }, VIDEO_HOVER_CLOSE_MS);
+}
+
+$('videoTrigger').addEventListener('click',()=>{
+  openVideoDialog('modal');
+});
+$('videoTrigger').addEventListener('mouseenter',()=>{
+  if (!VIDEO_FINE_HOVER_MEDIA.matches) return;
+  videoHoverInsideTrigger = true;
+  clearTimeout(videoHoverCloseTimer);
+  videoHoverCloseTimer = null;
+  if ($('videoDialog').open) return;
+  clearTimeout(videoHoverOpenTimer);
+  videoHoverOpenTimer = setTimeout(()=>{
+    videoHoverOpenTimer = null;
+    if (videoHoverInsideTrigger && VIDEO_FINE_HOVER_MEDIA.matches && !$('videoDialog').open){
+      openVideoDialog('hover');
+    }
+  }, VIDEO_HOVER_OPEN_MS);
+});
+$('videoTrigger').addEventListener('mouseleave',()=>{
+  videoHoverInsideTrigger = false;
+  clearTimeout(videoHoverOpenTimer);
+  videoHoverOpenTimer = null;
+  scheduleVideoHoverClose();
+});
+$('videoDialog').addEventListener('mouseenter',()=>{
+  videoHoverInsideDialog = true;
+  clearTimeout(videoHoverCloseTimer);
+  videoHoverCloseTimer = null;
+});
+$('videoDialog').addEventListener('mouseleave',()=>{
+  videoHoverInsideDialog = false;
+  scheduleVideoHoverClose();
+});
+$('videoDialog').addEventListener('pointerdown', event=>{
+  if ($('videoDialogSurface').contains(event.target)){
+    videoDialogLatched = true;
+    clearTimeout(videoHoverCloseTimer);
+    videoHoverCloseTimer = null;
+  }
+});
+$('videoDialog').addEventListener('click', event=>{
+  const dialog = $('videoDialog');
+  if (event.target === dialog && dialog.matches(':modal')){
+    closeVideoDialog(true);
+    return;
+  }
+  if ($('videoDialogSurface').contains(event.target)){
+    videoDialogLatched = true;
+    clearTimeout(videoHoverCloseTimer);
+    videoHoverCloseTimer = null;
+  }
+});
+$('videoDialogClose').addEventListener('click', event=>{
+  event.stopPropagation();
+  closeVideoDialog(true);
+});
+$('videoDialog').addEventListener('close',()=>{
+  if (videoDialogSwitching) return;
+  cleanupVideoDialogState(false);
+});
+window.addEventListener('blur',()=>{
+  const dialog = $('videoDialog');
+  const player = $('videoDialogPlayer');
+  if (dialog && dialog.open && player && player.contains(document.activeElement)){
+    videoDialogLatched = true;
+    clearTimeout(videoHoverCloseTimer);
+    videoHoverCloseTimer = null;
   }
 });
 
