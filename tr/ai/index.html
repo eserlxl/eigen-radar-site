@@ -526,6 +526,15 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     margin:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;
     font-size:.82rem;font-weight:600;line-height:1.25;color:var(--text);
   }
+  /* With an unused desk image the card reads like its neighbours: picture on top, text below
+     (operator 2026-11-14 21:15: "boş kart olmamış ... yazılar da altta olsun"). */
+  .fcard.brief-card.brief-video-card.has-thumb{
+    padding:0;gap:0;align-items:stretch;justify-content:flex-start;text-align:left;
+    background:linear-gradient(160deg,var(--card) 0%,var(--card-gradient-end) 100%);
+  }
+  .brief-video-card.has-thumb .brief-video-body{align-items:flex-start;gap:6px;padding:12px 14px 14px}
+  .brief-video-card.has-thumb .brief-video-icon{width:22px;height:22px}
+  .brief-video-card.has-thumb .brief-video-wordmark{font-size:.95rem}
   .yt-icon{width:1.4em;height:1em;flex:0 0 auto;display:inline-block;vertical-align:-.15em}
   /* At 320px the nav and the date selector share one row only with a mark no wider than the old play glyph. */
   @media(max-width:360px){.video-trigger .yt-icon{width:.8em;height:.57em}}
@@ -1651,7 +1660,7 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
 <figure class="brief-media"><a class="brief-media-link" href="/tr/ai/briefs/2026-11-14/suno-bridge-session-audio-generation/" aria-labelledby="brief-heading-2"><picture><source type="image/webp" srcset="/assets/briefs/2026-11-14/suno-bridge-session-audio-generation-640.0fd47d09ddf8.webp 640w, /assets/briefs/2026-11-14/suno-bridge-session-audio-generation-1280.fbcef7f01987.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)"><img src="/assets/briefs/2026-11-14/suno-bridge-session-audio-generation-1280.fbcef7f01987.webp" srcset="/assets/briefs/2026-11-14/suno-bridge-session-audio-generation-640.0fd47d09ddf8.webp 640w, /assets/briefs/2026-11-14/suno-bridge-session-audio-generation-1280.fbcef7f01987.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)" width="1280" height="720" loading="lazy" decoding="async" alt="Ev stüdyosunda bir prodüksiyon masası yukarıdan görülüyor: ekranında renkli ses klipleri dizilen açık bir dizüstü bilgisayar, MIDI klavye, ses kartı, kulaklık, vokal mikrofonu ve bir akustik gitar." title="Her içerik çok aşamalı bir denetimden süzülerek hazırlanmaktadır."></picture></a></figure><div class="brief-content"><h3 id="brief-heading-2"><a class="brief-detail-link" href="/tr/ai/briefs/2026-11-14/suno-bridge-session-audio-generation/">Suno Bridge, mevcut Ableton projelerine yeni çalgı ve vokal bölümleri ekliyor</a></h3>
 <p class="summary">ABD merkezli müzik yapay zekâ şirketi Suno, mevcut Ableton Live projesinde çalgı ve vokal bölümleri oluşturmak için Bridge deneme sürümünü açtı. Uygulama, müzikal bağlamı belirlemek üzere proje dosyalarını Suno’ya yüklüyor ve üretilen sesleri zaman çizelgesine yerleştiriyor. Yapımcılar yeni bölümler eklerken kullandıkları eklentileri ve ses yönlendirmesini koruyabiliyor.</p><small class="radar-stamp"><time datetime="2026-11-14T17:25:00+00:00">20:25 TSİ</time></small></div></article>
 <article class="fcard brief-card" aria-labelledby="brief-heading-3">
-<figure class="brief-media"><a class="brief-media-link" href="/tr/ai/briefs/2026-11-14/bigquery-agent-conversation-logging/" aria-labelledby="brief-heading-3"><picture><source type="image/webp" srcset="/assets/briefs/2026-11-14/bigquery-agent-conversation-logging-640.4813a054e965.webp 640w, /assets/briefs/2026-11-14/bigquery-agent-conversation-logging-1280.e414f73cc2dc.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)"><img src="/assets/briefs/2026-11-14/bigquery-agent-conversation-logging-1280.e414f73cc2dc.webp" srcset="/assets/briefs/2026-11-14/bigquery-agent-conversation-logging-640.4813a054e965.webp 640w, /assets/briefs/2026-11-14/bigquery-agent-conversation-logging-1280.e414f73cc2dc.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)" width="1280" height="720" loading="lazy" decoding="async" alt="Bir veri ekibinin masasında, yapay zekâ ajanının sohbet balonlarını ve bu sohbetlerin kaydedildiği tablo satırlarını gösteren ekrana kalemle işaret eden bir el." title="Her gün yüzlerce kaynağı eksiksiz analizlere dönüştürüyoruz."></picture></a></figure><div class="brief-content"><h3 id="brief-heading-3"><a class="brief-detail-link" href="/tr/ai/briefs/2026-11-14/bigquery-agent-conversation-logging/">Google, yapay zekâ eylemcilerinin konuşma kaydını BigQuery’de genel kullanıma açtı</a></h3>
+<figure class="brief-media"><a class="brief-media-link" href="/tr/ai/briefs/2026-11-14/bigquery-agent-conversation-logging/" aria-labelledby="brief-heading-3"><picture><source type="image/webp" srcset="/assets/briefs/2026-11-14/bigquery-agent-conversation-logging-640.19dfee6b1bf1.webp 640w, /assets/briefs/2026-11-14/bigquery-agent-conversation-logging-1280.af50652cf814.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)"><img src="/assets/briefs/2026-11-14/bigquery-agent-conversation-logging-1280.af50652cf814.webp" srcset="/assets/briefs/2026-11-14/bigquery-agent-conversation-logging-640.19dfee6b1bf1.webp 640w, /assets/briefs/2026-11-14/bigquery-agent-conversation-logging-1280.af50652cf814.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)" width="1280" height="720" loading="lazy" decoding="async" alt="Bir veri ekibinin boş toplantı odasında, duvar ekranında bulanık sohbet balonları ile yan yana duran tablo satırları ve küçük izleme panoları; önde dolap üstünde kapalı dosya ve fincan." title="Her gün yüzlerce kaynağı eksiksiz analizlere dönüştürüyoruz."></picture></a></figure><div class="brief-content"><h3 id="brief-heading-3"><a class="brief-detail-link" href="/tr/ai/briefs/2026-11-14/bigquery-agent-conversation-logging/">Google, yapay zekâ eylemcilerinin konuşma kaydını BigQuery’de genel kullanıma açtı</a></h3>
 <p class="summary">Google Cloud, BigQuery eylemcileri için konuşma günlüklerini ve Conversational Analytics arayüzünü genel kullanıma açtı. Kurumlar konuşma içeriğini kendi tablolarında, temizlenmiş işletim verilerinden ayrı ve isteğe bağlı olarak saklayabiliyor. Depolanan içeriğe erişim izinleri ve şifrelemeyle koruma sağlanıyor. Geri bildirim, değerlendirme ve günlük kullanım denetimlerinin bir bölümü ise önizleme aşamasında kalıyor.</p><small class="radar-stamp"><time datetime="2026-11-14T17:25:00+00:00">20:25 TSİ</time></small></div></article>
 <article class="fcard brief-card" aria-labelledby="brief-heading-4">
 <figure class="brief-media"><a class="brief-media-link" href="/tr/ai/briefs/2026-11-14/simready-robot-grasping-simulation/" aria-labelledby="brief-heading-4"><picture><source type="image/webp" srcset="/assets/briefs/2026-11-14/simready-robot-grasping-simulation-640.ea48509cd0ef.webp 640w, /assets/briefs/2026-11-14/simready-robot-grasping-simulation-1280.26c75320641a.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)"><img src="/assets/briefs/2026-11-14/simready-robot-grasping-simulation-1280.26c75320641a.webp" srcset="/assets/briefs/2026-11-14/simready-robot-grasping-simulation-640.ea48509cd0ef.webp 640w, /assets/briefs/2026-11-14/simready-robot-grasping-simulation-1280.26c75320641a.webp 1280w" sizes="(min-width:2560px) 30rem,(min-width:1920px) 28rem,(min-width:1440px) 25rem,(min-width:1200px) 23rem,(min-width:761px) 33vw,calc(100vw - 2rem)" width="1280" height="720" loading="lazy" decoding="async" alt="Boş bir robot test alanında, sabit gövdeli bir robot kol, etiketsiz bir içecek kutusunu iki parmaklı tutucusuyla kaldırıp düz masadaki sarı bantlı hedef kareye taşıyor." title="Tuzak başlık, boş haber yok. Sadece kaliteli içerikler."></picture></a></figure><div class="brief-content"><h3 id="brief-heading-4"><a class="brief-detail-link" href="/tr/ai/briefs/2026-11-14/simready-robot-grasping-simulation/">NVIDIA, fizik özellikleri tanımlı modellerle robotun kavrama hareketini deniyor</a></h3>
@@ -1804,7 +1813,7 @@ const UI = {
     emptyDesk:"Bu masa için henüz bir baskı yok.",
     videoPlay:"Videoyu oynat",
     videoBulletinTitle:"Son bülteni izle",
-    videoCardTitle:"Son bülten",
+    videoCardTitle:"Gündem",
     videoCardCta:"YouTube'da izle",
     videosList:"Masa videoları",
     details:"Ayrıntılar",
@@ -1898,7 +1907,7 @@ const UI = {
     emptyDesk:"No edition for this desk yet.",
     videoPlay:"Play video",
     videoBulletinTitle:"Watch the latest bulletin",
-    videoCardTitle:"Latest bulletin",
+    videoCardTitle:"Briefs",
     videoCardCta:"Watch on YouTube",
     videosList:"Desk videos",
     details:"Details",
@@ -2036,7 +2045,7 @@ document.addEventListener('error', event=>{
   }
 }, true);
 
-const ROUTE_DATA_URL = "/assets/data/app-2f583755.json";
+const ROUTE_DATA_URL = "/assets/data/app-b99dd6d6.json";
 const FILE_ASSET_PREFIX = "../../";
 const PAGE_EDITION = {"date": "2026-11-14", "n": 3};
 let ownEdition = PAGE_EDITION && typeof PAGE_EDITION.date === 'string' && Number.isInteger(PAGE_EDITION.n)
@@ -2665,8 +2674,18 @@ function frontPageHasVideoCard(key){
   }
   return topics.size === sel.briefs.length;
 }
-function briefVideoCard(pageIndex=0){
+// The newest edition's first geopolitics Brief image not already on the front page, else any unused one.
+function frontPageVideoThumb(key){
+  const sel = key && typeof frontPageSelection === 'function' ? frontPageSelection(key) : null;
+  if (!sel || !Array.isArray(sel.briefs)) return null;
+  const used = new Set(sel.briefs.map(ref=>`${ref?.topic}|${ref?.id}`));
+  const pool = BRIEFS.filter(brief=>brief && brief.editionDate===sel.date && editionN(brief)===sel.n
+    && !used.has(`${brief.topic}|${brief.id}`) && safeBriefAsset(brief.image?.src));
+  return pool.find(brief=>brief.topic==='geopolitics') || pool[0] || null;
+}
+function briefVideoCard(pageIndex=0, key=null){
   const u = UI[LANG] || UI.tr;
+  const thumb = frontPageVideoThumb(key);
   const el = document.createElement('article');
   const headingId = `brief-video-bulletin-${pageIndex}`;
   el.className = 'fcard brief-card brief-video-card';
@@ -2676,13 +2695,26 @@ function briefVideoCard(pageIndex=0){
   el.setAttribute('aria-haspopup', 'dialog');
   el.setAttribute('aria-controls', 'videoDialog');
   el.setAttribute('aria-labelledby', headingId);
-  el.innerHTML = `<svg class="brief-video-radar" viewBox="0 0 1280 720" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">`
+  let media = '';
+  if (thumb){
+    const image = thumb.image;
+    const srcset = (Array.isArray(image.variants) ? image.variants : [])
+      .map(row => ({src:safeBriefAsset(row?.src), width:Number(row?.width)}))
+      .filter(row => row.src && Number.isInteger(row.width) && row.width > 0)
+      .sort((a,b)=>a.width-b.width).map(row => `${row.src} ${row.width}w`).join(', ');
+    el.classList.add('has-thumb');
+    media = `<figure class="brief-media"><picture>`
+      + (srcset ? `<source type="image/webp" srcset="${escapeHTML(srcset)}" sizes="${BRIEF_RAIL_SIZES}">` : '')
+      + `<img src="${escapeHTML(safeBriefAsset(image.src))}"${srcset ? ` srcset="${escapeHTML(srcset)}" sizes="${BRIEF_RAIL_SIZES}"` : ''} width="1280" height="720" loading="eager" decoding="async" alt="">`
+      + `</picture></figure>`;
+  }
+  el.innerHTML = (media || `<svg class="brief-video-radar" viewBox="0 0 1280 720" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">`
     + `<path class="brief-video-radar-wedge" d="M640 330 L640 -130 A460 460 0 0 1 1038.37 560 Z"/>`
     + `<circle cx="640" cy="330" r="200"/>`
     + `<circle cx="640" cy="330" r="330"/>`
     + `<circle cx="640" cy="330" r="460"/>`
     + `<circle cx="640" cy="330" r="590"/>`
-    + `</svg><div class="brief-video-body">`
+    + `</svg>`) + `<div class="brief-video-body">`
     + `<div class="brief-video-brand">`
     + `<img class="brief-video-icon" src="${escapeHTML(assetURL('/assets/icon.svg'))}" width="132" height="132" alt="">`
     + `<span class="brief-video-wordmark">Eigen Radar</span>`
@@ -3265,7 +3297,7 @@ function renderBriefs(){
       }
       grid.appendChild(card);
       if (itemIndex === 0 && hasVideoCard && typeof briefVideoCard === 'function'){
-        grid.appendChild(briefVideoCard(pageIndex));
+        grid.appendChild(briefVideoCard(pageIndex, key));
       }
     });
     // Placement needs only the card count and the viewport, so do it before the first
