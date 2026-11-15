@@ -400,6 +400,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     :root[data-theme="light"] .podcast-bar audio{display:none}
     :root[data-theme="light"] .podcast-bar .podcast-desktop-controls{display:flex}
   }
+  /* Narrow tablets: the tabs with search hit counts and the date share one row (operator 2026-11-15). */
+  @media(min-width:641px) and (max-width:767px){
+    .home-view-button{font-size:.86rem}
+  }
+  /* Tablets keep the desktop's right-aligned date; the podcast bar beside it is a popover there. */
+  @media(min-width:641px) and (max-width:1079px){
+    #briefsSection > .section-title .podcast-bar:not([hidden])+.date-select{margin-left:auto}
+  }
   /* Operator 2026-10-01: the bar is about half again as wide on desktop, and Chromium
      only draws the native timeline once the control has room for it (190px hid it). */
   @media(min-width:960px){
@@ -409,6 +417,16 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   @media(min-width:1200px){
     .podcast-bar audio{width:340px}
     .podcast-desktop-controls{width:340px}
+  }
+  /* Operator 2026-11-15 ("Tarih alt satıra inmemeli, gerekiyorsa podcasti kısaltalım"): on the
+     desktop view row the podcast bar takes only the room left between the nav and the date, up to
+     its full width, so a long nav (search, hit counts) shortens its timeline instead of pushing the
+     date onto its own line. Below 12.5rem (the compact controls' play, time and volume) the date
+     wraps as before. Below 1080px the bar is the compact row's popover. */
+  @media(min-width:1080px){
+    #briefsSection > .section-title .podcast-bar{flex:1 1 0;min-width:12.5rem;max-width:max-content}
+    #briefsSection > .section-title .podcast-bar :is(audio,.podcast-desktop-controls,.podcast-seek){
+      flex:0 1 auto;min-width:0}
   }
   .listen-btn{margin:6px 0 2px;padding:6px 14px;border-radius:99px;border:1px solid var(--line);
     min-height:44px;background:var(--accent-soft);color:var(--accent);font-size:.8rem;cursor:pointer}
@@ -531,6 +549,28 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   /* Grown to the large card (operator 2026-11-15 10:30: "yüksekliği çok küçük kaldı"): the player keeps its own
      16:9 height there; flex:1 1 0 would collapse it to min-height in the large card's auto-height media. */
   .featured-grid.brief-mosaic > .brief-feature .brief-video-inline{flex:0 0 auto}
+  /* Operator 2026-11-15 12:12 ("Altta boşluk olmasın, eşitlensin ... 2-3 haber başlığı"): the grown card fills its two
+     rows (a Brief feature sets them with align-self:start, the shorter player card would end above them) and the
+     space under its text holds 2-3 of the bulletin's other headlines; fitVideoCardHeadlines drops the third when it
+     would make the rows taller. Only the grown desktop card shows them; phones keep the plain card. */
+  .featured-grid.brief-mosaic > .brief-video-card.brief-feature{align-self:stretch}
+  .brief-video-card.brief-feature .brief-video-body{flex:1 1 auto}
+  .brief-video-also{display:none}
+  @media(min-width:641px){
+    .brief-video-card.brief-feature .brief-video-also{
+      display:flex;flex:1 1 auto;flex-direction:column;justify-content:space-evenly;gap:4px;align-self:stretch;
+      min-width:0;margin-top:6px;padding-top:8px;border-top:1px solid var(--line);
+    }
+  }
+  .brief-video-also-label{margin:0;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .brief-video-also ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;justify-content:space-evenly;gap:6px;flex:1 1 auto}
+  .brief-video-also li{min-width:0}
+  .brief-video-also li[hidden]{display:none}
+  .brief-video-also a{
+    display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+    font-size:.88rem;font-weight:600;line-height:1.35;color:var(--text);text-decoration:none;
+  }
+  .brief-video-also a:hover,.brief-video-also a:focus-visible{color:var(--accent);text-decoration:underline}
   /* With an unused desk image the card reads like its neighbours: picture on top, text below
      (operator 2026-11-14 21:15: "boş kart olmamış ... yazılar da altta olsun"). */
   .fcard.brief-card.brief-video-card.has-thumb{
@@ -1386,9 +1426,14 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     }
     .edition-btn .edition-symbol{display:inline;margin-inline-start:0}.edition-btn .edition-text{display:none}
   }
-  @media(max-width:640px),
-    (min-width:641px) and (max-width:1000px) and (max-height:500px) and (orientation:landscape){
+  /* The compact view row (search icon, podcast popover) also serves tablets and small laptops
+     (operator 2026-11-15 12:43, "Tablet genişliğini de düzelt, tarih orada da inmesin"): below
+     1080px the open search field and the podcast bar beside the nav pushed the date onto its own line
+     (at 1024 once every tab carried a hit count). */
+  @media(max-width:1079px){
     #briefsSection .home-view-nav{gap:2px}
+    /* An open field adds a second line to the nav; the date stays level with the tab row. */
+    #briefsSection > .section-title .date-select{align-self:flex-start}
     #briefsSection > .section-title .home-view-nav .podcast-trigger:not([hidden]){
       display:inline-flex;align-items:center;gap:3px;
     }
@@ -1428,6 +1473,9 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
     .home-view-nav.is-search-open .radar-search{
       display:flex;flex:0 0 auto;width:0;min-width:100%;order:9;margin-inline:0;margin-top:2px;
     }
+  }
+  @media(max-width:640px),
+    (min-width:641px) and (max-width:1000px) and (max-height:500px) and (orientation:landscape){
     .video-dialog,.video-dialog:modal,.video-dialog:not(:modal){
       width:100%;max-width:100%;left:0;right:0;margin:auto 0;box-sizing:border-box;
     }
@@ -1513,12 +1561,10 @@ document.querySelector('meta[name="theme-color"]').content=t==='light'?'#c7d2e0'
   /* Front page (operator 2026-11-09, 2026-11-10): the root shells show the edition's
      selected Briefs from every desk over the selected columns, with the cross-desk
      news, writers and videos views, radar ticker, markets strip, podcast player and
-     edition picker. Desk-scoped controls -- tag filters and search -- belong to desk
-     pages and stay off it; picking a desk in the nav brings them back. */
+     edition picker. The desk-scoped tag filters stay off it; its search runs over every
+     desk (operator 2026-11-14, 2026-11-15). */
   html.js.static-front #static-front{display:block}
-  html.front-page #filters,
-  html.front-page #radarSearchToggle,
-  html.front-page #radarSearchForm{display:none !important}
+  html.front-page #filters{display:none !important}
   @media (prefers-reduced-motion: no-preference){
     html.js .brief-track .brief-card{animation:brief-card-in .35s ease both}
     .video-dialog[open]{animation:brief-card-in .15s ease both}
@@ -1818,6 +1864,7 @@ const UI = {
     videoBulletinTitle:"Son bülteni izle",
     videoCardTitle:"Gündem",
     videoCardCta:"YouTube'da izle",
+    videoCardAlso:"Bültende ayrıca",
     videosList:"Masa videoları",
     details:"Ayrıntılar",
     archiveDate:"Baskı tarihi",
@@ -1851,10 +1898,12 @@ const UI = {
     shareBtn:"Paylaş",
     shareCopied:"Bağlantı kopyalandı ✓",
     searchPlaceholder:"Bu masada ara…",
+    searchPlaceholderAll:"Tüm masalarda ara…",
     searchToggle:"Ara",
     searchArchiveCta:"Daha eski köşe yazıları ve analizler için arşivde ara",
     searchSevenDays:"Son 7 gün",
     noResults:"Son 7 günde bu masada yok.",
+    noResultsAll:"Son 7 günde hiçbir masada yok.",
     podcastTitle:"Sesli Özet",
     podcastAudioLabel:"Sesli özeti oynat",
     podcastPlay:"Sesli özeti oynat",
@@ -1912,6 +1961,7 @@ const UI = {
     videoBulletinTitle:"Watch the latest bulletin",
     videoCardTitle:"Briefs",
     videoCardCta:"Watch on YouTube",
+    videoCardAlso:"Also in this bulletin",
     videosList:"Desk videos",
     details:"Details",
     archiveDate:"Edition date",
@@ -1945,10 +1995,12 @@ const UI = {
     shareBtn:"Share",
     shareCopied:"Link copied ✓",
     searchPlaceholder:"Search this desk…",
+    searchPlaceholderAll:"Search all desks…",
     searchToggle:"Search",
     searchArchiveCta:"Search older columns and briefs in the archive",
     searchSevenDays:"Last 7 days",
     noResults:"Nothing on this desk in the last 7 days.",
+    noResultsAll:"Nothing on any desk in the last 7 days.",
     podcastTitle:"Audio Brief",
     podcastAudioLabel:"Play the audio brief",
     podcastPlay:"Play the audio brief",
@@ -2312,9 +2364,8 @@ function editionLabel(value){
 const EDITION_SYMBOLS={1:'I',2:'II',3:'III',4:'IV'};
 const EDITION_TIMES={1:'04:00',2:'10:00',3:'16:00',4:'22:00'};
 const EDITION_ICONS={1:'☕',2:'☀️',3:'🕯️',4:'🌙'};
-const COMPACT_EDITION_MEDIA=window.matchMedia(
-  '(max-width: 640px), (max-width: 1000px) and (max-height: 500px) and (orientation: landscape)'
-);
+// The compact view row (podcast popover) of the CSS, phones through small laptops (2026-11-15).
+const COMPACT_EDITION_MEDIA=window.matchMedia('(max-width: 1079px)');
 const EDITION_LABEL_MEDIA=window.matchMedia('(max-width: 640px)');
 function editionSymbol(value){
   const n = editionN(value || {});
@@ -2477,12 +2528,13 @@ function renderChrome(){
   $('featTitle').textContent = u.featTitle;
   $('radarKickerText').textContent = u.radarLabel;
   const searchInput = $('radarSearch');
+  const searchLabel = frontPageMode ? u.searchPlaceholderAll : u.searchPlaceholder;
   if (searchInput){
-    searchInput.placeholder = u.searchPlaceholder;
-    searchInput.setAttribute('aria-label', u.searchPlaceholder);
+    searchInput.placeholder = searchLabel;
+    searchInput.setAttribute('aria-label', searchLabel);
     if (searchInput.value !== searchQuery) searchInput.value = searchQuery;
   }
-  if ($('radarSearchLabel')) $('radarSearchLabel').textContent = u.searchPlaceholder;
+  if ($('radarSearchLabel')) $('radarSearchLabel').textContent = searchLabel;
   const searchToggle = $('radarSearchToggle');
   if (searchToggle){
     searchToggle.setAttribute('aria-label', u.searchToggle);
@@ -2686,9 +2738,37 @@ function frontPageVideoThumb(key){
     && !used.has(`${brief.topic}|${brief.id}`) && safeBriefAsset(brief.image?.src));
   return pool.find(brief=>brief.topic==='geopolitics') || pool[0] || null;
 }
+// Operator 2026-11-15 12:12: up to three Briefs of the bulletin's edition that are not cards on this front page, one per
+// desk in the front page's desk order, then any other; fewer than two: none. (The public editionAudio record carries no
+// desk list, only the bulletin files.)
+function frontPageVideoHeadlines(key){
+  const sel = key && typeof frontPageSelection === 'function' ? frontPageSelection(key) : null;
+  if (!sel || !Array.isArray(sel.briefs)) return [];
+  const used = new Set(sel.briefs.map(ref=>`${ref?.topic}|${ref?.id}`));
+  const desks = sel.briefs.map(ref=>ref?.topic);
+  const pool = BRIEFS.filter(brief=>brief && brief.editionDate===sel.date && editionN(brief)===sel.n
+    && !used.has(`${brief.topic}|${brief.id}`) && briefPath(brief) && localized(brief.title));
+  const out = [];
+  desks.forEach(desk=>{ const brief = out.length < 3 && pool.find(b=>b.topic===desk); if (brief) out.push(brief); });
+  pool.forEach(brief=>{ if (out.length < 3 && !out.includes(brief)) out.push(brief); });
+  return out.length >= 2 ? out : [];
+}
+// The third headline stays only when it does not make the grid taller than two headlines do.
+function fitVideoCardHeadlines(card){
+  const items = [...card.querySelectorAll('.brief-video-also li')];
+  items.forEach(item=>{ item.hidden = false; });
+  if (items.length < 3 || !card.classList.contains('brief-feature') || BRIEF_STACK_MEDIA.matches) return;
+  const grid = card.closest('.featured-grid');
+  if (!grid) return;
+  const withThree = grid.getBoundingClientRect().height;
+  items[2].hidden = true;
+  const withTwo = grid.getBoundingClientRect().height;
+  items[2].hidden = withThree > withTwo + 1;
+}
 function briefVideoCard(pageIndex=0, key=null){
   const u = UI[LANG] || UI.tr;
   const thumb = frontPageVideoThumb(key);
+  const headlines = frontPageVideoHeadlines(key);
   const sel = key && typeof frontPageSelection === 'function' ? frontPageSelection(key) : null;
   // Operator 2026-11-15 01:19: the edition's name (Sabah, Öğle, ...) beside its date.
   const dateText = sel ? `${localized(DATE_LABELS[sel.date]) || sel.date} · ${editionLabel({n:sel.n})}` : '';
@@ -2726,6 +2806,9 @@ function briefVideoCard(pageIndex=0, key=null){
     + `</div>`
     + (dateText ? `<p class="brief-video-date">${escapeHTML(dateText)}</p>` : '')
     + `<p class="brief-video-cta"><svg class="yt-icon" viewBox="0 0 28 20" width="28" height="20" aria-hidden="true" focusable="false"><path fill="#FF0000" d="M27.4 3.1A3.5 3.5 0 0 0 24.9.6C22.7 0 14 0 14 0S5.3 0 3.1.6A3.5 3.5 0 0 0 .6 3.1C0 5.3 0 10 0 10s0 4.7.6 6.9a3.5 3.5 0 0 0 2.5 2.5C5.3 20 14 20 14 20s8.7 0 10.9-.6a3.5 3.5 0 0 0 2.5-2.5C28 14.7 28 10 28 10s0-4.7-.6-6.9Z"/><path fill="#FFFFFF" d="M11.2 14.3 18.5 10l-7.3-4.3Z"/></svg><span>${escapeHTML(u.videoCardCta)}</span></p>`
+    + (headlines.length ? `<div class="brief-video-also"><p class="brief-video-also-label">${escapeHTML(u.videoCardAlso)}</p><ul>`
+      + headlines.map(brief=>`<li><a href="${escapeHTML(briefPath(brief))}" title="${escapeHTML(localized(brief.title))}">${escapeHTML(localized(brief.title))}</a></li>`).join('')
+      + `</ul></div>` : '')
     + `</div>`;
   return el;
 }
@@ -3240,6 +3323,7 @@ function layoutBriefMosaic(grid){
 }
 function syncBriefRailHeights(){
   document.querySelectorAll('.featured-grid.brief-mosaic').forEach(layoutBriefMosaic);
+  document.querySelectorAll('.brief-video-card.brief-feature').forEach(fitVideoCardHeadlines);
   syncBriefDeckHeight();
 }
 
@@ -3249,8 +3333,8 @@ function renderBriefs(){
   const track = $('featured');
   const shell = $('briefShell');
   const results = $('briefSearchResults');
-  // The front page has no search; its one page is the selection, in the editor's order.
-  const q = frontPageMode ? '' : searchNeedle();
+  // Without a query the front page shows its one page, the selection, in the editor's order.
+  const q = searchNeedle();
   if (q){
     if (shell) shell.hidden = true;
     if (results){
@@ -3258,7 +3342,18 @@ function renderBriefs(){
       results.innerHTML = '';
       const items = matchingBriefs();
       if (!items.length) results.innerHTML = emptySearchNote('briefs');
-      else items.forEach((brief, index) => results.appendChild(briefCard(brief, index, false, 0)));
+      else items.forEach((brief, index) => {
+        const card = briefCard(brief, index, false, 0);
+        // a front-page result comes from any desk, so it names its desk like a news card does
+        if (frontPageMode){
+          const label = document.createElement('span');
+          label.className = 'tag desk-tag';
+          label.dataset.desk = brief.topic;
+          label.textContent = topicMeta(brief.topic)?.label?.[LANG] || brief.topic;
+          card.querySelector('.brief-content')?.prepend(label);
+        }
+        results.appendChild(card);
+      });
     }
     section.hidden = false;
     return;
@@ -4075,6 +4170,8 @@ document.addEventListener('keydown', event=>{
 
 $('featured').addEventListener('click', event=>{
   const videoCard = event.target.closest('.brief-video-card');
+  // A bulletin headline is an ordinary link to its Brief page.
+  if (videoCard && event.target.closest('.brief-video-also a')) return;
   if (videoCard){
     event.preventDefault();
     growAndPlayVideoCard(videoCard);
@@ -4126,7 +4223,7 @@ $('featured').addEventListener('click', event=>{
 });
 $('featured').addEventListener('keydown', event=>{
   const videoCard = event.target.closest?.('.brief-video-card');
-  if (!videoCard) return;
+  if (!videoCard || event.target.closest('.brief-video-also a')) return;
   if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar'){
     event.preventDefault();
     growAndPlayVideoCard(videoCard);
@@ -4141,6 +4238,7 @@ function growAndPlayVideoCard(card){
     syncBriefRailHeights();
   }
   playVideoCardInline(card);
+  fitVideoCardHeadlines(card);
 }
 function stopVideoCardInline(card){
   const figure = card.querySelector('figure.brief-media');
@@ -4436,10 +4534,19 @@ function foldCorroboratingNews(newsItems, briefs = [], foldPlan = null){
   return folded;
 }
 function visibleNewsItems(){
-  if (typeof frontPageMode !== 'undefined' && frontPageMode) return radarPool();
   const q = searchNeedle();
+  if (typeof frontPageMode !== 'undefined' && frontPageMode){
+    if (!q) return radarPool();
+    // The front-page search runs the desk search on every desk, newest first.
+    return [...TOPIC_IDS].flatMap(topic => deskNewsItems(topic, q)).sort((a, b) =>
+      String(b.editionDate || '').localeCompare(String(a.editionDate || ''))
+      || radarSortKey(b) - radarSortKey(a));
+  }
+  return deskNewsItems(TOPIC, q);
+}
+function deskNewsItems(topic, q){
   const {date} = briefEditionParts(selectedBriefDate);
-  const latestDate = (DATA.newsDates || {})[TOPIC] || '';
+  const latestDate = (DATA.newsDates || {})[topic] || '';
   const searching = Boolean(q);
   const foldDate = searching ? latestDate : date || latestDate;
   let source;
@@ -4447,7 +4554,7 @@ function visibleNewsItems(){
     const seen = new Set();
     source = [];
     for (const n of [...LATEST_NEWS, ...NEWS_HISTORY]){
-      if (newsTopicOf(n)!==TOPIC) continue;
+      if (newsTopicOf(n)!==topic) continue;
       const key = typeof n.url==='string' && n.url ? n.url : String(n.src||'')+'|'+localized(n.title);
       if (seen.has(key)) continue;
       seen.add(key);
@@ -4456,10 +4563,10 @@ function visibleNewsItems(){
   } else {
     source = !date || date===latestDate ? LATEST_NEWS : NEWS_HISTORY;
   }
-  const rawStream = source.filter(n => newsTopicOf(n)===TOPIC &&
+  const rawStream = source.filter(n => newsTopicOf(n)===topic &&
     (searching || !date || date===latestDate || n.editionDate===date));
   const deskStream = typeof foldCorroboratingNews === 'function'
-    ? foldCorroboratingNews(rawStream, [], (DATA.newsFoldPlans || {})[TOPIC]?.[foldDate] || [])
+    ? foldCorroboratingNews(rawStream, [], (DATA.newsFoldPlans || {})[topic]?.[foldDate] || [])
     : rawStream;
   const matchesFilter = n => {
     if (activeFilter==='all') return true;
@@ -5172,10 +5279,7 @@ function syncFromHash(){
   // #q= carries the radar search; #view=news&q=openai is the language-switch form.
   const home = homeHashParts();
   if (home){
-    // A shared search is a desk-page thought: it opens the remembered desk
-    // rather than the front page, which has no search.
-    const leftFront = frontPageMode && Boolean(home.q);
-    if (leftFront) frontPageMode = false;
+    // A shared search on the root opens the front-page search over every desk.
     if (home.q) searchQuery = home.q;
     if (home.view) setHomeView(home.view);
     const input = $('radarSearch');
@@ -5188,9 +5292,7 @@ function syncFromHash(){
     if (searchNav) searchNav.classList.toggle('is-search-open', Boolean(searchQuery.trim()));
     const searchToggle = $('radarSearchToggle');
     if (searchToggle) searchToggle.setAttribute('aria-expanded', String(Boolean(searchQuery.trim())));
-    if (leftFront){
-      renderAll();
-    } else if (home.q || home.view){
+    if (home.q || home.view){
       renderBriefDateSelect();
       renderBriefs();
       renderNews();
@@ -5518,6 +5620,8 @@ async function briefWheelStep(dir){
 }
 
 function syncBriefEditionFromScroll(){
+  // A search hides the deck, which drops its scroll to the oldest page; that is no reader's pick.
+  if ($('briefShell')?.hidden) return;
   const pages = briefTrackPages();
   const at = briefPageIndex();
   if (at < 0) return;
@@ -5801,7 +5905,7 @@ function videoHaystack(v){
 function matchingBriefs(){
   const q = searchNeedle();
   if (!q) return BRIEFS.filter(brief => brief && brief.topic===TOPIC);
-  return BRIEFS.filter(brief => brief && brief.topic===TOPIC && briefHaystack(brief).includes(q));
+  return BRIEFS.filter(brief => brief && (frontPageMode || brief.topic===TOPIC) && briefHaystack(brief).includes(q));
 }
 function matchingWriterArticle(w){
   const q = searchNeedle();
@@ -5822,7 +5926,8 @@ function matchingWriterArticle(w){
   if (!q) return latest || null;
   if (searchFold(w.name).includes(q)) return latest || null;
   const hits = ARTICLES.filter(article =>
-    personaOf(article.writer).id === w.id && topicOf(article)===TOPIC && articleHaystack(article).includes(q)
+    personaOf(article.writer).id === w.id && topicOf(article)===(frontPageMode ? w.topic : TOPIC)
+      && articleHaystack(article).includes(q)
   ).sort((a,b) => String(b.date||'').localeCompare(String(a.date||'')));
   return hits[0] || null;
 }
@@ -5838,7 +5943,7 @@ function emptySearchNote(kind){
   if (kind==='briefs' || kind==='writers'){
     return `<p class="empty-note">${archive}</p>`;
   }
-  return `<p class="empty-note">${escapeHTML(u.noResults)}</p><p class="empty-note search-archive-hint">${archive}</p>`;
+  return `<p class="empty-note">${escapeHTML(frontPageMode ? u.noResultsAll : u.noResults)}</p><p class="empty-note search-archive-hint">${archive}</p>`;
 }
 function searchHitCounts(){
   const q = searchNeedle();
@@ -5847,7 +5952,10 @@ function searchHitCounts(){
     briefs: matchingBriefs().length,
     news: visibleNewsItems().length,
     videos: deskVideos().filter(v => videoHaystack(v).includes(q)).length,
-    writers: WRITERS.filter(w => w.topic===TOPIC && (matchingWriterArticle(w) || searchFold(w.name).includes(q))).length,
+    writers: WRITERS.filter(w => (frontPageMode
+        ? (frontPageDesks().length ? new Set(frontPageDesks()) : TOPIC_IDS).has(w.topic)  // as renderWriters
+        : w.topic===TOPIC)
+      && (matchingWriterArticle(w) || searchFold(w.name).includes(q))).length,
   };
 }
 function paintHomeViewLabel(id, label, count){
@@ -5920,7 +6028,6 @@ function clearRadarSearch(){
   setRadarSearch('');
 }
 function openRadarSearchField(){
-  if (frontPageMode) return;  // search is a desk tool; the front page hides it
   // The field lives in the view nav now, so it no longer depends on the ticker being
   // shown: a desk with no radar headlines is still searchable.
   const nav = $('homeViewNav');
