@@ -45,3 +45,7 @@ body{background:#fff;color:#000}
 main a{color:inherit}
 .writer-content{box-shadow:none}
 }
+.edition-refresh-bar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:90;display:inline-flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);padding:8px 10px 8px 16px;background:var(--card);color:var(--text);border:1px solid var(--accent);border-radius:999px;box-shadow:0 8px 24px var(--drawer-shadow);font-size:.82rem;line-height:1.25;white-space:nowrap}
+.edition-refresh-bar[hidden]{display:none}
+.edition-refresh-btn{flex:0 0 auto;min-height:30px;padding:5px 12px;border-radius:999px;background:var(--accent);color:var(--on-accent);font-size:.78rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center}
+@media(max-width:640px){.edition-refresh-bar{bottom:12px;gap:8px;padding:7px 9px 7px 13px;font-size:.78rem}.edition-refresh-btn{min-height:28px;padding:4px 10px;font-size:.74rem}}
