@@ -21,12 +21,13 @@ export const MARKETS_NAV_LABELS = {"tr":"Piyasalar","en":"Markets"} ;
 export const INTRADAY_LABELS = {"tr":{"1":"Sabah","2":"Öğle","3":"Akşam","4":"Gece"},"en":{"1":"Morning","2":"Midday","3":"Evening","4":"Night"}} ;
 export const TR_MONTHS = ["","Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"] ;
 export const EN_MONTHS = ["","January","February","March","April","May","June","July","August","September","October","November","December"] ;
-export const ORG_SAME_AS = ["https://x.com/eigenradar"] ;
-export const ORG_DESCRIPTION = {"tr":"Eigen Radar, yapay zekâ, jeopolitik, ekonomi ve piyasalar, bilim ve spor gündemini Türkçe ve İngilizce izleyen kaynak bağlantılı bağımsız bir derlemedir.","en":"Eigen Radar is an independent, source-linked Turkish and English digest covering AI, geopolitics, economics and markets, science, and sports."} ;
+export const ORG_SAME_AS = ["https://x.com/eigenradar","https://www.youtube.com/@eigenradar-tr","https://www.youtube.com/@eigenradar"] ;
+export const ORG_DESCRIPTION = {"tr":"Eigen Radar, yapay zekâ, jeopolitik, ekonomi ve piyasalar, bilim, spor ve sanat gündemini Türkçe ve İngilizce izleyen kaynak bağlantılı bağımsız bir derlemedir.","en":"Eigen Radar is an independent, source-linked Turkish and English digest covering artificial intelligence, geopolitics, economics & markets, science, sports, and arts."} ;
 export const ORG_FOUNDER_JOB_TITLE = {"tr":"Sorumlu Editör","en":"Editor of Record"} ;
 export const NEWS_CARD_STYLE = "\n.card{height:19rem;overflow:hidden}.card:has(.also-reported){height:auto;min-height:19rem}.card h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.card>p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.card .also-reported{margin-top:.35rem;color:var(--muted);font-size:.76rem;line-height:1.35}.card .also-reported a{display:inline;margin-top:0;font-size:inherit;font-weight:600}\n";
 export const TR_SOURCE_NAMES = {"Anadolu Agency":"Anadolu Ajansı","Anadolu Agency (AA)":"Anadolu Ajansı"} ;
 export const RENDERER_VERSION = "1";
+export const MEDIA_BASE = "https://media.eigenradar.com/";
 
 export const BASE_URL = "https://eigenradar.com";
 export const LANGS = ["tr", "en"];
@@ -135,6 +136,10 @@ export function topicBadge(topic, lang) {
 
 export function assetUrl(value) {
   return typeof value === "string" && BRIEF_ASSET.test(value) ? value : "";
+}
+
+export function mediaUrl(path) {
+  return absoluteUrl(MEDIA_BASE, path);
 }
 
 export function avatarUrl(value) {
@@ -1232,12 +1237,15 @@ export function shell({
   if (socialImage && typeof socialImage === "object") {
     socialSrc = assetUrl(socialImage.src) || avatarUrl(socialImage.src);
   }
+  const briefSocial = Boolean(socialSrc) && socialSrc === assetUrl(socialSrc);
   const socialWidth = socialImage ? positiveDimension(socialImage.width) : null;
   const socialHeight = socialImage ? positiveDimension(socialImage.height) : null;
   const socialAlt = socialImage ? text(socialImage.alt) : "";
-  const ogImage = socialSrc
-    ? new URL(socialSrc, canonical).toString()
-    : "https://eigenradar.com/assets/icon-512.png";
+  const ogImage = briefSocial
+    ? mediaUrl(socialSrc)
+    : socialSrc
+      ? new URL(socialSrc, canonical).toString()
+      : "https://eigenradar.com/assets/icon-512.png";
   const ogWidth = socialWidth || 512;
   const ogHeight = socialHeight || 512;
   const ogAlt = socialAlt || "Eigen Radar";
@@ -1270,7 +1278,14 @@ export function shell({
   const trUrl = lang === "tr" ? canonical : alternate;
   const enUrl = lang === "tr" ? alternate : canonical;
   const mainClass = collection ? "wrap page-collection" : "wrap page-detail";
-  const hasArticle = (graph?.["@graph"] || []).some((node) => node["@type"] === "Article");
+  // Brief and column pages carry one top-level Article node (NewsArticle appears only in a
+  // Brief's citations); its datePublished is the share card's publication time.
+  const articleNode = (graph?.["@graph"] || []).find((node) => node && node["@type"] === "Article");
+  const hasArticle = Boolean(articleNode);
+  const published = articleNode && typeof articleNode.datePublished === "string"
+    ? articleNode.datePublished.trim() : "";
+  const articleMeta = published
+    ? `\n<meta property="article:published_time" content="${esc(published, true)}">` : "";
   return `<!doctype html>
 <html lang="${lang}">
 <head>
@@ -1292,7 +1307,7 @@ ${extraHead}<link rel="search" type="application/opensearchdescription+xml" titl
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta property="og:type" content="${hasArticle ? "article" : "website"}">
+<meta property="og:type" content="${hasArticle ? "article" : "website"}">${articleMeta}
 <meta property="og:site_name" content="Eigen Radar">
 <meta property="og:url" content="${esc(canonical, true)}">
 <meta property="og:title" content="${esc(title, true)}">
@@ -1304,6 +1319,7 @@ ${extraHead}<link rel="search" type="application/opensearchdescription+xml" titl
 <meta property="og:image:height" content="${ogHeight}">
 <meta property="og:image:alt" content="${esc(ogAlt, true)}">
 <meta name="twitter:card" content="${twitterCard}">
+<meta name="twitter:site" content="@eigenradar">
 <link rel="stylesheet" href="/assets/site-pages.css">
 <style>${extraStyle}</style>
 <script type="application/ld+json">${jsonScript(graph)}</script>
@@ -1631,7 +1647,7 @@ export function renderBriefPage(payload, site, lang, opts = {}) {
     `${analysisHtml}\n${relatedColumns}\n${references}\n${hubChips}${relatedSection}</article></div>`;
   const image = payload.image && typeof payload.image === "object" ? payload.image : {};
   const imageSrc = assetUrl(image.src);
-  const imageUrl = imageSrc ? absoluteUrl(baseUrl, imageSrc) : null;
+  const imageUrl = imageSrc ? mediaUrl(imageSrc) : null;
   const citationUrls = [];
   const basedOn = [];
   for (const source of sources) {

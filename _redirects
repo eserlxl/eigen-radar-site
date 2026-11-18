@@ -3,6 +3,10 @@
 /assets/briefs/* https://media.eigenradar.com/assets/briefs/:splat 301
 /assets/videos/* https://media.eigenradar.com/assets/videos/:splat 301
 /about /tr/about/ 301
+/about.html /tr/about/ 301
+/en... /en/ 301
+# /about.html and the literal /en... are external links Search Console reported as 404
+# (export 2026-11-18); the site itself emits neither.
 
 # Edition-suffix /N/ column URLs are owned by the Worker after the SSR cutover: a
 # non-distinct slot 301s to the writer's base page and a published distinctColumn
