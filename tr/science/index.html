@@ -3221,6 +3221,12 @@ function briefMosaicColumns(count){
   // two rows; below 1200 px four left a stretched card alone in a third row (operator
   // 2026-11-18 14:19), so an exact five-column fit is taken from 960 px too.
   const exact = innerWidth >= 1200 ? options : [4, 5, 3];
+  // Operator 2026-11-19 11:52: an earlier front page (six Briefs, no video card: nine cells) fell
+  // to three huge columns over rows of three; every front page keeps the two-row mosaic, and the
+  // one cell left over widens the last card.
+  if (typeof frontPageMode !== 'undefined' && frontPageMode && exact.includes(Math.ceil(cells / 2))){
+    return Math.ceil(cells / 2);
+  }
   return exact.find(columns => cells % columns === 0 && cells / columns >= 2)
     || options.reduce((best, columns) =>
       ((columns - cells % columns) % columns) < ((best - cells % best) % best) ? columns : best);
@@ -6539,10 +6545,8 @@ $('briefsPrev').addEventListener('click', ()=>briefArrowStep(-1));
 $('briefsNext').addEventListener('click', ()=>briefArrowStep(1));
 let briefWheelGesture = 0;
 function handleDateWheel(event,targetForDirection,step){
-  // Operator 2026-11-18 14:19: on the front page a vertical wheel over the cards stepped back to
-  // the previous edition's front page instead of scrolling. The front page shows its own edition;
-  // the arrows, the date selector and a horizontal swipe still change it. Desks keep the wheel.
-  if (typeof frontPageMode !== 'undefined' && frontPageMode) return;
+  // Operator 2026-11-19 11:49: the front page steps editions with a vertical wheel over its cards,
+  // as the desks do; elsewhere the page scrolls.
   if (!BRIEF_REVEAL_MEDIA.matches || !event.deltaY
       || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
   const dir = event.deltaY > 0 ? -1 : 1;

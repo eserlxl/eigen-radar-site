@@ -1211,6 +1211,22 @@ function hubsHtml(lang, record, site) {
   return chips.length ? `<div class="hub-chips">${chips.join("")}</div>` : "";
 }
 
+// The index policy (site_pages.page_robots): with site.indexable present, a Brief or column page not on
+// that list renders noindex,follow; without it, every page is indexable as before.
+const INDEXABLE_SETS = new WeakMap();
+export function pageRobots(site, path) {
+  const list = site?.indexable;
+  if (!Array.isArray(list)) {
+    return "index,follow,max-image-preview:large";
+  }
+  let set = INDEXABLE_SETS.get(site);
+  if (!set) {
+    set = new Set(list);
+    INDEXABLE_SETS.set(site, set);
+  }
+  return set.has(path) ? "index,follow,max-image-preview:large" : "noindex,follow";
+}
+
 export function shell({
   lang,
   title,
@@ -1497,6 +1513,7 @@ export function renderArticlePage(payload, site, lang, opts = {}) {
     extraScript: WRITER_TOOLS_SCRIPT,
     extraHead: writerFeedLink,
     socialImage,
+    robots: pageRobots(site, path),
   });
 }
 
@@ -1745,5 +1762,6 @@ export function renderBriefPage(payload, site, lang, opts = {}) {
     extraStyle: BRIEF_DETAIL_STYLE,
     extraScript: `${BRIEF_IMAGE_TOGGLE_SCRIPT}\n${BRIEF_LISTEN_SCRIPT}\n${BRIEF_SHARE_SCRIPT}`,
     socialImage,
+    robots: pageRobots(site, path),
   });
 }
