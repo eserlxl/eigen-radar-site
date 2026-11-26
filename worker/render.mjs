@@ -1425,7 +1425,7 @@ export function renderArticlePage(payload, site, lang, opts = {}) {
     ? `<img src="${esc(avatar, true)}" width="64" height="64" loading="eager" decoding="async" alt="">`
     : "";
   const role = writerFocus(writer.role, lang);
-  const roleLine = [role, u.ai_persona, formatDate(payload.date, lang), editionLabel(payload, lang)]
+  const roleLine = [role, formatDate(payload.date, lang), editionLabel(payload, lang)]
     .filter(Boolean)
     .join(" · ");
   const badge = writerBadge(lang);
